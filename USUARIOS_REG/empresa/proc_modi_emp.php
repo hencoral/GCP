@@ -1,4 +1,4 @@
-<?
+<?php
 session_start();
 if(!isset($_SESSION["login"]))
 {
@@ -8,8 +8,10 @@ exit;
 ?>
 <?php
    include('../config.php');				
-   $connection = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
-   
+   global $server, $database, $dbpass, $dbuser, $charset;
+    // Conexion con la base de datos
+     $cx = new mysqli($server, $dbuser, $dbpass, $database);
+    
    	
    $id=$_POST['id']; 
    $raz_soc=$_POST['raz_soc'];    
@@ -40,14 +42,15 @@ exit;
    $nom_jefe_ppto=$_POST['nom_jefe_ppto'];    
    $ced_jefe_ppto=$_POST['ced_jefe_ppto']; 
    $tp_jefe_ppto=$_POST['tp_jefe_ppto'];    
-   $otr_resp=$_POST['otr_resp'];    
+   if(isset($_POST['otr_resp'])) $otr_resp=$_POST['otr_resp']; else $otr_resp=0;    
    $nom_otr_resp=$_POST['nom_otr_resp'];    
    $ced_otr_resp=$_POST['ced_otr_resp']; 
    $tp_otr_resp=$_POST['tp_otr_resp'];    
    $fut=$_POST['fut'];
    $cgr=$_POST['cgr']; 
     $otra_uni_eje=$_POST['otra_uni_eje']; 
-   $tipo_entidad=$_POST['tipo_entidad'];
+   
+   if(isset($_POST['tipo_entidad'])) $tipo_entidad=$_POST['tipo_entidad']; else $tipo_entidad=0;
    $regional=$_POST['regional'];
    $contratacion=$_POST['contratacion']; 
    $orden=$_POST['orden']; 
@@ -60,7 +63,7 @@ exit;
 	  
 	  	
 			$sql = "UPDATE empresa SET raz_soc='$raz_soc', nit='$nit', dv='$dv', cod_ins='$cod_ins', cod_cgn='$cod_cgn', cod_dep='$cod_dep', cod_mpio='$cod_mpio', dir='$dir', tel='$tel', fax='$fax', email='$email', web_site='$web_site', uni_eje='$uni_eje', nom_rep_leg='$nom_rep_leg', ced_rep_leg='$ced_rep_leg', tp_rep_leg='$tp_rep_leg', nom_cont='$nom_cont', ced_cont='$ced_cont', tp_cont='$tp_cont', nom_rev_fis='$nom_rev_fis', ced_rev_fis='$ced_rev_fis', tp_rev_fis='$tp_rev_fis', nom_ctrl_int='$nom_ctrl_int', ced_ctrl_int='$ced_ctrl_int', tp_ctrl_int='$tp_ctrl_int', nom_jefe_ppto='$nom_jefe_ppto', ced_jefe_ppto='$ced_jefe_ppto' , tp_jefe_ppto='$tp_jefe_ppto', otr_resp='$otr_resp' , nom_otr_resp='$nom_otr_resp', ced_otr_resp='$ced_otr_resp', tp_otr_resp='$tp_otr_resp', fut='$fut', cgr='$cgr', otra_uni_eje='$otra_uni_eje', tipo_entidad='$tipo_entidad', regional = '$regional', reg_contratacion ='$contratacion', orden='$orden',cargo_rep_leg='$cargo_rep_leg',cargo_conta='$cargo_conta',cargo_rev='$cargo_rev',cargo_ci='$cargo_ci',cargo_teso='$cargo_teso',cargo_ppto ='$cargo_ppto' WHERE cod_emp='$id' "; 
-			$resultado = mysql_db_query($database, $sql, $connection);
+			$resultado = $cx->query($sql);
 
 			echo "<span class='Estilo1'<br><br><br><center>Los Datos han sido Actualizados con &Eacute;xito<br><BR>";
   
@@ -102,6 +105,6 @@ a:active {
 .Estilo6 {color: #FFFFFF}
 -->
 </style> 
-<?
+<?php
 }
 ?>

@@ -36,14 +36,14 @@ if (!isset($_SESSION["login"])) {
 
 				var libre = document.getElementById('res_cdpp').value;
 				if (libre != 1) {
-					alert("El n�mero de CDP ya fue utilizado...");
+					alert("El número de CDP ya fue utilizado...");
 					document.getElementById('cdpp').select();
 					return false;
 				}
 
 				var des = document.getElementById('des').value;
 				if (des == '') {
-					alert("Por favor digite la descripci�n del CDP...");
+					alert("Por favor digite la descripción del CDP...");
 					document.getElementById('des').select();
 					return false;
 				}
@@ -170,8 +170,8 @@ if (!isset($_SESSION["login"])) {
 				}
 
 				fecha_ven = anio + "/" + mes + "/" + dia;
-				if (anio != '2019') {
-					fecha_ven = '2019/12/31';
+				if (anio != anio) {
+					fecha_ven = anio+'/12/31';
 				}
 				document.getElementById("fecha_ven").value = fecha_ven;
 			}

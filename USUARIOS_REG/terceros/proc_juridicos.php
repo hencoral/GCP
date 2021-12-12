@@ -33,10 +33,10 @@ if (!isset($_SESSION["login"])) {
 	$tel2 = $_POST['tel2'];
 	$fax2 = $_POST['fax2'];
 	$em2 = $_POST['email2'];
-	$contabilidad2 = $_POST['contabilidad2'];
-	$ppto2 = $_POST['ppto2'];
-	$tesoreria2 = $_POST['tesoreria2'];
-	$almacen2 = $_POST['almacen2'];
+	if(isset($_POST['contabilidad2']))	$contabilidad2 = $_POST['contabilidad2']; else $contabilidad2 = "";
+	if(isset($_POST['ppto2']))	$ppto2 = $_POST['ppto2']; else $ppto2 = "";
+	if(isset($_POST['tesoreria2']))	$tesoreria2 = $_POST['tesoreria2']; else $tesoreria2 = "";
+	if(isset($_POST['almacen2']))	$almacen2 = $_POST['almacen2']; else $almacen2 = "";
 	$pri_ape2 = $_POST['pri_ape2'];
 	$seg_ape2 = $_POST['seg_ape2'];
 	$pri_nom2 = $_POST['pri_nom2'];
@@ -45,7 +45,7 @@ if (!isset($_SESSION["login"])) {
 	$tel22 = $_POST['tel22'];
 	$fax22 = $_POST['fax22'];
 	$em22 = $_POST['email22'];
-	$interventor = $_POST['interventor'];
+	if(isset($_POST['interventor2']))	$interventor2 = $_POST['interventor2']; else $interventor2 = "";
 	$cree = $_POST['cree'];
 	$act_eco = $_POST['act_eco'];
 
@@ -69,7 +69,7 @@ if (!isset($_SESSION["login"])) {
 		</div>
 		</center>");
 		} else {
-			$sq = "INSERT INTO terceros_juridicos ( id_emp , fecha_reg , tip_id2 , num_id2 , dv2 , clase2 , regimen2 , ent_ofi2 , raz_soc2 , nom_com2 , pais2 , dpto2 , mpio2 , dir2 , tel2 , fax2 , em2 , contabilidad2 , ppto2 , tesoreria2 , almacen2 ,interventor, pri_ape2 , seg_ape2 , pri_nom2 , seg_nom2 , dir22 , tel22 , fax22 , em22) VALUES ( '$id_emp','$fecha_reg','$tip_id2','$num_id2','$dv2','$clase2','$regimen2','$ent_ofi2','$raz_soc2','$nom_com2','$pais2','$dpto2','$mpio2','$dir2','$tel2','$fax2','$em2','$contabilidad2','$ppto2','$tesoreria2','$almacen2','$interventor','$pri_ape2','$seg_ape2','$pri_nom2','$seg_nom2','$dir22','$tel22','$fax22','$em22')";
+			$sq = "INSERT INTO terceros_juridicos ( id_emp , fecha_reg , tip_id2 , num_id2 , dv2 , clase2 , regimen2 , ent_ofi2 , raz_soc2 , nom_com2 , pais2 , dpto2 , mpio2 , dir2 , tel2 , fax2 , em2 , contabilidad2 , ppto2 , tesoreria2 , almacen2 ,interventor, pri_ape2 , seg_ape2 , pri_nom2 , seg_nom2 , dir22 , tel22 , fax22 , em22) VALUES ( '$id_emp','$fecha_reg','$tip_id2','$num_id2','$dv2','$clase2','$regimen2','$ent_ofi2','$raz_soc2','$nom_com2','$pais2','$dpto2','$mpio2','$dir2','$tel2','$fax2','$em2','$contabilidad2','$ppto2','$tesoreria2','$almacen2','$interventor2','$pri_ape2','$seg_ape2','$pri_nom2','$seg_nom2','$dir22','$tel22','$fax22','$em22')";
 			$res = $cx->query($sq);
 			printf("<br><br><center class='Estilo4'>DATOS ALMACENADOS CON EXITO<br><br>");
 			printf("<div style='padding-left:3px; padding-top:3px; padding-right:3px; padding-bottom:3px; background:#004080;    	width:150px'>

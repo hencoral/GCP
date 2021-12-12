@@ -1,18 +1,19 @@
-<?
+<?php
 set_time_limit(150);
 session_start();
-if(!session_is_registered("login"))
+include('../config.php');
+global $server, $database, $dbpass, $dbuser, $charset;
+// Conexion con la base de datos
+$cx = new mysqli($server, $dbuser, $dbpass, $database);					// verifico permisos del usuario
+
+if(!isset($_SESSION["login"]))
 {
 header("Location: ../login.php");
 exit;
 } else {
-							// verifico permisos del usuario
-		include('../config.php');
-		$cx = mysql_connect("$server","$dbuser","$dbpass")or die ("Conexion no Exitosa");
-		mysql_select_db("$database"); 
-       	$sql="SELECT conta FROM usuarios2 where login = '$_SESSION[login]'";
-		$res=mysql_db_query($database,$sql,$cx);
-		$rw =mysql_fetch_array($res);
+   	$sql="SELECT conta FROM usuarios2 where login = '$_SESSION[login]'";
+		$res=$cx->query($sql);
+		$rw = mysqli_fetch_array($res);
 if ($rw['conta']=='SI')
 {
 
@@ -152,26 +153,20 @@ function VerFecha()
   </tr>
   <tr>
     <td>
-<?
-include('../config.php');
+<?php
 
-//**** variables para generacion dinamica
-
-$base=$database;
-$conexion=mysql_connect ($server, $dbuser, $dbpass);
 
 $sqlxx = "select * from fecha";
-$resultadoxx = mysql_db_query($base, $sqlxx, $conexion);
-while($rowxx = mysql_fetch_array($resultadoxx)) 
+$resultadoxx = $cx->query($sqlxx);
+while($rowxx = $resultadoxx->fetch_assoc())
 {  $idxx=$rowxx["id_emp"];  $id_emp=$rowxx["id_emp"];  }
 
 //**********************
 				
-$connectionxx = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
 $sqlxx = "select * from fecha";
-$resultadoxx = mysql_db_query($database, $sqlxx, $connectionxx);
+$resultadoxx = $cx->query($sqlxx);
 
-while($rowxx = mysql_fetch_array($resultadoxx)) 
+while($rowxx = $resultadoxx->fetch_assoc())
    {
    
    $idxx=$rowxx["id_emp"];
@@ -180,14 +175,15 @@ while($rowxx = mysql_fetch_array($resultadoxx))
  
    }
 $sq2 ="select nit from empresa where cod_emp=2";
-$res = mysql_db_query($database,$sq2,$connectionxx);
-$nit = mysql_fetch_array($res);
+$res = $cx->query($sq2);
+$nit = $res->fetch_array();
 
    
 $sqlxx3 = "select * from fecha_ini_op";
-$resultadoxx3 = mysql_db_query($database, $sqlxx3, $connectionxx);
+$resultadoxx3 = $cx->query($sqlxx3);
 
-while($rowxx3 = mysql_fetch_array($resultadoxx3)) 
+while($rowxx3 = $resultadoxx3->fetch_assoc())
+   
    {
    $desde=$rowxx3["fecha_ini_op"];
    }  
@@ -331,12 +327,11 @@ while($rowxx3 = mysql_fetch_array($resultadoxx3))
     <td><div style="padding-left:5px; padding-top:5px; padding-right:5px; padding-bottom:5px;">
       <div align="center"> <span class="Estilo4">Fecha de  esta Sesion:</span> <br />
           <span class="Estilo4"> <strong>
-          <? include('../config.php');				
-$connectionxx = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
+          <?php 				
 $sqlxx = "select * from fecha";
-$resultadoxx = mysql_db_query($database, $sqlxx, $connectionxx);
+$resultadoxx =$cx->query($sqlxx);
 
-while($rowxx = mysql_fetch_array($resultadoxx)) 
+while($rowxx = $resultadoxx->fetch_assoc())
 {
   $ano=$rowxx["ano"];
 }
@@ -355,7 +350,7 @@ echo $ano;
 
 
 
-<?
+<?php
 }else{ // si no tiene persisos de usuario
 	echo "<br><br><center>Usuario no tiene permisos en este m&oacute;dulo</center><br>";
 	echo "<center>Click <a href=\"../user.php\">aqu&iacute; para volver</a></center>";

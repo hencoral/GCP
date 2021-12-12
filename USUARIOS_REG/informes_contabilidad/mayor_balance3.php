@@ -1,7 +1,7 @@
 <?php
 set_time_limit(1200);
 session_start();
-if(!session_is_registered("login"))
+if(!isset($_SESSION["login"]))
 {
 header("Location: ../login.php");
 exit;
@@ -29,16 +29,21 @@ header("Expires: 0");
 $fec1 =$_GET['fec1'];
 $fec2 =$_GET['fec2'];
 include('../config.php');		
-$cx = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
-$sqlv = mysql_db_query($database,"select * from vf",$cx);
-while ($rwv = mysql_fetch_array($sqlv))
+global $server, $database, $dbpass, $dbuser, $charset;
+// Conexion con la base de datos
+$cx = new mysqli($server, $dbuser, $dbpass, $database);
+$sqlv = "select * from vf";
+$resv = $cx->query($sqlv);
+
+while ($rwv = $resv->fetch_array())
 	{
 		$fecha_ini = $rwv["fecha_ini"];
 	} 
 	$cod2 = explode("/", $fecha_ini);
 	$anno = $cod2[0]; 
-$sql1 = mysql_db_query($database,"select * from empresa",$cx);
-while ($rw1 = mysql_fetch_array($sql1))
+$sql1 = "select * from empresa";
+$res1 = $cx->query($sql1);
+while ($rw1 = $res1->fetch_assoc()) 
 	{
 		$entidad = $rw1["raz_soc"];
 		$nit = $rw1["nit"];
@@ -94,11 +99,9 @@ printf ("<table width='1380' border ='1' align='center' class='bordepunteado1'>
 		<td bgcolor='#DCE9E5' width='120' align='center' class='Estilo4'><b>Debito</b></td>
 		<td bgcolor='#DCE9E5' width='120' align='center' class='Estilo4'><b>Credito</b></td>
 		</tr>");
-include('../config.php');		
-$cx = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
 $sql = "select * from pgcp group by cod_pptal order by cod_pptal asc";
-$res = mysql_db_query($database, $sql, $cx) or die ($resultadoxx2 .mysql_error()."");
-while($row = mysql_fetch_array($res)) 
+$res = $cx->query($sql);
+while($row = $res->fetch_assoc())
 {
 	$ini_deb = 0;
 				$ini_cred = 0;
@@ -109,11 +112,11 @@ while($row = mysql_fetch_array($res))
 	$cuenta=$row["cod_pptal"];
 	$tip_dato=$row["tip_dato"];
 	$nivel=$row["nivel"];
-	$nombre=ereg_replace("[,;?]", "",$row["nom_rubro"]);
+	$nombre=mb_ereg_replace("[,;?]", "",$row["nom_rubro"]);
 	$nivel =strlen($cuenta);
 		$sq2 = "select sum(inicial_deb),sum(inicial_cred),sum(debito),sum(credito),sum(saldo_deb),sum(saldo_cred) from aux_contaduria_gral where cuenta like '$cuenta%'"; 	
-		$re2 = mysql_db_query($database,$sq2,$cx);
-		while ($rw2 = mysql_fetch_array($re2))
+		$re2 = $cx->query($sq2);
+		while ($rw2 = $re2->fetch_array())
 			{
 				$ini_deb = $rw2["sum(inicial_deb)"];
 				$ini_cred = $rw2["sum(inicial_cred)"];

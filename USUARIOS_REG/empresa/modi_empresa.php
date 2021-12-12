@@ -1,5 +1,9 @@
-<?
+<?php
 session_start();
+include('../config.php');
+global $server, $database, $dbpass, $dbuser, $charset;
+// Conexion con la base de datos
+$cx = new mysqli($server, $dbuser, $dbpass, $database);
 if(!isset($_SESSION["login"]))
 {
 header("Location: login.php");
@@ -62,7 +66,7 @@ table.bordepunteado1 { border-style: solid; border-collapse:collapse; border-wid
 </style>
 
 <script language="">
-<!--
+
 function cursor(){document.empresa.raz_soc.focus();}
 // -->
 </script>
@@ -125,7 +129,7 @@ function validar(e) {
         <td width="422" class="Estilo4">
 		<div id="main_div" style="padding-left:3px; padding-top:5px; padding-right:3px; padding-bottom:3px;">
 		<input name="id" type="hidden" value="<?php $a=$_GET['id1']; printf("%d", $a); ?>" size="40">
-		<input name="raz_soc" type="text" class="Estilo7" id="raz_soc" tabindex="0" size="40" onkeyup="empresa.raz_soc.value=empresa.raz_soc.value.toUpperCase();" value="<?php include('../config.php'); mysql_connect($server,$dbuser,$dbpass);   $a=$_GET['id1'];  $a1=mysql_query("select raz_soc from empresa where cod_emp = $a");  $result = @mysql_query($a1); while($row = mysql_fetch_array($a1)) { printf("%s", $row["raz_soc"]); }?>" />
+		<input name="raz_soc" type="text" class="Estilo7" id="raz_soc" tabindex="0" size="40" onkeyup="empresa.raz_soc.value=empresa.raz_soc.value.toUpperCase();" value="<?php   $a=$_GET['id1'];  $a1=$cx->query("select raz_soc from empresa where cod_emp = $a");  while($row = $a1->fetch_assoc()) { printf("%s", $row["raz_soc"]); }?>" />
 </div>		</td>
       </tr>
       <tr>
@@ -135,9 +139,9 @@ function validar(e) {
 		</div>		</td>
         <td class="Estilo4">
 		<div id="main_div" style="padding-left:3px; padding-top:5px; padding-right:3px; padding-bottom:3px;">
-		  <input name="nit" type="text" class="Estilo7" id="nit" tabindex="0" size="15" onkeypress="return validar(event)" value="<?php  mysql_connect($server,$dbuser,$dbpass);   $a=$_GET['id1'];  $a1=mysql_query("select nit from empresa where cod_emp = $a");  $result = @mysql_query($a1); while($row = mysql_fetch_array($a1)) { printf("%d", $row["nit"]); }  ?>" /> 
+		  <input name="nit" type="text" class="Estilo7" id="nit" tabindex="0" size="15" onkeypress="return validar(event)" value="<?php   $a=$_GET['id1'];  $a1=$cx->query("select nit from empresa where cod_emp = $a");   while($row = $a1->fetch_assoc()) { printf("%d", $row["nit"]); }  ?>" /> 
 		  <span class="Estilo8">..</span> DV
-          <input name="dv" type="text" class="Estilo4" id="dv" size="4" value="<?php  mysql_connect($server,$dbuser,$dbpass);   $a=$_GET['id1'];  $a1=mysql_query("select dv from empresa where cod_emp = $a");  $result = @mysql_query($a1); while($row = mysql_fetch_array($a1)) { printf("%d", $row["dv"]); }  ?>" />
+          <input name="dv" type="text" class="Estilo4" id="dv" size="4" value="<?php   $a=$_GET['id1'];  $a1=$cx->query("select dv from empresa where cod_emp = $a");  while($row = $a1->fetch_assoc()) { printf("%d", $row["dv"]); }  ?>" />
 		0 - 9 </div>		</td>
       </tr>
       <tr>
@@ -147,7 +151,7 @@ function validar(e) {
 		</div>		</td>
         <td class="Estilo4">
 		<div id="main_div" style="padding-left:3px; padding-top:5px; padding-right:3px; padding-bottom:3px;">
-		  <input name="cod_ins" type="text" class="Estilo7" id="cod_ins" tabindex="0" size="15" onkeyup="empresa.cod_ins.value=empresa.cod_ins.value.toUpperCase();" value="<?php  mysql_connect($server,$dbuser,$dbpass);   $a=$_GET['id1'];  $a1=mysql_query("select cod_ins from empresa where cod_emp = $a");  $result = @mysql_query($a1); while($row = mysql_fetch_array($a1)) { printf("%s", $row["cod_ins"]); }  ?>" />
+		  <input name="cod_ins" type="text" class="Estilo7" id="cod_ins" tabindex="0" size="15" onkeyup="empresa.cod_ins.value=empresa.cod_ins.value.toUpperCase();" value="<?php  $a=$_GET['id1'];  $a1=$cx->query("select cod_ins from empresa where cod_emp = $a");   while($row = $a1->fetch_assoc()) { printf("%s", $row["cod_ins"]); }  ?>" />
 </div>		</td>
       </tr>
 	  <tr>
@@ -157,7 +161,7 @@ function validar(e) {
 		</div>		</td>
         <td class="Estilo4">
 		<div id="main_div" style="padding-left:3px; padding-top:5px; padding-right:3px; padding-bottom:3px;">
-		  <input name="cod_cgn" type="text" class="Estilo7" id="cod_cgn" tabindex="0" size="15" onkeyup="empresa.cod_cgn.value=empresa.cod_cgn.value.toUpperCase();" value="<?php  mysql_connect($server,$dbuser,$dbpass);   $a=$_GET['id1'];  $a1=mysql_query("select cod_cgn from empresa where cod_emp = $a");  $result = @mysql_query($a1); while($row = mysql_fetch_array($a1)) { printf("%s", $row["cod_cgn"]); }  ?>" />
+		  <input name="cod_cgn" type="text" class="Estilo7" id="cod_cgn" tabindex="0" size="15" onkeyup="empresa.cod_cgn.value=empresa.cod_cgn.value.toUpperCase();" value="<?php  $a=$_GET['id1'];  $a1=$cx->query("select cod_cgn from empresa where cod_emp = $a");   while($row = $a1->fetch_assoc()) { printf("%s", $row["cod_cgn"]); }  ?>" />
 </div>		</td>
       </tr>
 	  <tr>
@@ -252,7 +256,7 @@ function validar(e) {
 		</div>		</td>
         <td class="Estilo4">
 		<div id="main_div" style="padding-left:3px; padding-top:5px; padding-right:3px; padding-bottom:3px;">
-		  <input name="dir" type="text" class="Estilo7" id="dir" tabindex="0" size="40" onkeyup="empresa.dir.value=empresa.dir.value.toUpperCase();" value="<?php  mysql_connect($server,$dbuser,$dbpass);   $a=$_GET['id1'];  $a1=mysql_query("select dir from empresa where cod_emp = $a");  $result = @mysql_query($a1); while($row = mysql_fetch_array($a1)) { printf("%s", $row["dir"]); }  ?>" />
+		  <input name="dir" type="text" class="Estilo7" id="dir" tabindex="0" size="40" onkeyup="empresa.dir.value=empresa.dir.value.toUpperCase();" value="<?php    $a=$_GET['id1'];  $a1=$cx->query("select dir from empresa where cod_emp = $a");   while($row = $a1->fetch_assoc()) { printf("%s", $row["dir"]); }  ?>" />
 </div>		</td>
       </tr>
       <tr>
@@ -262,7 +266,7 @@ function validar(e) {
 		</div>		</td>
         <td class="Estilo4">
 		<div id="main_div" style="padding-left:3px; padding-top:5px; padding-right:3px; padding-bottom:3px;">
-		  <input name="tel" type="text" class="Estilo7" id="tel" tabindex="0" size="15" onkeypress="return validar(event)" value="<?php  mysql_connect($server,$dbuser,$dbpass);   $a=$_GET['id1'];  $a1=mysql_query("select tel from empresa where cod_emp = $a");  $result = @mysql_query($a1); while($row = mysql_fetch_array($a1)) { printf("%s", $row["tel"]); }  ?>"/>
+		  <input name="tel" type="text" class="Estilo7" id="tel" tabindex="0" size="15" onkeypress="return validar(event)" value="<?php    $a=$_GET['id1'];  $a1=$cx->query("select tel from empresa where cod_emp = $a");   while($row = $a1->fetch_assoc()) { printf("%s", $row["tel"]); }  ?>"/>
 </div>		</td>
       </tr>
       <tr>
@@ -272,7 +276,7 @@ function validar(e) {
 		</div>		</td>
         <td class="Estilo4">
 		<div id="main_div" style="padding-left:3px; padding-top:5px; padding-right:3px; padding-bottom:3px;">
-		  <input name="fax" type="text" class="Estilo7" id="fax" tabindex="0" size="15" onkeypress="return validar(event)" value="<?php  mysql_connect($server,$dbuser,$dbpass);   $a=$_GET['id1'];  $a1=mysql_query("select fax from empresa where cod_emp = $a");  $result = @mysql_query($a1); while($row = mysql_fetch_array($a1)) { printf("%s", $row["fax"]); }  ?>" />
+		  <input name="fax" type="text" class="Estilo7" id="fax" tabindex="0" size="15" onkeypress="return validar(event)" value="<?php    $a=$_GET['id1'];  $a1=$cx->query("select fax from empresa where cod_emp = $a");   while($row = $a1->fetch_assoc()) { printf("%s", $row["fax"]); }  ?>" />
 </div>		</td>
       </tr>
       <tr>
@@ -282,7 +286,7 @@ function validar(e) {
 		</div>		</td>
         <td class="Estilo4">
 		<div id="main_div" style="padding-left:3px; padding-top:5px; padding-right:3px; padding-bottom:3px;">
-		  <input name="email" type="text" class="Estilo7" id="email" tabindex="0" size="40" value="<?php  mysql_connect($server,$dbuser,$dbpass);   $a=$_GET['id1'];  $a1=mysql_query("select email from empresa where cod_emp = $a");  $result = @mysql_query($a1); while($row = mysql_fetch_array($a1)) { printf("%s", $row["email"]); }  ?>"/>
+		  <input name="email" type="text" class="Estilo7" id="email" tabindex="0" size="40" value="<?php    $a=$_GET['id1'];  $a1=$cx->query("select email from empresa where cod_emp = $a");   while($row = $a1->fetch_assoc()) { printf("%s", $row["email"]); }  ?>"/>
 </div>		</td>
       </tr>
       <tr>
@@ -292,7 +296,7 @@ function validar(e) {
 		</div>		</td>
         <td class="Estilo4">
 		<div id="main_div" style="padding-left:3px; padding-top:5px; padding-right:3px; padding-bottom:3px;">
-		  <input name="web_site" type="text" class="Estilo7" id="web_site" tabindex="0" size="40" value="<?php  mysql_connect($server,$dbuser,$dbpass);   $a=$_GET['id1'];  $a1=mysql_query("select web_site from empresa where cod_emp = $a");  $result = @mysql_query($a1); while($row = mysql_fetch_array($a1)) { printf("%s", $row["web_site"]); }  ?>"/>
+		  <input name="web_site" type="text" class="Estilo7" id="web_site" tabindex="0" size="40" value="<?php    $a=$_GET['id1'];  $a1=$cx->query("select web_site from empresa where cod_emp = $a");   while($row = $a1->fetch_assoc()) { printf("%s", $row["web_site"]); }  ?>"/>
 </div>		</td>
       </tr>
 	  <tr>
@@ -314,13 +318,10 @@ function validar(e) {
       </tr>
 	  
 	<?php 
-	include('../config.php');				
-	$cx = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
 	$sqlx = "select * from empresa where cod_emp = $a";
-	$rx = mysql_db_query($database, $sqlx, $cx);
+	$rx = $cx->query($sqlx);
 
-	while($rwx = mysql_fetch_array($rx)) 
-   	{
+	while($rwx = $rx->fetch_assoc()){
    
    	$otra_uni_eje=$rwx["otra_uni_eje"];
    	$tipo_entidad=$rwx["tipo_entidad"];
@@ -446,6 +447,7 @@ function validar(e) {
 		     <select name="orden" class="Estilo4" id="orden">
              
               <?php 
+			  $orden =0;
 			 $k=0;
 			  $datos = array("","NACIONAL","DEPARTAMENTAL","MUNICIPAL");
 			  for ($k=0;$k<4;$k++)
@@ -546,18 +548,18 @@ function validar(e) {
               </div></td>
               <td><div id="div10" style="padding-left:3px; padding-top:5px; padding-right:3px; padding-bottom:3px;">
                 <div align="center">
-                  <input name="nom_rep_leg" type="text" class="Estilo4" id="nom_rep_leg" size="35" onkeyup="empresa.nom_rep_leg.value=empresa.nom_rep_leg.value.toUpperCase();" value="<?php  mysql_connect($server,$dbuser,$dbpass);   $a=$_GET['id1'];  $a1=mysql_query("select nom_rep_leg from empresa where cod_emp = $a");  $result = @mysql_query($a1); while($row = mysql_fetch_array($a1)) { printf("%s", $row["nom_rep_leg"]); }  ?>" />
+                  <input name="nom_rep_leg" type="text" class="Estilo4" id="nom_rep_leg" size="35" onkeyup="empresa.nom_rep_leg.value=empresa.nom_rep_leg.value.toUpperCase();" value="<?php    $a=$_GET['id1'];  $a1=$cx->query("select nom_rep_leg from empresa where cod_emp = $a");   while($row = $a1->fetch_assoc()) { printf("%s", $row["nom_rep_leg"]); }  ?>" />
                 </div>
               </div></td>
               <td><div id="div27" style="padding-left:3px; padding-top:5px; padding-right:3px; padding-bottom:3px;">
                 <div align="center">
-                  <input name="ced_rep_leg" type="text" class="Estilo4" id="ced_rep_leg" onkeypress="return validar(event)" size="16" value="<?php  mysql_connect($server,$dbuser,$dbpass);   $a=$_GET['id1'];  $a1=mysql_query("select ced_rep_leg from empresa where cod_emp = $a");  $result = @mysql_query($a1); while($row = mysql_fetch_array($a1)) { printf("%s", $row["ced_rep_leg"]); }  ?>" />
+                  <input name="ced_rep_leg" type="text" class="Estilo4" id="ced_rep_leg" onkeypress="return validar(event)" size="16" value="<?php    $a=$_GET['id1'];  $a1=$cx->query("select ced_rep_leg from empresa where cod_emp = $a");   while($row = $a1->fetch_assoc()) { printf("%s", $row["ced_rep_leg"]); }  ?>" />
                 </div>
               </div></td>
               <td><div id="div16" style="padding-left:3px; padding-top:5px; padding-right:3px; padding-bottom:3px;">
                 
                   <div align="center">
-                    <input name="tp_rep_leg" type="text" class="Estilo4" id="tp_rep_leg" onkeypress="return validar(event)" size="16" value="<?php  mysql_connect($server,$dbuser,$dbpass);   $a=$_GET['id1'];  $a1=mysql_query("select tp_rep_leg from empresa where cod_emp = $a");  $result = @mysql_query($a1); while($row = mysql_fetch_array($a1)) { printf("%s", $row["tp_rep_leg"]); }  ?>"/>
+                    <input name="tp_rep_leg" type="text" class="Estilo4" id="tp_rep_leg" onkeypress="return validar(event)" size="16" value="<?php    $a=$_GET['id1'];  $a1=$cx->query("select tp_rep_leg from empresa where cod_emp = $a");   while($row = $a1->fetch_assoc()) { printf("%s", $row["tp_rep_leg"]); }  ?>"/>
                     </div>
               </div></td>
               <td><input name="cargo_rep_leg" type="text" class="Estilo4" id="cargo_rep_leg" size="40" value='<?php echo $cargo_rep_leg; ?>' /></td>
@@ -568,18 +570,18 @@ function validar(e) {
               </div></td>
               <td><div id="div11" style="padding-left:3px; padding-top:5px; padding-right:3px; padding-bottom:3px;">
                 <div align="center">
-                  <input name="nom_cont" type="text" class="Estilo4" id="nom_cont" size="35" onkeyup="empresa.nom_cont.value=empresa.nom_cont.value.toUpperCase();" value="<?php  mysql_connect($server,$dbuser,$dbpass);   $a=$_GET['id1'];  $a1=mysql_query("select nom_cont from empresa where cod_emp = $a");  $result = @mysql_query($a1); while($row = mysql_fetch_array($a1)) { printf("%s", $row["nom_cont"]); }  ?>" />
+                  <input name="nom_cont" type="text" class="Estilo4" id="nom_cont" size="35" onkeyup="empresa.nom_cont.value=empresa.nom_cont.value.toUpperCase();" value="<?php    $a=$_GET['id1'];  $a1=$cx->query("select nom_cont from empresa where cod_emp = $a");   while($row = $a1->fetch_assoc()) { printf("%s", $row["nom_cont"]); }  ?>" />
                 </div>
               </div></td>
               <td><div id="div26" style="padding-left:3px; padding-top:5px; padding-right:3px; padding-bottom:3px;">
                 <div align="center">
-                  <input name="ced_cont" type="text" class="Estilo4" id="ced_cont" onkeypress="return validar(event)" size="16" value="<?php  mysql_connect($server,$dbuser,$dbpass);   $a=$_GET['id1'];  $a1=mysql_query("select ced_cont from empresa where cod_emp = $a");  $result = @mysql_query($a1); while($row = mysql_fetch_array($a1)) { printf("%s", $row["ced_cont"]); }  ?>"/>
+                  <input name="ced_cont" type="text" class="Estilo4" id="ced_cont" onkeypress="return validar(event)" size="16" value="<?php    $a=$_GET['id1'];  $a1=$cx->query("select ced_cont from empresa where cod_emp = $a");   while($row = $a1->fetch_assoc()) { printf("%s", $row["ced_cont"]); }  ?>"/>
                 </div>
               </div></td>
               <td><div id="div17" style="padding-left:3px; padding-top:5px; padding-right:3px; padding-bottom:3px;">
                 
                   <div align="center">
-                    <input name="tp_cont" type="text" class="Estilo4" id="tp_cont" onkeypress="return validar(event)" size="16" value="<?php  mysql_connect($server,$dbuser,$dbpass);   $a=$_GET['id1'];  $a1=mysql_query("select tp_cont from empresa where cod_emp = $a");  $result = @mysql_query($a1); while($row = mysql_fetch_array($a1)) { printf("%s", $row["tp_cont"]); }  ?>"/>
+                    <input name="tp_cont" type="text" class="Estilo4" id="tp_cont" onkeypress="return validar(event)" size="16" value="<?php    $a=$_GET['id1'];  $a1=$cx->query("select tp_cont from empresa where cod_emp = $a");   while($row = $a1->fetch_assoc()) { printf("%s", $row["tp_cont"]); }  ?>"/>
                     </div>
               </div></td>
               <td><input name="cargo_conta" type="text" class="Estilo4" id="cargo_conta" size="40" value='<?php echo $cargo_conta; ?>' /></td>
@@ -590,18 +592,18 @@ function validar(e) {
               </div></td>
               <td><div id="div12" style="padding-left:3px; padding-top:5px; padding-right:3px; padding-bottom:3px;">
                 <div align="center">
-                  <input name="nom_rev_fis" type="text" class="Estilo4" id="nom_rev_fis" size="35" onkeyup="empresa.nom_rev_fis.value=empresa.nom_rev_fis.value.toUpperCase();" value="<?php  mysql_connect($server,$dbuser,$dbpass);   $a=$_GET['id1'];  $a1=mysql_query("select nom_rev_fis from empresa where cod_emp = $a");  $result = @mysql_query($a1); while($row = mysql_fetch_array($a1)) { printf("%s", $row["nom_rev_fis"]); }  ?>" />
+                  <input name="nom_rev_fis" type="text" class="Estilo4" id="nom_rev_fis" size="35" onkeyup="empresa.nom_rev_fis.value=empresa.nom_rev_fis.value.toUpperCase();" value="<?php    $a=$_GET['id1'];  $a1=$cx->query("select nom_rev_fis from empresa where cod_emp = $a");   while($row = $a1->fetch_assoc()) { printf("%s", $row["nom_rev_fis"]); }  ?>" />
                 </div>
               </div></td>
               <td><div id="div25" style="padding-left:3px; padding-top:5px; padding-right:3px; padding-bottom:3px;">
                 <div align="center">
-                  <input name="ced_rev_fis" type="text" class="Estilo4" id="ced_rev_fis" onkeypress="return validar(event)" size="16" value="<?php  mysql_connect($server,$dbuser,$dbpass);   $a=$_GET['id1'];  $a1=mysql_query("select ced_rev_fis from empresa where cod_emp = $a");  $result = @mysql_query($a1); while($row = mysql_fetch_array($a1)) { printf("%s", $row["ced_rev_fis"]); }  ?>"/>
+                  <input name="ced_rev_fis" type="text" class="Estilo4" id="ced_rev_fis" onkeypress="return validar(event)" size="16" value="<?php    $a=$_GET['id1'];  $a1=$cx->query("select ced_rev_fis from empresa where cod_emp = $a");   while($row = $a1->fetch_assoc()) { printf("%s", $row["ced_rev_fis"]); }  ?>"/>
                 </div>
               </div></td>
               <td><div id="div18" style="padding-left:3px; padding-top:5px; padding-right:3px; padding-bottom:3px;">
                 
                   <div align="center">
-                    <input name="tp_rev_fis" type="text" class="Estilo4" id="tp_rev_fis" onkeypress="return validar(event)" size="16" value="<?php  mysql_connect($server,$dbuser,$dbpass);   $a=$_GET['id1'];  $a1=mysql_query("select tp_rev_fis from empresa where cod_emp = $a");  $result = @mysql_query($a1); while($row = mysql_fetch_array($a1)) { printf("%s", $row["tp_rev_fis"]); }  ?>" />
+                    <input name="tp_rev_fis" type="text" class="Estilo4" id="tp_rev_fis" onkeypress="return validar(event)" size="16" value="<?php    $a=$_GET['id1'];  $a1=$cx->query("select tp_rev_fis from empresa where cod_emp = $a");   while($row = $a1->fetch_assoc()) { printf("%s", $row["tp_rev_fis"]); }  ?>" />
                     </div>
               </div></td>
               <td><input name="cargo_rev" type="text" class="Estilo4" id="cargo_rev" size="40" value='<?php echo $cargo_rev; ?>' /></td>
@@ -612,18 +614,18 @@ function validar(e) {
               </div></td>
               <td><div id="div13" style="padding-left:3px; padding-top:5px; padding-right:3px; padding-bottom:3px;">
                 <div align="center">
-                  <input name="nom_ctrl_int" type="text" class="Estilo4" id="nom_ctrl_int" size="35" onkeyup="empresa.nom_ctrl_int.value=empresa.nom_ctrl_int.value.toUpperCase();" value="<?php  mysql_connect($server,$dbuser,$dbpass);   $a=$_GET['id1'];  $a1=mysql_query("select nom_ctrl_int from empresa where cod_emp = $a");  $result = @mysql_query($a1); while($row = mysql_fetch_array($a1)) { printf("%s", $row["nom_ctrl_int"]); }  ?>" />
+                  <input name="nom_ctrl_int" type="text" class="Estilo4" id="nom_ctrl_int" size="35" onkeyup="empresa.nom_ctrl_int.value=empresa.nom_ctrl_int.value.toUpperCase();" value="<?php    $a=$_GET['id1'];  $a1=$cx->query("select nom_ctrl_int from empresa where cod_emp = $a");   while($row = $a1->fetch_assoc()) { printf("%s", $row["nom_ctrl_int"]); }  ?>" />
                 </div>
               </div></td>
               <td><div id="div24" style="padding-left:3px; padding-top:5px; padding-right:3px; padding-bottom:3px;">
                 <div align="center">
-                  <input name="ced_ctrl_int" type="text" class="Estilo4" id="ced_ctrl_int" onkeypress="return validar(event)" size="16" value="<?php  mysql_connect($server,$dbuser,$dbpass);   $a=$_GET['id1'];  $a1=mysql_query("select ced_ctrl_int from empresa where cod_emp = $a");  $result = @mysql_query($a1); while($row = mysql_fetch_array($a1)) { printf("%s", $row["ced_ctrl_int"]); }  ?>"/>
+                  <input name="ced_ctrl_int" type="text" class="Estilo4" id="ced_ctrl_int" onkeypress="return validar(event)" size="16" value="<?php    $a=$_GET['id1'];  $a1=$cx->query("select ced_ctrl_int from empresa where cod_emp = $a");   while($row = $a1->fetch_assoc()) { printf("%s", $row["ced_ctrl_int"]); }  ?>"/>
                 </div>
               </div></td>
               <td><div id="div19" style="padding-left:3px; padding-top:5px; padding-right:3px; padding-bottom:3px;">
                 
                   <div align="center">
-                    <input name="tp_ctrl_int" type="text" class="Estilo4" id="tp_ctrl_int" onkeypress="return validar(event)" size="16" value="<?php  mysql_connect($server,$dbuser,$dbpass);   $a=$_GET['id1'];  $a1=mysql_query("select tp_ctrl_int from empresa where cod_emp = $a");  $result = @mysql_query($a1); while($row = mysql_fetch_array($a1)) { printf("%s", $row["tp_ctrl_int"]); }  ?>"/>
+                    <input name="tp_ctrl_int" type="text" class="Estilo4" id="tp_ctrl_int" onkeypress="return validar(event)" size="16" value="<?php    $a=$_GET['id1'];  $a1=$cx->query("select tp_ctrl_int from empresa where cod_emp = $a");   while($row = $a1->fetch_assoc()) { printf("%s", $row["tp_ctrl_int"]); }  ?>"/>
                     </div>
               </div></td>
               <td><input name="cargo_ci" type="text" class="Estilo4" id="cargo_ci" size="40"  value='<?php echo $cargo_ci; ?>' /></td>
@@ -634,18 +636,18 @@ function validar(e) {
               </div></td>
               <td><div id="div14" style="padding-left:3px; padding-top:5px; padding-right:3px; padding-bottom:3px;">
                 <div align="center">
-                  <input name="nom_jefe_ppto" type="text" class="Estilo4" id="nom_jefe_ppto" size="35" onkeyup="empresa.nom_jefe_ppto.value=empresa.nom_jefe_ppto.value.toUpperCase();" value="<?php  mysql_connect($server,$dbuser,$dbpass);   $a=$_GET['id1'];  $a1=mysql_query("select nom_jefe_ppto from empresa where cod_emp = $a");  $result = @mysql_query($a1); while($row = mysql_fetch_array($a1)) { printf("%s", $row["nom_jefe_ppto"]); }  ?>" />
+                  <input name="nom_jefe_ppto" type="text" class="Estilo4" id="nom_jefe_ppto" size="35" onkeyup="empresa.nom_jefe_ppto.value=empresa.nom_jefe_ppto.value.toUpperCase();" value="<?php    $a=$_GET['id1'];  $a1=$cx->query("select nom_jefe_ppto from empresa where cod_emp = $a");   while($row = $a1->fetch_assoc()) { printf("%s", $row["nom_jefe_ppto"]); }  ?>" />
                 </div>
               </div></td>
               <td><div id="div23" style="padding-left:3px; padding-top:5px; padding-right:3px; padding-bottom:3px;">
                 <div align="center">
-                  <input name="ced_jefe_ppto" type="text" class="Estilo4" id="ced_jefe_ppto" onkeypress="return validar(event)" size="16" value="<?php  mysql_connect($server,$dbuser,$dbpass);   $a=$_GET['id1'];  $a1=mysql_query("select ced_jefe_ppto from empresa where cod_emp = $a");  $result = @mysql_query($a1); while($row = mysql_fetch_array($a1)) { printf("%s", $row["ced_jefe_ppto"]); }  ?>" />
+                  <input name="ced_jefe_ppto" type="text" class="Estilo4" id="ced_jefe_ppto" onkeypress="return validar(event)" size="16" value="<?php    $a=$_GET['id1'];  $a1=$cx->query("select ced_jefe_ppto from empresa where cod_emp = $a");   while($row = $a1->fetch_assoc()) { printf("%s", $row["ced_jefe_ppto"]); }  ?>" />
                 </div>
               </div></td>
               <td><div id="div20" style="padding-left:3px; padding-top:5px; padding-right:3px; padding-bottom:3px;">
                 
                   <div align="center">
-                    <input name="tp_jefe_ppto" type="text" class="Estilo4" id="tp_jefe_ppto" onkeypress="return validar(event)" size="16" value="<?php  mysql_connect($server,$dbuser,$dbpass);   $a=$_GET['id1'];  $a1=mysql_query("select tp_jefe_ppto from empresa where cod_emp = $a");  $result = @mysql_query($a1); while($row = mysql_fetch_array($a1)) { printf("%s", $row["tp_jefe_ppto"]); }  ?>"/>
+                    <input name="tp_jefe_ppto" type="text" class="Estilo4" id="tp_jefe_ppto" onkeypress="return validar(event)" size="16" value="<?php    $a=$_GET['id1'];  $a1=$cx->query("select tp_jefe_ppto from empresa where cod_emp = $a");   while($row = $a1->fetch_assoc()) { printf("%s", $row["tp_jefe_ppto"]); }  ?>"/>
                     </div>
               </div></td>
               <td><input name="cargo_ppto" type="text" class="Estilo4" id="cargo_ppto" size="40"  value='<?php echo $cargo_ppto; ?>' /></td>
@@ -657,19 +659,19 @@ function validar(e) {
                   <td  valign="middle"><div id="div15" style="padding-left:0px; padding-top:5px; padding-right:0px; padding-bottom:3px;">
                     
                       <div align="center">
-                        <input name="nom_otr_resp" type="text" class="Estilo4" id="nom_otr_resp" size="35" onkeyup="empresa.nom_otr_resp.value=empresa.nom_otr_resp.value.toUpperCase();" value="<?php  mysql_connect($server,$dbuser,$dbpass);   $a=$_GET['id1'];  $a1=mysql_query("select nom_otr_resp from empresa where cod_emp = $a");  $result = @mysql_query($a1); while($row = mysql_fetch_array($a1)) { printf("%s", $row["nom_otr_resp"]); }  ?>" />
+                        <input name="nom_otr_resp" type="text" class="Estilo4" id="nom_otr_resp" size="35" onkeyup="empresa.nom_otr_resp.value=empresa.nom_otr_resp.value.toUpperCase();" value="<?php  $a=$_GET['id1'];  $a1=$cx->query("select nom_otr_resp from empresa where cod_emp = $a");   while($row = $a1->fetch_assoc()) { printf("%s", $row["nom_otr_resp"]); }  ?>" />
                       </div>
                   </div></td>
                   <td  valign="middle"><div id="div21" style="padding-left:0px; padding-top:5px; padding-right:0px; padding-bottom:3px;">
                     
                       <div align="center">
-                        <input name="ced_otr_resp" type="text" class="Estilo4" id="ced_otr_resp" onkeypress="return validar(event)" size="16" value="<?php  mysql_connect($server,$dbuser,$dbpass);   $a=$_GET['id1'];  $a1=mysql_query("select ced_otr_resp from empresa where cod_emp = $a");  $result = @mysql_query($a1); while($row = mysql_fetch_array($a1)) { printf("%s", $row["ced_otr_resp"]); }  ?>"/>
+                        <input name="ced_otr_resp" type="text" class="Estilo4" id="ced_otr_resp" onkeypress="return validar(event)" size="16" value="<?php    $a=$_GET['id1'];  $a1=$cx->query("select ced_otr_resp from empresa where cod_emp = $a");   while($row = $a1->fetch_assoc()) { printf("%s", $row["ced_otr_resp"]); }  ?>"/>
                       </div>
                   </div></td>
                   <td  valign="middle"><div id="div22" style="padding-left:0px; padding-top:5px; padding-right:0px; padding-bottom:3px;">
                     
                       <div align="center">
-                        <input name="tp_otr_resp" type="text" class="Estilo4" id="tp_otr_resp" onkeypress="return validar(event)" size="16" value="<?php  mysql_connect($server,$dbuser,$dbpass);   $a=$_GET['id1'];  $a1=mysql_query("select tp_otr_resp from empresa where cod_emp = $a");  $result = @mysql_query($a1); while($row = mysql_fetch_array($a1)) { printf("%s", $row["tp_otr_resp"]); }  ?>"/>
+                        <input name="tp_otr_resp" type="text" class="Estilo4" id="tp_otr_resp" onkeypress="return validar(event)" size="16" value="<?php    $a=$_GET['id1'];  $a1=$cx->query("select tp_otr_resp from empresa where cod_emp = $a");   while($row = $a1->fetch_assoc()) { printf("%s", $row["tp_otr_resp"]); }  ?>"/>
                         </div>
                   </div></td>
                   <td><input name="cargo_teso" type="text" class="Estilo4" id="cargo_teso" size="40" value='<?php echo $cargo_teso; ?>' /></td>
@@ -679,12 +681,9 @@ function validar(e) {
             <tr>
               <td colspan="4"><?php
 //-------
-include('../config.php');				
-$connection = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
 $sql = "select * from fecha";
-$resultado = mysql_db_query($database, $sql, $connection);
-
-while($row = mysql_fetch_array($resultado)) 
+$resultado = $cx->query($sql);
+while($row = $resultado->fetch_assoc())
    {
 printf(" <input name='ano' id='ano' type='hidden' value='%s' />", $row["ano"]);  
    }
@@ -703,19 +702,19 @@ printf(" <input name='ano' id='ano' type='hidden' value='%s' />", $row["ano"]);
               <td colspan="5"><div style="padding-left:5px; padding-top:5px; padding-right:5px; padding-bottom:5px;">
                 <div align="center"> Fecha de  esta Sesion: <br />
                     <strong>
-                    <? include('../config.php');				
-$connectionxx = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
+                    <?php			
 $sqlxx = "select * from fecha";
-$resultadoxx = mysql_db_query($database, $sqlxx, $connectionxx);
+$resultadoxx = $cx->query($sqlxx);
 
-while($rowxx = mysql_fetch_array($resultadoxx)) 
+while($rowxx = $resultadoxx->fetch_assoc())
+   
 {
   $ano=$rowxx["ano"];
 }
 echo $ano;
 ?>
                     </strong> <br />
-                    <b>Usuario: </b><u><? echo $_SESSION["login"];?></u> </div>
+                    <b>Usuario: </b><u><?php echo $_SESSION["login"];?></u> </div>
               </div></td>
             </tr>
           </table>
@@ -738,10 +737,10 @@ echo $ano;
   <tr>
     <td width="200">
 	<div class="Estilo7" id="main_div" style="padding-left:3px; padding-top:5px; padding-right:3px; padding-bottom:3px;">
-	  <div align="center"><?PHP include('../config.php'); echo $nom_emp ?><br />
-	    <?PHP echo $dir_tel ?><BR />
-	    <?PHP echo $muni ?> <br />
-	    <?PHP echo $email ?>	</div>
+	  <div align="center"><?php include('../config.php'); echo $nom_emp ?><br />
+	    <?php echo $dir_tel ?><BR />
+	    <?php echo $muni ?> <br />
+	    <?php echo $email ?>	</div>
 	</div>	</td>
     <td width="200">
 	<div class="Estilo7" id="main_div" style="padding-left:3px; padding-top:5px; padding-right:3px; padding-bottom:3px;">
@@ -759,6 +758,6 @@ echo $ano;
 </table>
 </body>
 </html>
-<?
+<?php
 }
 ?>

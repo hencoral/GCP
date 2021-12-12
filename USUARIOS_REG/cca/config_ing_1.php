@@ -1,4 +1,4 @@
-<?
+<?php
 session_start();
 if(!isset($_SESSION["login"]))
 {
@@ -283,15 +283,18 @@ req.send(null);
   </tr>
   <tr>
     <td colspan="3">
-<?
-$cod_pptal=$_GET['vr'];
-$nom_rubro=$_GET['vr2'];  
+<?php
+if(isset($_GET['vr'])) $cod_pptal=$_GET['vr']; else $cod_pptal=0;
+if(isset($_GET['vr2'])) $nom_rubro=$_GET['vr2']; else $nom_rubro=0;
 
 include('../config.php');				
-$cx = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
+global $server, $database, $dbpass, $dbuser, $charset;
+// Conexion con la base de datos
+$cx = new mysqli($server, $dbuser, $dbpass, $database);
+$uso=0;
 $sqlxx = "select * from cca_ing where cod_pptal = '$cod_pptal'";
-$resultadoxx = mysql_db_query($database, $sqlxx, $cx);
-while($rowxx = mysql_fetch_array($resultadoxx)) 
+$resultadoxx = $cx->query($sqlxx);
+while($rowxx = $resultadoxx->fetch_assoc())
 {
   $uso=$rowxx["ctrl"];
 }
@@ -311,15 +314,19 @@ else
     </tr>
   <tr>
     <td><div class="Estilo4" style="padding-left:5px; padding-top:5px; padding-right:5px; padding-bottom:5px;">
-      <div align="center"><? printf("$uso");?>
+      <div align="center"><?php printf("$uso");?>
       </div>
     </div></td>
     </tr>
 </table>
 <br />
 <?php
-$var1 =$_POST["ctrl"];
-
+if (isset($_POST["ctrol"])) $var1 =$_POST["ctrl"]; else $var1 = "";
+$sel_causacion=0;
+$sel_pago=0;
+$ver_causacion=0;
+$ver_directo=0;
+$ver_boton=0;
 if ($var1 =="causacion")
 {
 $sel_causacion ="checked";
@@ -344,15 +351,15 @@ $ver_causacion="none";
         <div align="center"><strong>QUE USO LE DARA A LA CUENTA SELECCIONADA ? </strong> <br />
         </div>
       </div>
-	  <input name="codp" type="hidden" value="<? printf("%s",$cod_pptal);?>" />
-	  <input name="nomr" type="hidden" value="<? printf("%s",$nom_rubro);?>" />
+	  <input name="codp" type="hidden" value="<?php printf("%s",$cod_pptal);?>" />
+	  <input name="nomr" type="hidden" value="<?php printf("%s",$nom_rubro);?>" />
 	  </td>
     </tr>
     <tr>
       <td colspan="2"><div class="Estilo4" style="padding-left:5px; padding-top:5px; padding-right:5px; padding-bottom:5px;">
-        <div align="center"><span class="Estilo4" style="padding-left:5px; padding-top:5px; padding-right:5px; padding-bottom:5px;"><? printf("%s",$cod_pptal);?></span>		
+        <div align="center"><span class="Estilo4" style="padding-left:5px; padding-top:5px; padding-right:5px; padding-bottom:5px;"><?php printf("%s",$cod_pptal);?></span>		
 		<br />
-        <span class="Estilo4" style="padding-left:5px; padding-top:5px; padding-right:5px; padding-bottom:5px;"><? printf("%s",$nom_rubro);?></span>		</div>
+        <span class="Estilo4" style="padding-left:5px; padding-top:5px; padding-right:5px; padding-bottom:5px;"><?php printf("%s",$nom_rubro);?></span>		</div>
       </div></td>
       </tr>
     <tr>
@@ -393,19 +400,17 @@ miPopup = window.open("../pgcp/consulta_cta.php","CONTAFACIL","width=800,height=
   </tr>
 </table> -->
 <br />
-<?
-$var=$_POST['ctrl'];
-$codp=$_POST['codp'];
-$nomr=$_POST['nomr'];
+<?php
+if(isset($_POST['ctrl'])) $var =$_POST["ctrl"]; else $var = "";
+if(isset($_POST['codp'])) $codp =$_POST["codp"]; else $codp = "";
+if(isset($_POST['nomr'])) $nomr =$_POST["nomr"]; else $nomr = "";
 
 if($var == 'causacion')
 {
 
-include('../config.php');				
-$cx = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
 $sqlxx = "select * from cca_ing where cod_pptal = '$codp' and ctrl ='CAUSACION DEL INGRESO'";
-$resultadoxx = mysql_db_query($database, $sqlxx, $cx);
-while($rowxx = mysql_fetch_array($resultadoxx)) 
+$resultadoxx = $cx->query($sqlxx);
+while($rowxx = $resultadoxx->fetch_assoc())
 {
   
   $ctrl=$rowxx["ctrl"];
@@ -420,12 +425,12 @@ while($rowxx = mysql_fetch_array($resultadoxx))
 		  <div align="right"><strong>CODIGO  PPTAL SELECCIONADO : </strong></div>
 		</div>		</td>
         <td width="176" bgcolor="#FFFFFF" align="center"><div class="Estilo4" style="padding-left:5px; padding-top:5px; padding-right:5px; padding-bottom:5px;">
-		<input type="hidden" name="cod_pptal" value="<? printf("%s",$codp);?>" />
-		<? printf("%s",$codp);?>
+		<input type="hidden" name="cod_pptal" value="<?php printf("%s",$codp);?>" />
+		<?php printf("%s",$codp);?>
 		</div></td>
         <td colspan="2" align="center" bgcolor="#FFFFFF"><div class="Estilo4" style="padding-left:5px; padding-top:5px; padding-right:5px; padding-bottom:5px;">
-          <input type="hidden" name="nom_rubro" value="<? printf("%s",$nomr);?>" />
-          <? printf("%s",$nomr);?>
+          <input type="hidden" name="nom_rubro" value="<?php printf("%s",$nomr);?>" />
+          <?php printf("%s",$nomr);?>
         </div></td>
         </tr>
       <tr>
@@ -447,10 +452,13 @@ while($rowxx = mysql_fetch_array($resultadoxx))
         </div>		</td>
         </tr>
       <tr>
-	  	<?
+	  	<?php
+		  $acc='';
+		  $resnomb='';
+		  $resnombp='';
 			$sqlxx = "select * from cca_ing where cod_pptal = '$codp' and ctrl ='CAUSACION DEL INGRESO'";
-			$resultadoxx = mysql_db_query($database, $sqlxx, $cx);
-			if (mysql_num_rows($resultadoxx) == 0)
+			$resultadoxx = $cx->query($sqlxx);
+			if ($resultadoxx->num_rows == 0)
 			{
 				$ctrl=$rowxx["ctrl"];
 					 //$acc='block';
@@ -500,7 +508,7 @@ while($rowxx = mysql_fetch_array($resultadoxx))
 			}
 			else
 			{
-				while($rowxx = mysql_fetch_array($resultadoxx)) 
+				while($rowxx = $resultadoxx->fetch_assoc())
 				{
 					$ctrl=$rowxx["ctrl"];
 					 //$acc='block';
@@ -513,14 +521,15 @@ while($rowxx = mysql_fetch_array($resultadoxx))
 						 if (!empty($rowxx[$f]))
 						 {
 							 $sqlxxp = "select * from pgcp where cod_pptal = '$rowxx[$f]'";
-							$resultadoxxp = mysql_db_query($database, $sqlxxp, $cx);
-							while($rowxxp = mysql_fetch_array($resultadoxxp)) 
+							$resultadoxxp = $cx->query($sqlxxp);
+							while($rowxxp = $resultadoxxp->fetch_assoc())
 							{
 								$resnomb = $rowxxp['nom_rubro'];
 							}
 							 $sqlxxpp = "select * from pgcp where cod_pptal = '$rowxx[$ff]'";
-							$resultadoxxpp = mysql_db_query($database, $sqlxxpp, $cx);
-							while($rowxxpp = mysql_fetch_array($resultadoxxpp)) 
+							$resultadoxxpp = $cx->query($sqlxxpp);
+							while($rowxxpp = $resultadoxxpp->fetch_assoc())
+							
 							{
 								$resnombp = $rowxxpp['nom_rubro'];
 							}
@@ -573,23 +582,21 @@ while($rowxx = mysql_fetch_array($resultadoxx))
       <tr>
         <td colspan="4"><div style="padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:5px;">
           <div align="center">
-            <input name="ctrl" type="hidden" value="<? printf("CAUSACION DEL INGRESO");?>" />
+            <input name="ctrl" type="hidden" value="<?php printf("CAUSACION DEL INGRESO");?>" />
 			<input name="Submit" type="submit" class="Estilo4" value="Guardar Configuracion" onclick="this.form.action = 'config_ing_2.php'" />
           </div>
         </div></td>
         </tr>
     </table>
 	</form>
-<?
+<?php
 }
 if($var == 'directo')
 {
 
-	include('../config.php');				
-	$cx = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
 	$sqlxx = "select * from cca_ing where cod_pptal = '$codp' and ctrl ='RECAUDO DIRECTO'";
-	$resultadoxx = mysql_db_query($database, $sqlxx, $cx);
-	while($rowxx = mysql_fetch_array($resultadoxx)) 
+	$resultadoxx = $cx->query($sqlxx);
+	while($rowxx = $resultadoxx->fetch_assoc())
 	{
 	  $ctrl=$rowxx["ctrl"];
 	}
@@ -602,12 +609,12 @@ if($var == 'directo')
 		  <div align="right"><strong>CODIGO  PPTAL SELECCIONADO : </strong></div>
 		</div>		</td>
         <td width="176" bgcolor="#FFFFFF" align="center"><div class="Estilo4" style="padding-left:5px; padding-top:5px; padding-right:5px; padding-bottom:5px;">
-		<input type="hidden" name="cod_pptal" value="<? printf("%s",$codp);?>" />
-		<? printf("%s",$codp);?>
+		<input type="hidden" name="cod_pptal" value="<?php printf("%s",$codp);?>" />
+		<?php printf("%s",$codp);?>
 		</div></td>
         <td colspan="2" align="center" bgcolor="#FFFFFF"><div class="Estilo4" style="padding-left:5px; padding-top:5px; padding-right:5px; padding-bottom:5px;">
           <input type="hidden" name="nom_rubro" value="<? printf("%s",$nomr);?>" />
-          <? printf("%s",$nomr);?>
+          <?php printf("%s",$nomr);?>
         </div></td>
         </tr>
       <tr>
@@ -629,10 +636,10 @@ if($var == 'directo')
         </div>		</td>
         </tr>
       <tr>
-        <?
+        <?php
 			$sqlxx = "select * from cca_ing where cod_pptal = '$codp' and ctrl ='RECAUDO DIRECTO'";
-			$resultadoxx = mysql_db_query($database, $sqlxx, $cx);
-			if (mysql_num_rows($resultadoxx) == 0)
+			$resultadoxx = $cx->query($sqlxx);
+			if ($resultadoxx->num_rows == 0)
 			{
 				$ctrl=$rowxx["ctrl"];
 					 //$acc='block';
@@ -682,7 +689,7 @@ if($var == 'directo')
 			}
 			else
 			{
-				while($rowxx = mysql_fetch_array($resultadoxx)) 
+				while($rowxx = $resultadoxx->fetch_assoc())
 				{
 					$ctrl=$rowxx["ctrl"];
 					 //$acc='block';
@@ -695,14 +702,16 @@ if($var == 'directo')
 						 if (!empty($rowxx[$f]))
 						 {
 							 $sqlxxp = "select * from pgcp where cod_pptal = '$rowxx[$f]'";
-							$resultadoxxp = mysql_db_query($database, $sqlxxp, $cx);
-							while($rowxxp = mysql_fetch_array($resultadoxxp)) 
+							$resultadoxxp = $cx->query($sqlxxp);
+							while($rowxxp = $resultadoxxp->fetch_assoc())
+							
 							{
 								$resnomb = $rowxxp['nom_rubro'];
 							}
 							 $sqlxxpp = "select * from pgcp where cod_pptal = '$rowxx[$ff]'";
-							$resultadoxxpp = mysql_db_query($database, $sqlxxpp, $cx);
-							while($rowxxpp = mysql_fetch_array($resultadoxxpp)) 
+							$resultadoxxpp = $cx->query($sqlxxpp);
+							while($rowxxpp = $resultadoxxpp->fetch_assoc())
+							
 							{
 								$resnombp = $rowxxpp['nom_rubro'];
 							}
@@ -756,14 +765,14 @@ if($var == 'directo')
       <tr>
         <td colspan="4"><div style="padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:5px;">
           <div align="center">
-            <input name="ctrl" type="hidden" value="<? printf("RECAUDO DIRECTO");?>" />
+            <input name="ctrl" type="hidden" value="<?php printf("RECAUDO DIRECTO");?>" />
 			<input name="Submit" type="submit" class="Estilo4" value="Guardar Configuracion" onclick="this.form.action = 'config_ing_2.php'" />
           </div>
         </div></td>
         </tr>
     </table> 
 	</form>	
-<?
+<?php
 }
 ?>
 	</td>
@@ -784,28 +793,27 @@ if($var == 'directo')
     <td colspan="3"><div style="padding-left:5px; padding-top:5px; padding-right:5px; padding-bottom:5px;">
       <div align="center"> <span class="Estilo4">Fecha de  esta Sesion:</span> <br />
           <span class="Estilo4"> <strong>
-          <? include('../config.php');				
-				$connectionxx = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
+          <?php
 				$sqlxx = "select * from fecha";
-				$resultadoxx = mysql_db_query($database, $sqlxx, $connectionxx);
+				$resultadoxx = $cx->query($sqlxx);
 				
-				while($rowxx = mysql_fetch_array($resultadoxx)) 
+				while($rowxx = $resultadoxx->fetch_array())
 				{
 				  $ano=$rowxx["ano"];
 				}
 				echo $ano;
 			?>
           </strong> </span> <br />
-          <span class="Estilo4"><b>Usuario: </b><u><? echo $_SESSION["login"];?></u> </span> </div>
+          <span class="Estilo4"><b>Usuario: </b><u><?php echo $_SESSION["login"];?></u> </span> </div>
     </div></td>
   </tr>
   <tr>
     <td width="266">
 	<div class="Estilo7" id="main_div" style="padding-left:3px; padding-top:5px; padding-right:3px; padding-bottom:3px;">
-	  <div align="center"><?PHP include('../config.php'); echo $nom_emp ?><br />
-	    <?PHP echo $dir_tel ?><BR />
-	    <?PHP echo $muni ?> <br />
-	    <?PHP echo $email?>	</div>
+	  <div align="center"><?php  echo $nom_emp ?><br />
+	    <?php echo $dir_tel ?><BR />
+	    <?php echo $muni ?> <br />
+	    <?php echo $email?>	</div>
 	</div>	</td>
     <td width="266">
 	<div class="Estilo7" id="main_div" style="padding-left:3px; padding-top:5px; padding-right:3px; padding-bottom:3px;">
@@ -823,6 +831,6 @@ if($var == 'directo')
 </table>
 </body>
 </html>
-<?
+<?php
 }
 ?>

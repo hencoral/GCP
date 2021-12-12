@@ -1,6 +1,6 @@
-<?
+<?php
 session_start();
-if(!session_is_registered("login"))
+if(!isset($_SESSION["login"]))
 {
 header("Location: login.php");
 exit;
@@ -25,9 +25,9 @@ exit;
 <div align="center" class="Estilo1">
 <h1 class="Estilo1 Estilo2">Actualizar Password</h1>
 <br>
-...::: <? echo $_SESSION["login"];?> :::... <span class="Estilo3">est&aacute; a punto de cambiar su contrase&ntilde;a</span><br>
+...::: <?php echo $_SESSION["login"];?> :::... <span class="Estilo3">est&aacute; a punto de cambiar su contrase&ntilde;a</span><br>
 <br>
-<p><?
+<p><?php
 
 
 echo '<FORM METHOD="POST" ACTION="actualizar2.php">';
@@ -46,6 +46,6 @@ echo '<FORM METHOD="POST" ACTION="actualizar2.php">';
 </div>
 </BODY>
 </HTML>
-<?
+<?php
 }
 ?>

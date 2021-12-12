@@ -1,13 +1,14 @@
-<?
+<?php
 session_start();
 set_time_limit(150);
+include('../config.php');
+global $server, $database, $dbpass, $dbuser, $charset;
+// Conexion con la base de datos
+$cx = new mysqli($server, $dbuser, $dbpass, $database);
 								// verifico permisos del usuario
-		include('../config.php');
-		$cx = mysql_connect("$server","$dbuser","$dbpass")or die ("Conexion no Exitosa");
-		mysql_select_db("$database"); 
        	$sql="SELECT conta,importar FROM usuarios2 where login = '$_SESSION[login]'";
-		$res=mysql_db_query($database,$sql,$cx);
-		$rw =mysql_fetch_array($res);
+		$res= $cx->query($sql);
+		$rw = $res->fetch_array();
 if ($rw['conta']=='SI' and $rw['importar'] =='SI')
 {
 
@@ -116,21 +117,18 @@ a:active {
   <tr>
     <td><?php
 //-------
-include('../config.php');	
-$connectionxx = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
 $sqlxx = "select * from fecha";
-$resultadoxx = mysql_db_query($database, $sqlxx, $connectionxx);
+$resultadoxx = $cx->query($sqlxx);
 
-while($rowxx = mysql_fetch_array($resultadoxx)) 
+while($rowxx = $resultadoxx->fetch_array())
 {
   $idxx=$rowxx["id_emp"];
   $id_emp=$rowxx["id_emp"];
 }
 
 			
-$cx = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
 $sq = "select * from sico order by cuenta asc ";
-$re = mysql_db_query($database, $sq, $cx);
+$re = $cx->query($sq);
 printf("<BR><center><span class='Estilo2'><B>SALDOS INICIALES DE CONTABILIDAD CARGADOS</B></span></center><BR>");
 printf("
 <center>
@@ -149,12 +147,12 @@ printf("
 
 ");
 
-while($rw = @mysql_fetch_array($re)) 
+while($rw = $re->fetch_array())
    {
    		$eval_cuenta=$rw["cuenta"];
 		$sqlr = "select * from pgcp where cod_pptal='$eval_cuenta' and id_emp='$id_emp'";
-		$resultr = mysql_query($sqlr, $cx) or die(mysql_error());
-		if (mysql_num_rows($resultr) == 0)
+		$resultr = $cx->query($sqlr);
+		if ($resultr->num_rows == 0)
 		{
 		
 				if($rw["cuenta"]=='' or $rw["cuenta"]=='CUENTA')

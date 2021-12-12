@@ -1,4 +1,4 @@
-<?
+<?php
 set_time_limit(150);
 session_start();
 if(!isset($_SESSION["login"]))
@@ -8,11 +8,12 @@ exit;
 } else {
 		// verifico permisos del usuario
 		include('../config.php');
-		$cx = mysql_connect("$server","$dbuser","$dbpass")or die ("Conexion no Exitosa");
-		mysql_select_db("$database"); 
-       	$sql="SELECT conta FROM usuarios2 where login = '$_SESSION[login]'";
-		$res=mysql_db_query($database,$sql,$cx);
-		$rw =mysql_fetch_array($res);
+    global $server, $database, $dbpass, $dbuser, $charset;
+    // Conexion con la base de datos
+    $cx = new mysqli($server, $dbuser, $dbpass, $database);
+    $sql="SELECT conta FROM usuarios2 where login = '$_SESSION[login]'";
+		$res=$cx->query($sql);
+		$rw =$res->fetch_array();
 if ($rw['conta']=='SI')
 {
 
@@ -139,33 +140,29 @@ table.bordepunteado1 { border-style: solid; border-collapse:collapse; border-wid
   </tr>
   <tr>
     <td colspan="3">
-<?
+<?php
 include('../config.php');
 
 //**** variables para generacion dinamica
 
-$base=$database;
-$conexion=mysql_connect ($server, $dbuser, $dbpass);
-
 $sqlxx = "select * from fecha";
-$resultadoxx = mysql_db_query($base, $sqlxx, $conexion);
-while($rowxx = mysql_fetch_array($resultadoxx)) 
+$resultadoxx = $cx->query($sqlxx);
+while($rowxx = $resultadoxx->fetch_assoc())
 {  $idxx=$rowxx["id_emp"];  $id_emp=$rowxx["id_emp"];  }
 
 $sqlxx3 = "select * from fecha_ini_op";
-$resultadoxx3 = mysql_db_query($database, $sqlxx3, $conexion);
+$resultadoxx3 = $cx->query($sqlxx3);
 
-while($rowxx3 = mysql_fetch_array($resultadoxx3)) 
+while($rowxx3 = $resultadoxx3->fetch_assoc())
    {
    $fecha_ini_op=$rowxx3["fecha_ini_op"];
    }  
 //**********************
 				
-$connectionxx = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
 $sqlxx = "select * from fecha";
-$resultadoxx = mysql_db_query($database, $sqlxx, $connectionxx);
+$resultadoxx = $cx->query($sqlxx);
 
-while($rowxx = mysql_fetch_array($resultadoxx)) 
+while($rowxx = $resultadoxx->fetch_assoc())
    {
    
    $idxx=$rowxx["id_emp"];
@@ -175,9 +172,10 @@ while($rowxx = mysql_fetch_array($resultadoxx))
    }
    
 $sqlxx3 = "select * from fecha_ini_op";
-$resultadoxx3 = mysql_db_query($database, $sqlxx3, $connectionxx);
+$resultadoxx3 = $cx->query($sqlxx3);
 
-while($rowxx3 = mysql_fetch_array($resultadoxx3)) 
+while($rowxx3 = $resultadoxx3->fetch_assoc())
+   
    {
    $desde=$rowxx3["fecha_ini_op"];
    }  
@@ -224,15 +222,13 @@ while($rowxx3 = mysql_fetch_array($resultadoxx3))
     <td colspan="2" style="display:none"><div class="Estilo4" style="padding-left:3px; padding-top:3px; padding-right:3px; padding-bottom:3px;">
       <div align="center">
 	  <select name="nn" onchange="cambia()" class="Estilo4" style="width: 400px;">
-		                <?
-include('../config.php');
-$db = new mysqli($server, $dbuser, $dbpass, $database);
+		                <?php
 
 $strSQL = "SELECT * FROM pgcp WHERE id_emp = '$idxx' AND tip_dato = 'D' AND cod_pptal REGEXP '^[1-9]' ORDER BY cod_pptal";
-$rs = mysql_query($strSQL);
-$nr = mysql_num_rows($rs);
+$rs = $cx->query($strSQL);
+$nr = $rs->num_rows;
 for ($i=0; $i<$nr; $i++) {
-	$r = mysql_fetch_array($rs);
+	$r = $rs->fetch_array();
 	echo "<OPTION VALUE=\"".$r["cod_pptal"]."\">".$r["cod_pptal"]." - ".$r["nom_rubro"]."</b></OPTION>";
 }
 ?>
@@ -279,12 +275,11 @@ for ($i=0; $i<$nr; $i++) {
     <td colspan="3"><div style="padding-left:5px; padding-top:5px; padding-right:5px; padding-bottom:5px;">
       <div align="center"> <span class="Estilo4">Fecha de  esta Sesion:</span> <br />
           <span class="Estilo4"> <strong>
-          <? include('../config.php');				
-$connectionxx = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
+          <?php 		
 $sqlxx = "select * from fecha";
-$resultadoxx = mysql_db_query($database, $sqlxx, $connectionxx);
+$resultadoxx = $cx->query($sqlxx);
 
-while($rowxx = mysql_fetch_array($resultadoxx)) 
+while($rowxx = $resultadoxx->fetch_assoc())
 {
   $ano=$rowxx["ano"];
 }
@@ -297,10 +292,10 @@ echo $ano;
   <tr>
     <td width="266">
 	<div class="Estilo7" id="main_div" style="padding-left:3px; padding-top:5px; padding-right:3px; padding-bottom:3px;">
-	  <div align="center"><?PHP include('../config.php'); echo $nom_emp ?><br />
-	    <?PHP echo $dir_tel ?><BR />
-	    <?PHP echo $muni ?> <br />
-	    <?PHP echo $email?>	</div>
+	  <div align="center"><?php echo $nom_emp ?><br />
+	    <?php echo $dir_tel ?><BR />
+	    <?php echo $muni ?> <br />
+	    <?php echo $email?>	</div>
 	</div>	</td>
     <td width="266">
 	<div class="Estilo7" id="main_div" style="padding-left:3px; padding-top:5px; padding-right:3px; padding-bottom:3px;">
@@ -324,7 +319,7 @@ echo $ano;
 
 
 
-<?
+<?php
 }else{ // si no tiene persisos de usuario
 	echo "<br><br><center>Usuario no tiene permisos en este m&oacute;dulo</center><br>";
 	echo "<center>Click <a href=\"../user.php\">aqu&iacute; para volver</a></center>";

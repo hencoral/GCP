@@ -1,6 +1,5 @@
 <?php
 session_start();
-echo "<div style='color:gray;font-size: 12px;'>LOGIN : " . $_SESSION["login"] . "</div>";
 unset($_SESSION["fecha"]);
 unset($_SESSION["pendiente"]);
 unset($_SESSION["fecha2"]);

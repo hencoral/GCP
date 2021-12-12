@@ -38,9 +38,9 @@ if (!isset($_SESSION["login"])) {
 	$tel = $_POST['tel'];
 	$fax = $_POST['fax'];
 	$em = $_POST['email'];
-	$contabilidad = $_POST['contabilidad'];
+	if(isset($_POST['contabilidad'])) $contabilidad = $_POST['contabilidad']; else $contabilidad = "";
 	$ppto = isset($_POST['ppto']) ? $_POST['ppto'] : '';
-	$tesoreria = $_POST['tesoreria'];
+	if(isset($_POST['tesoreria'])) $tesoreria = $_POST['tesoreria']; else $tesoreria = "";
 	$almacen = isset($_POST['almacen']) ? $_POST['almacen'] : '';
 	$interventor = isset($_POST['interventor']) ? $_POST['interventor'] : '';
 	$monto = $_POST['monto'];

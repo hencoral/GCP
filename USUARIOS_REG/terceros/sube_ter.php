@@ -5,9 +5,9 @@ set_time_limit(1200);
 echo "Escribi� en el campo de texto: " . $cadenatexto . "<br><br>";*/
 
 //datos del arhivo
-$nombre_archivo = $HTTP_POST_FILES['userfile']['name'];
-$tipo_archivo = $HTTP_POST_FILES['userfile']['type'];
-$tamano_archivo = $HTTP_POST_FILES['userfile']['size'];
+$nombre_archivo = $_FILES['userfile']['name'];
+$tipo_archivo = $_FILES['userfile']['type'];
+$tamano_archivo = $_FILES['userfile']['size'];
 
 //printf("%s<br>%s<br>%s",$nombre_archivo,$tipo_archivo,$tamano_archivo);
 //compruebo si las caracter�sticas del archivo son las que deseo
@@ -16,7 +16,7 @@ $tamano_archivo = $HTTP_POST_FILES['userfile']['size'];
 if ((!(strpos($tipo_archivo, "vnd.ms-excel")) && ($tamano_archivo < 1000000))) {
     echo "<center><br>La extensi�n o el tama�o de los archivos no es correcta. <br><br><table><tr><td><li>Solo se permiten archivos .csv<br><li>se permiten archivos de 1000 Kb (1Mb) m�ximo.</td></tr></table></center>";
 }else{
-    if (move_uploaded_file($HTTP_POST_FILES['userfile']['tmp_name'], $nombre_archivo)){
+    if (move_uploaded_file($_FILES['userfile']['tmp_name'], $nombre_archivo)){
         echo "<center><br><br><img src=\"../homogif.gif\" width=\"160\" height=\"150\" /></center>";
     }else{
        echo "<center><br><br>Ocurri� alg�n error al subir el fichero. No pudo guardarse.</center>";
