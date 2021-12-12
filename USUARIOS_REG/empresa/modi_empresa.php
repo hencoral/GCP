@@ -171,7 +171,7 @@ function validar(e) {
 		</div>		</td>
         <td class="Estilo4">
 		<div id="main_div" style="padding-left:3px; padding-top:5px; padding-right:3px; padding-bottom:3px;">
-		  <input name="cod_dep" type="text" class="Estilo7" id="cod_dep" tabindex="0" value="52" size="5" />
+		  <input name="cod_dep" type="text" class="Estilo7" id="cod_dep" tabindex="0" value="85" size="5" />
 </div>		</td>
       </tr>
       <tr>
@@ -182,70 +182,26 @@ function validar(e) {
         <td class="Estilo4">
 		<div id="main_div" style="padding-left:3px; padding-top:5px; padding-right:3px; padding-bottom:3px;">
 		  <select name="cod_mpio" class="Estilo4" id="cod_mpio">
-		    <option value="001">PASTO</option>
-		    <option value="019">ALBAN</option>
-		    <option value="022">ALDANA</option>
-		    <option value="036">ANCUYA</option>
-		    <option value="051">ARBOLEDA</option>
-		    <option value="079">BARBACOAS</option>
-		    <option value="083">BELEN</option>
-		    <option value="110">BUESACO</option>
-		    <option value="203">COLON (GENOVA)</option>
-		    <option value="207">CONSACA</option>
-		    <option value="210">CONTADERO</option>
-		    <option value="215">CORDOBA</option>
-		    <option value="224">CUASPUD</option>
-		    <option value="227">CUMBAL</option>
-		    <option value="233">CUMBITARA</option>
-		    <option value="240">CHACHAGUI</option>
-		    <option value="250">EL CHARCO</option>
-		    <option value="254">EL PE&Ntilde;OL</option>
-		    <option value="256">EL ROSARIO</option>
-		    <option value="258">EL TABLON</option>
-		    <option value="260">EL TAMBO</option>
-		    <option value="287">FUNES</option>
-		    <option value="317">GUACHUCAL</option>
-		    <option value="320">GUATARILLA</option>
-		    <option value="323">GUALMATAN</option>
-		    <option value="352">ILES</option>
-		    <option value="354">IMUES</option>
-		    <option value="356">IPIALES</option>
-		    <option value="378">LA CRUZ</option>
-		    <option value="381">LA FLORIDA</option>
-		    <option value="385">LA LLANADA</option>
-		    <option value="390">LA TOLA</option>
-		    <option value="399">LA UNION</option>
-		    <option value="405">LEIVA</option>
-		    <option value="411">LINARES</option>
-		    <option value="418">LOS ANDES</option>
-		    <option value="427">MAGUI</option>
-		    <option value="435">MALLAMA</option>
-		    <option value="473">MOSQUERA</option>
-		    <option value="480">NARI&Ntilde;O</option>
-		    <option value="490">OLAYA HERRERA</option>
-		    <option value="506">OSPINA</option>
-		    <option value="520">PIZARRO</option>
-		    <option value="540">POLICARPA</option>
-		    <option value="560">POTOSI</option>
-		    <option value="565">PROVIDENCIA</option>
-		    <option value="573">PUERRES</option>
-		    <option value="585">PUPIALES</option>
-		    <option value="612">RICAURTE</option>
-		    <option value="621">ROBERTO PAYAN</option>
-		    <option value="678">SAMANIEGO</option>
-		    <option value="683">SANDONA</option>
-		    <option value="685">SAN BERNARDO</option>
-		    <option value="687">SAN LORENZO</option>
-		    <option value="693">SAN PABLO</option>
-		    <option value="694">SAN PEDRO DE CARTAGO</option>
-		    <option value="696">SANTA BARBARA</option>
-		    <option value="699">SANTACRUZ</option>
-		    <option value="720">SAPUYES</option>
-		    <option value="786">TAMINANGO</option>
-		    <option value="788">TANGUA</option>
-		    <option value="835">TUMACO</option>
-		    <option value="838">TUQUERRES</option>
-		    <option value="885">YACUANQUER</option>
+		    <option value="001">YOPAL</option>
+		    <option value="010">AGUAZUL</option>
+		    <option value="015">CHAMEZA</option>
+		    <option value="125">HATO COROZAL</option>
+		    <option value="136">LA SALINA</option>
+		    <option value="139">MANI</option>
+		    <option value="162">MONTERREY</option>
+		    <option value="225">NUNCHIA</option>
+		    <option value="230">OROCUE</option>
+		    <option value="250">PAZ DE ARIPORO</option>
+		    <option value="263">PORE</option>
+		    <option value="279">RECETOR</option>
+		    <option value="300">SABANALARGA</option>
+		    <option value="315">SACAMA</option>
+		    <option value="325">SAN LUIS DE PALENQUE</option>
+		    <option value="400">TAMARA</option>
+		    <option value="410">TAURAMENA</option>
+		    <option value="430">TRINIDAD</option>
+		    <option value="440">VILLANUEVA</option>
+		    
 		    </select>
 		  </div>		</td>
       </tr>
