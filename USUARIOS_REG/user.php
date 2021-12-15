@@ -271,7 +271,7 @@ if (!isset($_SESSION["login"])) {
                 <td colspan="3">
                     <div class="Estilo2" id="main_div" style="padding-left:3px; padding-top:3px; padding-right:3px; padding-bottom:3px;">
                         <div align="center">
-                            <img src="images/PLANTILLA PNG PARA BANNER COMUN.png" width="585" height="100" />
+                            <img src="images/PLANTILLA PNG PARA BANNER COMUN.png" width="750" height="100" />
                         </div>
                     </div>
                 </td>

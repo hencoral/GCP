@@ -1,10 +1,10 @@
 <?php
 	$server="localhost";  
-	$database="bd_esepotosi2021"; 
+	$database="contableHc"; 
 	$dbpass="12345"; 
 	$dbuser="root";
-	$nom_emp="";
-	$dir_tel="";
-	$muni="";
-	$email="";
+	$nom_emp="RED SALUD CASANARE";
+	$dir_tel="6349939";
+	$muni="YOPAL";
+	$email="contactenos@redsaludcasanare.gov.co";
 ?>
