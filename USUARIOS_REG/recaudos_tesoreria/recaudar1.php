@@ -14,7 +14,7 @@ if (!isset($_SESSION["login"])) {
 		<title>CONTAFACIL</title>
 		<script language="JavaScript" type="text/javascript" src="javas.js"></script>
 		<link rel="stylesheet" type="text/css" href="../css/jquery.autocomplete.css" />
-		<script type="text/javascript" src="../js/jquery.js"></script>
+		<script type="text/javascript" src="jquery.js"></script>
 		<script type='text/javascript' src='jquery.autocomplete.js'></script>
 		<link rel="stylesheet" type="text/css" href="../css/estilos.css" />
 
@@ -178,7 +178,6 @@ if (!isset($_SESSION["login"])) {
 		</LINK>
 		<SCRIPT type="text/javascript" src="../dhtmlgoodies_calendar/dhtmlgoodies_calendar.js?random=20060118"></script>
 		<style type="text/css">
-			<!--
 			.Estilo12 {
 				font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
 				font-size: 10px;
@@ -190,8 +189,7 @@ if (!isset($_SESSION["login"])) {
 				font-size: 10px;
 				color: #333333;
 			}
-
-			</style>
+		</style>
 		<SCRIPT language="javascript">
 			function MostrarOcultar(objetoVisualizar) {
 				if (document.all['naturales'].style.display == 'none') {
@@ -207,7 +205,6 @@ if (!isset($_SESSION["login"])) {
 				}
 			}
 		</SCRIPT>
-		<!--muestra - oculta juridicos -->
 		<SCRIPT language="javascript">
 			function MostrarOcultar2(objetoVisualizar) {
 
@@ -746,7 +743,7 @@ if (!isset($_SESSION["login"])) {
 
 								// conexion				
 								$connectionxx = new mysqli($server, $dbuser, $dbpass, $database) or die("Fallo en la Conexion a la Base de Datos");
-								$ver='';
+								$ver = '';
 								// extraer datos
 								$sqlxx = "select * from fecha where user ='$_SESSION[login]'";
 								$resultadoxx = $connectionxx->query($sqlxx);
@@ -785,7 +782,7 @@ if (!isset($_SESSION["login"])) {
 							<tr>
 								<td colspan="4" bgcolor="#DCE9E5">
 									<div style="padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:10px;">
-										<div align="center" class="Estilo4"><strong>INFORMACION REQUERIDA PARA EL REGISTRO/strong></div>
+										<div align="center" class="Estilo4"><strong>INFORMACION REQUERIDA PARA EL REGISTRO</strong></div>
 									</div>
 								</td>
 							</tr>

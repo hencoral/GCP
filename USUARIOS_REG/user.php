@@ -271,7 +271,7 @@ if (!isset($_SESSION["login"])) {
                 <td colspan="3">
                     <div class="Estilo2" id="main_div" style="padding-left:3px; padding-top:3px; padding-right:3px; padding-bottom:3px;">
                         <div align="center">
-                            <img src="images/PLANTILLA PNG PARA BANNER COMUN.png" width="750" height="100" />
+                            <img src="images/PLANTILLA PNG PARA BANNER COMUN.png" width="585" height="100" />
                         </div>
                     </div>
                 </td>
@@ -557,26 +557,16 @@ if($cx->connect_errno)
 
                                     <script type="text/javascript" src="wz_tooltip/wz_tooltip.js"></script>
                                     3.3. <a href="#" onmouseover="Tip('<br>3.2.1. <a href=\'pagos_tesoreria/pagos_tesoreria.php\'>Pagos Vigencia Actual<\/a><br><br>3.2.2. <a href=\'pagos_tesoreria/pagos_tesoreria_ceac.php\'>Pagos Acumulados<\/a><br><br>3.2.3. <a href=\'pagos_tesoreria/pagos_tesoreria_cxp.php\'>Pagos Vigencia Anterior<\/a><br><br>3.2.4. <a href=\'pagos_tesoreria/pagos_anulados.php\'>Pagos Anulados<\/a><br><br>', WIDTH, 200, TITLE, '<center>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PAGOS</center>', SHADOW, true, FADEIN, 300, FADEOUT, 300, STICKY, 1, CLOSEBTN, true, CLICKCLOSE, true)" onmouseout="UnTip()">Pagos Presupuestales</a><br />
+                                    
+                                    <script type="text/javascript" src="wz_tooltip/wz_tooltip.js"></script>
+                                    3.4. <a href="#" onmouseover="Tip('<br>3.5.1. <a href=\'mvto_ppto_gas/cxp_lista2.php\'>Reservas y C x P<\/a><br><br>3.5.2. <a href=\'informes_tesoreria/relacion_pagos_det.php\'>Relacion de Pagos - Detallada<\/a><br><br>3.5.3. <a href=\'informes_tesoreria/retefuente.php\'>Relacion de Pagos - Retefuente<\/a><br><br>3.5.4. <a href=\'informes_terceros/terceros.php\'>Informe de ejecucion por tercero<\/a><br><br>3.5.5. <a href=\'informes_tesoreria/relacion_ingresos_corte.php\'>Relacion de Ingresos<\/a><br><br>3.5.6. <a href=\'informes_tesoreria/relacion_gastos_corte.php\'>Relacion de Pagos<\/a><br><br>3.5.7. <a href=\'informes_tesoreria/cuentas_x_pagar_corte.php\'>Relacion de C x P<\/a><br><br>3.5.8. <a href=\'informes_terceros/certificaciones/index.php\'>Certificaciones<\/a><br><br>', WIDTH, 250, TITLE, '<center>Informes Tesoreria</center>', SHADOW, true, FADEIN, 300, FADEOUT, 300, STICKY, 1, CLOSEBTN, true, CLICKCLOSE, true)" onmouseout="UnTip()">Informes</a><br />
 
 
                                     <script type="text/javascript" src="wz_tooltip/wz_tooltip.js"></script>
-                                    3.4. <a href="#" onmouseover="Tip('<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href=\'actualiza_mvtos/a.php\' target=\'_parent\'>ACTUALIZAR MVTOS CONTABLES<\/a><br><br>3.3.1. <a href=\'carga_conciliaciones/conciliaciones_vig_ant.php\' target=\'_parent\'>Cargar Mvtos Bancarios Vig Ant<\/a><br><br>4.5.3. &lt;a href=\'conciliaciones/conciliacionesmes.php\' target=\'_parent\'&gt;Consultar conciliaciones por mes&lt;\/a&gt;&lt;br&gt;&lt;br&gt;', WIDTH, 300, TITLE, '<center>&nbsp;&nbsp;Conciliaciones Bancarias</center>', SHADOW, true, FADEIN, 300, FADEOUT, 300, STICKY, 1, CLOSEBTN, true, CLICKCLOSE, true)" onmouseout="UnTip()">Conciliaciones Bancarias</a><br />
+                                    3.5. <a href="#" onmouseover="Tip('<br>3.6.1. <a href=\'pagos_tesoreria/desctos.php\'>Descuentos en Pagos Tesoreria<\/a><br><br>', WIDTH, 250, TITLE, '<center>Configuraciones</center>', SHADOW, true, FADEIN, 300, FADEOUT, 300, STICKY, 1, CLOSEBTN, true, CLICKCLOSE, true)" onmouseout="UnTip()">Configuraciones</a><br />
 
                                     <script type="text/javascript" src="wz_tooltip/wz_tooltip.js"></script>
-                                    3.5. <a href="#" onmouseover="Tip('<br>3.4.1. <a href=\'consulta_ppto_ing.php\'>P.A.C Ingresos<\/a><br><br>3.4.2. <a href=\'ppto_gastos/consulta_ppto_gas.php\'>P.A.C Ppto Gastos<\/a><br><br>3.4.3. <a href=\'cxp/consulta_ppto_gas.php\'>P.A.C Cuentas x Pagar<\/a><br><br>3.4.4. <a href=\'pagos_tesoreria/pac_aprob_ing.php\'>P.A.C de ingresos aprobado<\/a><br><br>3.4.5. <a href=\'pagos_tesoreria/pac_aprob_gas.php\'>P.A.C de gastos aprobado<\/a><br><br>3.4.6. <a href=\'pagos_tesoreria/ejec_pptal_gastos2.php\'>Ejecucion P.A.C Gastos<\/a><br><br>3.4.7. <a href=\'pagos_tesoreria/ejec_pptal_ing.php\'>Ejecucion P.A.C Ingresos<\/a><br><br>', WIDTH, 200, TITLE, '<center>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;P.A.C</center>', SHADOW, true, FADEIN, 300, FADEOUT, 300, STICKY, 1, CLOSEBTN, true, CLICKCLOSE, true)" onmouseout="UnTip()">P.A.C </a><br />
-
-
-
-
-                                    <script type="text/javascript" src="wz_tooltip/wz_tooltip.js"></script>
-                                    3.7. <a href="#" onmouseover="Tip('<br>3.5.1. <a href=\'mvto_ppto_gas/cxp_lista2.php\'>Reservas y C x P<\/a><br><br>3.5.2. <a href=\'informes_tesoreria/relacion_pagos_det.php\'>Relacion de Pagos - Detallada<\/a><br><br>3.5.3. <a href=\'informes_tesoreria/retefuente.php\'>Relacion de Pagos - Retefuente<\/a><br><br>3.5.4. <a href=\'informes_terceros/terceros.php\'>Informe de ejecucion por tercero<\/a><br><br>3.5.5. <a href=\'informes_tesoreria/relacion_ingresos_corte.php\'>Relacion de Ingresos<\/a><br><br>3.5.6. <a href=\'informes_tesoreria/relacion_gastos_corte.php\'>Relacion de Pagos<\/a><br><br>3.5.7. <a href=\'informes_tesoreria/cuentas_x_pagar_corte.php\'>Relacion de C x P<\/a><br><br>3.5.8. <a href=\'informes_terceros/certificaciones/index.php\'>Certificaciones<\/a><br><br>', WIDTH, 250, TITLE, '<center>Informes Tesoreria</center>', SHADOW, true, FADEIN, 300, FADEOUT, 300, STICKY, 1, CLOSEBTN, true, CLICKCLOSE, true)" onmouseout="UnTip()">Informes</a><br />
-
-
-                                    <script type="text/javascript" src="wz_tooltip/wz_tooltip.js"></script>
-                                    3.8. <a href="#" onmouseover="Tip('<br>3.6.1. <a href=\'pagos_tesoreria/desctos.php\'>Descuentos en Pagos Tesoreria<\/a><br><br>', WIDTH, 250, TITLE, '<center>Configuraciones</center>', SHADOW, true, FADEIN, 300, FADEOUT, 300, STICKY, 1, CLOSEBTN, true, CLICKCLOSE, true)" onmouseout="UnTip()">Configuraciones</a><br />
-
-                                    <script type="text/javascript" src="wz_tooltip/wz_tooltip.js"></script>
-                                    3.9. <a href="#" onmouseover="Tip('<br>3.7.1. <a href=\'pagos_tesoreria/cheques.php\'>Buscar cheques<\/a><br><br>3.7.2. <a href=\'informes_tesoreria/relacion_cheques_corte.php\'>Libro radicador cheques<\/a><br><br>3.7.3. <a href=\'informes_tesoreria/estampillas.php\'>Descuento de estampillas<\/a><br><br>3.7.4. <a href=\'informes_tesoreria/retefuente.php\'>Retenci&oacute;n en la fuente<\/a><br><br>3.7.5. <a href=\'informes_tesoreria/certifi.php\'>Certificado de retenciones<\/a><br><br>', WIDTH, 250, TITLE, '<center>Herramientas</center>', SHADOW, true, FADEIN, 300, FADEOUT, 300, STICKY, 1, CLOSEBTN, true, CLICKCLOSE, true)" onmouseout="UnTip()">Herramientas</a><br />
+                                    3.6. <a href="#" onmouseover="Tip('<br>3.7.1. <a href=\'pagos_tesoreria/cheques.php\'>Buscar cheques<\/a><br><br>3.7.2. <a href=\'informes_tesoreria/relacion_cheques_corte.php\'>Libro radicador cheques<\/a><br><br>3.7.3. <a href=\'informes_tesoreria/estampillas.php\'>Descuento de estampillas<\/a><br><br>3.7.4. <a href=\'informes_tesoreria/retefuente.php\'>Retenci&oacute;n en la fuente<\/a><br><br>3.7.5. <a href=\'informes_tesoreria/certifi.php\'>Certificado de retenciones<\/a><br><br>', WIDTH, 250, TITLE, '<center>Herramientas</center>', SHADOW, true, FADEIN, 300, FADEOUT, 300, STICKY, 1, CLOSEBTN, true, CLICKCLOSE, true)" onmouseout="UnTip()">Herramientas</a><br />
 
 
                                 </div>
@@ -604,7 +594,7 @@ if($cx->connect_errno)
                         </tr>
                         <tr>
                             <td valign="top" class="Estilo4">
-                                <div style="padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:10px;"> 4.1. <a href="mvto_contable/menu_cont.php" target="_parent">Movimientos</a><br />
+                                <div style="padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:10px;"> 4.1. <a href="contable/index.php" target="_parent">Movimientos</a><br />
                                     4.2. <a href="facturacion/upload.php" target="_parent">Facturaci&oacute;n </a><br />
                                     4.3. <a href="pgcp/index_pgcp.php" target="_parent">Plan de Cuentas P.G.C.P </a><br />
                                     4.4. <a href="dctos_fuente/dctos_fuente.php" target="_parent">Documentos Fuente</a><br />

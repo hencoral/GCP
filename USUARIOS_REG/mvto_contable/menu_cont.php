@@ -1,608 +1,661 @@
 <?php
 session_start();
-$b='';
+$b = '';
 //$_POST['nn']='';
 //echo $_GET['nn'];
-$_POST['buscar']='';
-$ver_boton='';
-$buscar='';
-$filtro='';
-if(!isset($_SESSION["login"]))
-{
-header("Location: ../login.php");
-exit;
+$_POST['buscar'] = '';
+$ver_boton = '';
+$buscar = '';
+$filtro = '';
+$registrado = 'rrs';
+if (!isset($_SESSION["login"])) {
+	header("Location: ../login.php");
+	exit;
 } else {
-include('../config.php');     
+	include('../config.php');
 	// verifico permisos del usuario
 	global $server, $database, $dbpass, $dbuser, $charset;
 	// Conexion con la base de datos
 	$cx = new mysqli($server, $dbuser, $dbpass, $database);
-       	$sql="SELECT conta FROM usuarios2 where login = '$_SESSION[login]'";
-		$res=$cx->query($sql);
-		$rw = mysqli_fetch_array($res);
-if ($rw['conta']=='SI')
-{
-          
-$sqlxx = "select * from fecha";
-$resultadoxx = $cx->query($sqlxx);
-$mesh = array('cc','ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE');
-while($rowxx = mysqli_fetch_array($resultadoxx))
-   {
-   $idxx=$rowxx["id_emp"];
-   $ano=$rowxx["ano"];
-   }
-   list($an, $me, $di)  = explode('/', $ano);
+	$sql = "SELECT conta FROM usuarios2 where login = '$_SESSION[login]'";
+	$res = $cx->query($sql);
+	$rw = mysqli_fetch_array($res);
+	if ($rw['conta'] == 'SI') {
+
+		$sqlxx = "select * from fecha";
+		$resultadoxx = $cx->query($sqlxx);
+		$mesh = array('cc', 'ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE');
+		while ($rowxx = mysqli_fetch_array($resultadoxx)) {
+			$idxx = $rowxx["id_emp"];
+			$ano = $rowxx["ano"];
+		}
+		list($an, $me, $di)  = explode('/', $ano);
 
 ?>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
-
-<title>CONTAFACIL</title>
-
-<style type="text/css">
-<!--
-.Estilo2 {font-size: 9px}
-.Estilo4 {font-family: Verdana, Geneva, Arial, Helvetica, sans-serif; font-size: 10px; color: #333333; }
-a {
-    font-family: Verdana, Arial, Helvetica, sans-serif;
-    font-size: 11px;
-    color: #666666;
-}
-a:link {
-    text-decoration: none;
-}
-a:visited {
-    text-decoration: none;
-    color: #666666;
-}
-a:hover {
-    text-decoration: underline;
-    color: #666666;
-}
-a:active {
-    text-decoration: none;
-    color: #666666;
-}
-.Estilo7 {font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 9px; color: #666666; }
--->
-</style>
-
-<style>
-.fc_main { background: #FFFFFF; border: 1px solid #000000; font-family: Verdana; font-size: 10px; }
-.fc_date { border: 1px solid #D9D9D9;  cursor:pointer; font-size: 10px; text-align: center;}
-.fc_dateHover, TD.fc_date:hover { cursor:pointer; border-top: 1px solid #FFFFFF; border-left: 1px solid #FFFFFF; border-right: 1px solid #999999; border-bottom: 1px solid #999999; background: #E7E7E7; font-size: 10px; text-align: center; }
-.fc_wk {font-family: Verdana; font-size: 10px; text-align: center;}
-.fc_wknd { color: #FF0000; font-weight: bold; font-size: 10px; text-align: center;}
-.fc_head { background: #000066; color: #FFFFFF; font-weight:bold; text-align: left;  font-size: 11px; }
-</style>
-<style type="text/css">
-table.bordepunteado1 { border-style: solid; border-collapse:collapse; border-width: 2px; border-color: #004080; }
-.Estilo8 {
-    color: #990000;
-    font-weight: bold;
-}
-</style>
-<!--muestra - oculta naturales -->
-<script language="JavaScript" type="text/javascript" src="javas.js"></script>
-<SCRIPT language="javascript">
-
-function MostrarOcultar (objetoVisualizar) 
-{
-        if (document.all['naturales'].style.display=='none')
-        {
-        document.all['naturales'].style.display='block';
-        document.a.ter_nat.disabled=false;
-        document.all['juridicos'].style.display='none';
-        document.a.ter_jur.disabled=true;
-        }
-        else 
-        {
-        document.a.ter_nat.disabled=true;
-        document.a.ter_jur.disabled=true;
-        document.all['naturales'].style.display='none';
-        document.all['juridicos'].style.display='none';
-        }
-}
-
-function mostrah(){
- document.getElementById("caja14").style.display = "block";
-document.getElementById("toncon").style.display = "none";
-}
-function quitarh(){
- document.getElementById("caja14").style.display = "none";
-}
-</SCRIPT>
-<!--muestra - oculta juridicos -->
-<SCRIPT language="javascript">
-function MostrarOcultar2 (objetoVisualizar) 
-{
-    
-        if (document.all['juridicos'].style.display=='none') 
-        {
-        document.all['naturales'].style.display='none';
-        document.a.ter_nat.disabled=true;
-        document.all['juridicos'].style.display='block';
-        document.a.ter_jur.disabled=false;
-        }
-        else 
-        {
-        document.a.ter_nat.disabled=true;
-        document.a.ter_jur.disabled=true;
-        document.all['naturales'].style.display='none';
-        document.all['juridicos'].style.display='none';
-        }
-    
-        
-        
-}
-</SCRIPT>  
-
-
-
-<script language="JavaScript">
-
-var nav4 = window.Event ? true : false;
-function acceptNum(evt){
-// NOTE: Backspace = 8, Enter = 13, '0' = 48, '9' = 57
-var key = nav4 ? evt.which : evt.keyCode;
-return (key <= 13 || (key >= 48 && key <= 57));
-}
-//-->
-</script>
-
-<!--linea de insercion del jquery-->
-
-<script type="text/javascript" language="javascript" src="../jquery.js"></script>
-
-
-<!-- inicio mostrar tabla-->
-
-<!--**************************-->
-<script type="text/javascript">
-$(function()
-{
-
-$("#mostrar").click(function(event) {
-event.preventDefault();
-$("#caja").slideToggle();
-});
-
-$("#caja a").click(function(event) {
-event.preventDefault();
-$("#caja").slideUp();
-});
-});
-</script>
-<!--**************************-->
-<script type="text/javascript">
-$(function()
-{
-
-$("#mostrar2").click(function(event) {
-event.preventDefault();
-$("#caja2").slideToggle();
-});
-
-$("#caja a").click(function(event) {
-event.preventDefault();
-$("#caja2").slideUp();
-});
-});
-</script>
-<!--**************************-->
-<script type="text/javascript">
-$(function()
-{
-
-$("#mostrar3").click(function(event) {
-event.preventDefault();
-$("#caja3").slideToggle();
-});
-
-$("#caja a").click(function(event) {
-event.preventDefault();
-$("#caja3").slideUp();
-});
-});
-</script>
-<!--**************************-->
-<script type="text/javascript">
-$(function()
-{
-
-$("#mostrar4").click(function(event) {
-event.preventDefault();
-$("#caja4").slideToggle();
-});
-
-$("#caja a").click(function(event) {
-event.preventDefault();
-$("#caja4").slideUp();
-});
-});
-</script>
-<!--**************************-->
-<script type="text/javascript">
-$(function()
-{
-
-$("#mostrar5").click(function(event) {
-event.preventDefault();
-$("#caja5").slideToggle();
-$("#toncon").slideUp();
-});
-
-$("#caja a").click(function(event) {
-event.preventDefault();
-$("#caja5").slideUp();
-});
-});
-</script>
-<!--**************************-->
-<script type="text/javascript">
-$(function()
-{
-
-$("#mostrar6").click(function(event) {
-event.preventDefault();
-$("#caja6").slideToggle();
-});
-
-$("#caja a").click(function(event) {
-event.preventDefault();
-$("#caja6").slideUp();
-});
-});
-</script>
-<!--**************************-->
-<script type="text/javascript">
-$(function()
-{
-
-$("#mostrar7").click(function(event) {
-event.preventDefault();
-$("#caja7").slideToggle();
-});
-
-$("#caja a").click(function(event) {
-event.preventDefault();
-$("#caja7").slideUp();
-});
-});
-</script>
-<!--**************************-->
-<script type="text/javascript">
-$(function()
-{
-
-$("#mostrar8").click(function(event) {
-event.preventDefault();
-$("#caja8").slideToggle();
-});
-
-$("#caja a").click(function(event) {
-event.preventDefault();
-$("#caja8").slideUp();
-});
-});
-</script>
-<!--**************************-->
-<script type="text/javascript">
-$(function()
-{
-
-$("#mostrar9").click(function(event) {
-event.preventDefault();
-$("#caja9").slideToggle();
-});
-
-$("#caja a").click(function(event) {
-event.preventDefault();
-$("#caja9").slideUp();
-});
-});
-</script>
-<!--**************************-->
-<script type="text/javascript">
-$(function()
-{
-
-$("#mostrar10").click(function(event) {
-event.preventDefault();
-$("#caja10").slideToggle();
-});
-
-$("#caja a").click(function(event) {
-event.preventDefault();
-$("#caja10").slideUp();
-});
-});
-</script>
-<!--**************************-->
-<style type="text/css">
-body {
-    font-family: Verdana, Arial, Helvetica, sans-serif;
-    font-size: 11px;
-    color: #666666; 
-}
-
-a{color:#993300; text-decoration:none;}
-
-#caja {
-width:100%;
-display: none;
-padding:5px;
-border:2px solid #ffffff;
-background-color:#ffffff;
-}
-#mostrar{
-display:block;
-width:100%;
-padding:5px;
-border:2px solid #D0E8F4;
-background-color:#ECF8FD;
-}
-
-#caja2 {
-width:100%;
-display: none;
-padding:5px;
-border:2px solid #ffffff;
-background-color:#ffffff;
-}
-#mostrar2{
-display:block;
-width:100%;
-padding:5px;
-border:2px solid #D0E8F4;
-background-color:#ECF8FD;
-}
-
-#caja3 {
-width:100%;
-display: none;
-padding:5px;
-border:2px solid #ffffff;
-background-color:#ffffff;
-}
-#mostrar3{
-display:block;
-width:100%;
-padding:5px;
-border:2px solid #D0E8F4;
-background-color:#ECF8FD;
-}
-
-#caja4 {
-width:100%;
-display: none;
-padding:5px;
-border:2px solid #ffffff;
-background-color:#ffffff;
-}
-#mostrar4{
-display:block;
-width:100%;
-padding:5px;
-border:2px solid #D0E8F4;
-background-color:#ECF8FD;
-}
-
-#caja5 {
-width:100%;
-display: none;
-padding:5px;
-border:2px solid #ffffff;
-background-color:#ffffff;
-}
-#mostrar5{
-display:block;
-width:100%;
-padding:5px;
-border:2px solid #D0E8F4;
-background-color:#ECF8FD;
-}
-
-#caja6 {
-width:100%;
-display: none;
-padding:5px;
-border:2px solid #ffffff;
-background-color:#ffffff;
-}
-#mostrar6{
-display:block;
-width:100%;
-padding:5px;
-border:2px solid #D0E8F4;
-background-color:#ECF8FD;
-}
-
-#caja7 {
-width:100%;
-display: none;
-padding:5px;
-border:2px solid #ffffff;
-background-color:#ffffff;
-}
-#mostrar7{
-display:block;
-width:100%;
-padding:5px;
-border:2px solid #D0E8F4;
-background-color:#ECF8FD;
-}
-
-#caja8 {
-width:100%;
-display: none;
-padding:5px;
-border:2px solid #ffffff;
-background-color:#ffffff;
-}
-#mostrar8{
-display:block;
-width:100%;
-padding:5px;
-border:2px solid #D0E8F4;
-background-color:#ECF8FD;
-}
-
-#caja9 {
-width:100%;
-display: none;
-padding:5px;
-border:2px solid #ffffff;
-background-color:#ffffff;
-}
-#mostrar9{
-display:block;
-width:100%;
-padding:5px;
-border:2px solid #D0E8F4;
-background-color:#ECF8FD;
-}
-
-#caja10 {
-width:100%;
-display: none;
-padding:5px;
-border:2px solid #ffffff;
-background-color:#ffffff;
-}
-#mostrar10{
-display:block;
-width:100%;
-padding:5px;
-border:2px solid #D0E8F4;
-background-color:#ECF8FD;
-}
-</style>
-
-<!-- fin mostrar tabla--> 
-
-
-<!--propiedades de las tablas-->
-
-<style type="text/css" title="currentStyle">
-@import "../libscroll/css/demo_table.css";
-</style>
-<!--<script type="text/javascript" language="javascript" src="../libscroll/js/jquery.js"></script>-->
-<script type="text/javascript" language="javascript" src="../libscroll/js/jquery.dataTables.js"></script>
-
-
-<script type="text/javascript" charset="utf-8">
-$(document).ready(function() {
-$('#tabla1').dataTable( {
-"sPaginationType": "full_numbers"
-} );
-} );
-</script>
-
-
-<script type="text/javascript" charset="utf-8">
-$(document).ready(function() {
-$('#tabla2').dataTable( {
-"sPaginationType": "full_numbers"
-} );
-} );
-</script>
-
-<script type="text/javascript" charset="utf-8">
-$(document).ready(function() {
-$('#tabla3').dataTable( {
-"sPaginationType": "full_numbers"
-} );
-} );
-</script>
-
-<script type="text/javascript" charset="utf-8">
-$(document).ready(function() {
-$('#tabla4').dataTable( {
-"sPaginationType": "full_numbers"
-} );
-} );
-</script>
-
-<script type="text/javascript" charset="utf-8">
-$(document).ready(function() {
-$('#tabla5').dataTable( {
-"sPaginationType": "full_numbers"
-} );
-} );
-</script>
-
-<script type="text/javascript" charset="utf-8">
-$(document).ready(function() {
-$('#tabla6').dataTable( {
-"sPaginationType": "full_numbers"
-} );
-} );
-
-</script>
-
-<script type="text/javascript" charset="utf-8">
-$(document).ready(function() {
-$('#tabla7').dataTable( {
-"sPaginationType": "full_numbers"
-} );
-} );
-</script>
-
-<script type="text/javascript" charset="utf-8">
-$(document).ready(function() {
-$('#tabla8').dataTable( {
-"sPaginationType": "full_numbers"
-} );
-} );
-</script>
-
-<script type="text/javascript" charset="utf-8">
-$(document).ready(function() {
-$('#tabla9').dataTable( {
-"sPaginationType": "full_numbers"
-} );
-} );
-</script>
-
-<script type="text/javascript" charset="utf-8">
-$(document).ready(function() {
-$('#tabla10').dataTable( {
-"sPaginationType": "full_numbers"
-} );
-} );
-</script>
-
-
-
-<!-- FIN propiedades de las tablas-->
-
-
-<SCRIPT TYPE="text/javascript" LANGUAGE="javascript">
-
-
-
-function waitPreloadPage() { //DOM
-if (document.getElementById){
-document.getElementById('prepage').style.visibility='hidden';
-}else{
-if (document.layers){ //NS4
-document.prepage.visibility = 'hidden';
-}
-else { //IE4
-document.all.prepage.style.visibility = 'hidden';
-}
-}
-}
-// End -->
-
-</SCRIPT>
-
-</head>
-<body>
-<!--<body onLoad="waitPreloadPage();">
+		<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+		<html xmlns="http://www.w3.org/1999/xhtml">
+
+		<head>
+			<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+
+			<title>CONTAFACIL</title>
+
+			<style type="text/css">
+				<!--
+				.Estilo2 {
+					font-size: 9px
+				}
+
+				.Estilo4 {
+					font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+					font-size: 10px;
+					color: #333333;
+				}
+
+				a {
+					font-family: Verdana, Arial, Helvetica, sans-serif;
+					font-size: 11px;
+					color: #666666;
+				}
+
+				a:link {
+					text-decoration: none;
+				}
+
+				a:visited {
+					text-decoration: none;
+					color: #666666;
+				}
+
+				a:hover {
+					text-decoration: underline;
+					color: #666666;
+				}
+
+				a:active {
+					text-decoration: none;
+					color: #666666;
+				}
+
+				.Estilo7 {
+					font-family: Verdana, Arial, Helvetica, sans-serif;
+					font-size: 9px;
+					color: #666666;
+				}
+				-->
+			</style>
+
+			<style>
+				.fc_main {
+					background: #FFFFFF;
+					border: 1px solid #000000;
+					font-family: Verdana;
+					font-size: 10px;
+				}
+
+				.fc_date {
+					border: 1px solid #D9D9D9;
+					cursor: pointer;
+					font-size: 10px;
+					text-align: center;
+				}
+
+				.fc_dateHover,
+				TD.fc_date:hover {
+					cursor: pointer;
+					border-top: 1px solid #FFFFFF;
+					border-left: 1px solid #FFFFFF;
+					border-right: 1px solid #999999;
+					border-bottom: 1px solid #999999;
+					background: #E7E7E7;
+					font-size: 10px;
+					text-align: center;
+				}
+
+				.fc_wk {
+					font-family: Verdana;
+					font-size: 10px;
+					text-align: center;
+				}
+
+				.fc_wknd {
+					color: #FF0000;
+					font-weight: bold;
+					font-size: 10px;
+					text-align: center;
+				}
+
+				.fc_head {
+					background: #000066;
+					color: #FFFFFF;
+					font-weight: bold;
+					text-align: left;
+					font-size: 11px;
+				}
+			</style>
+			<style type="text/css">
+				table.bordepunteado1 {
+					border-style: solid;
+					border-collapse: collapse;
+					border-width: 2px;
+					border-color: #004080;
+				}
+
+				.Estilo8 {
+					color: #990000;
+					font-weight: bold;
+				}
+			</style>
+			<!--muestra - oculta naturales -->
+			<script language="JavaScript" type="text/javascript" src="javas.js"></script>
+			<SCRIPT language="javascript">
+				function MostrarOcultar(objetoVisualizar) {
+					if (document.all['naturales'].style.display == 'none') {
+						document.all['naturales'].style.display = 'block';
+						document.a.ter_nat.disabled = false;
+						document.all['juridicos'].style.display = 'none';
+						document.a.ter_jur.disabled = true;
+					} else {
+						document.a.ter_nat.disabled = true;
+						document.a.ter_jur.disabled = true;
+						document.all['naturales'].style.display = 'none';
+						document.all['juridicos'].style.display = 'none';
+					}
+				}
+
+				function mostrah() {
+					document.getElementById("caja14").style.display = "block";
+					document.getElementById("toncon").style.display = "none";
+				}
+
+				function quitarh() {
+					document.getElementById("caja14").style.display = "none";
+				}
+			</SCRIPT>
+			<!--muestra - oculta juridicos -->
+			<SCRIPT language="javascript">
+				function MostrarOcultar2(objetoVisualizar) {
+
+					if (document.all['juridicos'].style.display == 'none') {
+						document.all['naturales'].style.display = 'none';
+						document.a.ter_nat.disabled = true;
+						document.all['juridicos'].style.display = 'block';
+						document.a.ter_jur.disabled = false;
+					} else {
+						document.a.ter_nat.disabled = true;
+						document.a.ter_jur.disabled = true;
+						document.all['naturales'].style.display = 'none';
+						document.all['juridicos'].style.display = 'none';
+					}
+
+
+
+				}
+			</SCRIPT>
+
+
+
+			<script language="JavaScript">
+				var nav4 = window.Event ? true : false;
+
+				function acceptNum(evt) {
+					// NOTE: Backspace = 8, Enter = 13, '0' = 48, '9' = 57
+					var key = nav4 ? evt.which : evt.keyCode;
+					return (key <= 13 || (key >= 48 && key <= 57));
+				}
+				//-->
+			</script>
+
+			<!--linea de insercion del jquery-->
+
+			<script type="text/javascript" language="javascript" src="../jquery.js"></script>
+
+
+			<!-- inicio mostrar tabla-->
+
+			<!--**************************-->
+			<script type="text/javascript">
+				$(function() {
+
+					$("#mostrar").click(function(event) {
+						event.preventDefault();
+						$("#caja").slideToggle();
+					});
+
+					$("#caja a").click(function(event) {
+						event.preventDefault();
+						$("#caja").slideUp();
+					});
+				});
+			</script>
+			<!--**************************-->
+			<script type="text/javascript">
+				$(function() {
+
+					$("#mostrar2").click(function(event) {
+						event.preventDefault();
+						$("#caja2").slideToggle();
+					});
+
+					$("#caja a").click(function(event) {
+						event.preventDefault();
+						$("#caja2").slideUp();
+					});
+				});
+			</script>
+			<!--**************************-->
+			<script type="text/javascript">
+				$(function() {
+
+					$("#mostrar3").click(function(event) {
+						event.preventDefault();
+						$("#caja3").slideToggle();
+					});
+
+					$("#caja a").click(function(event) {
+						event.preventDefault();
+						$("#caja3").slideUp();
+					});
+				});
+			</script>
+			<!--**************************-->
+			<script type="text/javascript">
+				$(function() {
+
+					$("#mostrar4").click(function(event) {
+						event.preventDefault();
+						$("#caja4").slideToggle();
+					});
+
+					$("#caja a").click(function(event) {
+						event.preventDefault();
+						$("#caja4").slideUp();
+					});
+				});
+			</script>
+			<!--**************************-->
+			<script type="text/javascript">
+				$(function() {
+
+					$("#mostrar5").click(function(event) {
+						event.preventDefault();
+						$("#caja5").slideToggle();
+						$("#toncon").slideUp();
+					});
+
+					$("#caja a").click(function(event) {
+						event.preventDefault();
+						$("#caja5").slideUp();
+					});
+				});
+			</script>
+			<!--**************************-->
+			<script type="text/javascript">
+				$(function() {
+
+					$("#mostrar6").click(function(event) {
+						event.preventDefault();
+						$("#caja6").slideToggle();
+					});
+
+					$("#caja a").click(function(event) {
+						event.preventDefault();
+						$("#caja6").slideUp();
+					});
+				});
+			</script>
+			<!--**************************-->
+			<script type="text/javascript">
+				$(function() {
+
+					$("#mostrar7").click(function(event) {
+						event.preventDefault();
+						$("#caja7").slideToggle();
+					});
+
+					$("#caja a").click(function(event) {
+						event.preventDefault();
+						$("#caja7").slideUp();
+					});
+				});
+			</script>
+			<!--**************************-->
+			<script type="text/javascript">
+				$(function() {
+
+					$("#mostrar8").click(function(event) {
+						event.preventDefault();
+						$("#caja8").slideToggle();
+					});
+
+					$("#caja a").click(function(event) {
+						event.preventDefault();
+						$("#caja8").slideUp();
+					});
+				});
+			</script>
+			<!--**************************-->
+			<script type="text/javascript">
+				$(function() {
+
+					$("#mostrar9").click(function(event) {
+						event.preventDefault();
+						$("#caja9").slideToggle();
+					});
+
+					$("#caja a").click(function(event) {
+						event.preventDefault();
+						$("#caja9").slideUp();
+					});
+				});
+			</script>
+			<!--**************************-->
+			<script type="text/javascript">
+				$(function() {
+
+					$("#mostrar10").click(function(event) {
+						event.preventDefault();
+						$("#caja10").slideToggle();
+					});
+
+					$("#caja a").click(function(event) {
+						event.preventDefault();
+						$("#caja10").slideUp();
+					});
+				});
+			</script>
+			<!--**************************-->
+			<style type="text/css">
+				body {
+					font-family: Verdana, Arial, Helvetica, sans-serif;
+					font-size: 11px;
+					color: #666666;
+				}
+
+				a {
+					color: #993300;
+					text-decoration: none;
+				}
+
+				#caja {
+					width: 100%;
+					display: none;
+					padding: 5px;
+					border: 2px solid #ffffff;
+					background-color: #ffffff;
+				}
+
+				#mostrar {
+					display: block;
+					width: 100%;
+					padding: 5px;
+					border: 2px solid #D0E8F4;
+					background-color: #ECF8FD;
+				}
+
+				#caja2 {
+					width: 100%;
+					display: none;
+					padding: 5px;
+					border: 2px solid #ffffff;
+					background-color: #ffffff;
+				}
+
+				#mostrar2 {
+					display: block;
+					width: 100%;
+					padding: 5px;
+					border: 2px solid #D0E8F4;
+					background-color: #ECF8FD;
+				}
+
+				#caja3 {
+					width: 100%;
+					display: none;
+					padding: 5px;
+					border: 2px solid #ffffff;
+					background-color: #ffffff;
+				}
+
+				#mostrar3 {
+					display: block;
+					width: 100%;
+					padding: 5px;
+					border: 2px solid #D0E8F4;
+					background-color: #ECF8FD;
+				}
+
+				#caja4 {
+					width: 100%;
+					display: none;
+					padding: 5px;
+					border: 2px solid #ffffff;
+					background-color: #ffffff;
+				}
+
+				#mostrar4 {
+					display: block;
+					width: 100%;
+					padding: 5px;
+					border: 2px solid #D0E8F4;
+					background-color: #ECF8FD;
+				}
+
+				#caja5 {
+					width: 100%;
+					display: none;
+					padding: 5px;
+					border: 2px solid #ffffff;
+					background-color: #ffffff;
+				}
+
+				#mostrar5 {
+					display: block;
+					width: 100%;
+					padding: 5px;
+					border: 2px solid #D0E8F4;
+					background-color: #ECF8FD;
+				}
+
+				#caja6 {
+					width: 100%;
+					display: none;
+					padding: 5px;
+					border: 2px solid #ffffff;
+					background-color: #ffffff;
+				}
+
+				#mostrar6 {
+					display: block;
+					width: 100%;
+					padding: 5px;
+					border: 2px solid #D0E8F4;
+					background-color: #ECF8FD;
+				}
+
+				#caja7 {
+					width: 100%;
+					display: none;
+					padding: 5px;
+					border: 2px solid #ffffff;
+					background-color: #ffffff;
+				}
+
+				#mostrar7 {
+					display: block;
+					width: 100%;
+					padding: 5px;
+					border: 2px solid #D0E8F4;
+					background-color: #ECF8FD;
+				}
+
+				#caja8 {
+					width: 100%;
+					display: none;
+					padding: 5px;
+					border: 2px solid #ffffff;
+					background-color: #ffffff;
+				}
+
+				#mostrar8 {
+					display: block;
+					width: 100%;
+					padding: 5px;
+					border: 2px solid #D0E8F4;
+					background-color: #ECF8FD;
+				}
+
+				#caja9 {
+					width: 100%;
+					display: none;
+					padding: 5px;
+					border: 2px solid #ffffff;
+					background-color: #ffffff;
+				}
+
+				#mostrar9 {
+					display: block;
+					width: 100%;
+					padding: 5px;
+					border: 2px solid #D0E8F4;
+					background-color: #ECF8FD;
+				}
+
+				#caja10 {
+					width: 100%;
+					display: none;
+					padding: 5px;
+					border: 2px solid #ffffff;
+					background-color: #ffffff;
+				}
+
+				#mostrar10 {
+					display: block;
+					width: 100%;
+					padding: 5px;
+					border: 2px solid #D0E8F4;
+					background-color: #ECF8FD;
+				}
+			</style>
+
+			<!-- fin mostrar tabla-->
+
+
+			<!--propiedades de las tablas-->
+
+			<style type="text/css" title="currentStyle">
+				@import "../libscroll/css/demo_table.css";
+			</style>
+			<!--<script type="text/javascript" language="javascript" src="../libscroll/js/jquery.js"></script>-->
+			<script type="text/javascript" language="javascript" src="../libscroll/js/jquery.dataTables.js"></script>
+
+
+			<script type="text/javascript" charset="utf-8">
+				$(document).ready(function() {
+					$('#tabla1').dataTable({
+						"sPaginationType": "full_numbers"
+					});
+				});
+			</script>
+
+
+			<script type="text/javascript" charset="utf-8">
+				$(document).ready(function() {
+					$('#tabla2').dataTable({
+						"sPaginationType": "full_numbers"
+					});
+				});
+			</script>
+
+			<script type="text/javascript" charset="utf-8">
+				$(document).ready(function() {
+					$('#tabla3').dataTable({
+						"sPaginationType": "full_numbers"
+					});
+				});
+			</script>
+
+			<script type="text/javascript" charset="utf-8">
+				$(document).ready(function() {
+					$('#tabla4').dataTable({
+						"sPaginationType": "full_numbers"
+					});
+				});
+			</script>
+
+			<script type="text/javascript" charset="utf-8">
+				$(document).ready(function() {
+					$('#tabla5').dataTable({
+						"sPaginationType": "full_numbers"
+					});
+				});
+			</script>
+
+			<script type="text/javascript" charset="utf-8">
+				$(document).ready(function() {
+					$('#tabla6').dataTable({
+						"sPaginationType": "full_numbers"
+					});
+				});
+			</script>
+
+			<script type="text/javascript" charset="utf-8">
+				$(document).ready(function() {
+					$('#tabla7').dataTable({
+						"sPaginationType": "full_numbers"
+					});
+				});
+			</script>
+
+			<script type="text/javascript" charset="utf-8">
+				$(document).ready(function() {
+					$('#tabla8').dataTable({
+						"sPaginationType": "full_numbers"
+					});
+				});
+			</script>
+
+			<script type="text/javascript" charset="utf-8">
+				$(document).ready(function() {
+					$('#tabla9').dataTable({
+						"sPaginationType": "full_numbers"
+					});
+				});
+			</script>
+
+			<script type="text/javascript" charset="utf-8">
+				$(document).ready(function() {
+					$('#tabla10').dataTable({
+						"sPaginationType": "full_numbers"
+					});
+				});
+			</script>
+
+
+
+			<!-- FIN propiedades de las tablas-->
+
+
+			<SCRIPT TYPE="text/javascript" LANGUAGE="javascript">
+				function waitPreloadPage() { //DOM
+					if (document.getElementById) {
+						document.getElementById('prepage').style.visibility = 'hidden';
+					} else {
+						if (document.layers) { //NS4
+							document.prepage.visibility = 'hidden';
+						} else { //IE4
+							document.all.prepage.style.visibility = 'hidden';
+						}
+					}
+				}
+				// End -->
+			</SCRIPT>
+
+		</head>
+
+		<body>
+			<!--<body onLoad="waitPreloadPage();">
 <DIV id="prepage" style="position:absolute; font-family:arial; font-size:16; left:0px; top:0px; background-color:white; layer-background-color:white; height:100%; width:100%;">
 <center> 
 <br /><br /><br /><br />
@@ -611,171 +664,191 @@ document.all.prepage.style.visibility = 'hidden';
 </center>
 </DIV>-->
 
-<table width="800" border="0" align="center">
-  <tr>
-    
-    <td colspan="3">
-    <div class="Estilo2" id="main_div" style="padding-left:3px; padding-top:3px; padding-right:3px; padding-bottom:3px;">
-      <div align="center">
-      <img src="../images/PLANTILLA PNG PARA BANNER COMUN.png" width="585" height="100" />    </div>
-    </div>  </td>
-  </tr>
-  
-  <tr>
-    <td colspan="3"><div style="padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:5px;">
-      <div align="center">
-        <div style='padding-left:3px; padding-top:3px; padding-right:3px; padding-bottom:3px; background:#004080; width:150px'>
-          <div style='padding-left:5px; padding-top:5px; padding-right:5px; padding-bottom:5px; background:#FFFFFF'>
-            <div align="center"><a href='../user.php' target='_parent'>VOLVER </a> </div>
-          </div>
-        </div>
-      </div>
-    </div></td>
-  </tr>
-  <tr>
-    <td colspan="3">
-    <div style="padding-left:10px; padding-top:30px; padding-right:10px; padding-bottom:10px;">
-      <div align="center" class="Estilo4"><strong>MOVIMIENTOS CONTABLES</strong></div>
-    </div>  </td>
-  </tr>
-  <tr>
-    <td colspan="3">
-    <div style="padding-left:0px; padding-top:5px; padding-right:0px; padding-bottom:5px;">
-<form method="post" action="menu_cont.php">
-  <table width="800" border="0" align="center">
-    <tr>
-      <td width="600">
-        <div style="padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:10px;">
-          <div align="right"><span class="Estilo4"><strong>Seleccione el Comprobante </strong>: </span>
-            <select name="nn" class="Estilo4" style="width: 350px;">
-              <?php
-$strSQL = "SELECT * FROM dctos_fuente_comprobantes  WHERE id_emp = '$idxx' AND cont = 'SI' ";
-$rs = $cx->query($strSQL);
-$nr = $rs->num_rows;
-for ($i=0; $i<$nr; $i++) {
-    $r = $rs->fetch_array();
-    echo "<OPTION VALUE=\"".$r["cod"]."\">".$r["cod"]." - ".$r["nombre"]."</b></OPTION>";
-}
+			<table width="800" border="0" align="center">
+				<tr>
 
-$sq3 ="select cargo from usuarios2 where login = '$_SESSION[login]'";
-$re3 = $cx->query($sq3);
-$rw3 = $re3->fetch_array();
-if ($rw3['cargo'] == "REVISOR")
-{
-	$ver_boton = "style=display:none";
-}
+					<td colspan="3">
+						<div class="Estilo2" id="main_div" style="padding-left:3px; padding-top:3px; padding-right:3px; padding-bottom:3px;">
+							<div align="center">
+								<img src="../images/PLANTILLA PNG PARA BANNER COMUN.png" width="585" height="100" />
+							</div>
+						</div>
+					</td>
+				</tr>
 
-?>
-            </select>
-          </div>
-        </div></td>
-      <td width="190"><div style="padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:10px;">
-        <div align="center">
-          <input id="btncomp" name="Submit" type="submit" class="Estilo4" value="Seleccionar Comprobante" />
-        </div>
-      </div></td>
-    </tr>
-  </table>
-</form>
-<form method="post" action="menu_cont.php">
-  <table width="800" border="0" align="center">
-    <tr>
-      <td width="600">
-        <div style="padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:10px;">
-          <div align="right"><span class="Estilo4"><strong>Seleccione el Soporte </strong>: </span>
-            <select name="nn" class="Estilo4" style="width: 350px;">
-              <?php
-			  	// Datos para mostrar listas
-	if(isset($_GET['ini'])) $ini=$_GET['ini']; else $ini=0;
-	if(isset($_GET['fin'])) $fin=$_GET['fin']; else $fin=0;
-	if(isset($_GET['k'])) $indice =$_GET['k']; else $indice=0;
-	$muestra = 250;
-	if (!$ini) 
-	{
-		$ini=0;
-		$fin=$muestra;	
-	}
+				<tr>
+					<td colspan="3">
+						<div style="padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:5px;">
+							<div align="center">
+								<div style='padding-left:3px; padding-top:3px; padding-right:3px; padding-bottom:3px; background:#004080; width:150px'>
+									<div style='padding-left:5px; padding-top:5px; padding-right:5px; padding-bottom:5px; background:#FFFFFF'>
+										<div align="center"><a href='../user.php' target='_parent'>VOLVER </a> </div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="3">
+						<div style="padding-left:10px; padding-top:30px; padding-right:10px; padding-bottom:10px;">
+							<div align="center" class="Estilo4"><strong>MOVIMIENTOS CONTABLES</strong></div>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="3">
+						<div style="padding-left:0px; padding-top:5px; padding-right:0px; padding-bottom:5px;">
+							<form method="post" action="menu_cont.php">
+								<table width="800" border="0" align="center">
+									<tr>
+										<td width="600">
+											<div style="padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:10px;">
+												<div align="right"><span class="Estilo4"><strong>Seleccione el Comprobante </strong>: </span>
+													<select name="nn" class="Estilo4" style="width: 350px;">
+														<?php
+														$strSQL = "SELECT * FROM dctos_fuente_comprobantes  WHERE id_emp = '$idxx' AND cont = 'SI' ";
+														$rs = $cx->query($strSQL);
+														$nr = $rs->num_rows;
+														for ($i = 0; $i < $nr; $i++) {
+															$r = $rs->fetch_array();
+															echo "<OPTION VALUE=\"" . $r["cod"] . "\">" . $r["cod"] . " - " . $r["nombre"] . "</b></OPTION>";
+														}
 
-$strSQL = "SELECT * FROM dctos_fuente_soportes  WHERE id_emp = '$idxx' AND afecta_con = 'SI' ";
-$rs = $cx->query($strSQL);
-$nr = $rs->num_rows;
-for ($i=0; $i<$nr; $i++) {
-    $r = $rs->fetch_array();
-    echo "<OPTION VALUE=\"".$r["cod"]."\">".$r["cod"]." - ".$r["nombre"]."</b></OPTION>";
-}
-?>
-            </select>
-          </div>
-        </div></td>
-      <td width="190"><div style="padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:10px;">
-        <div align="center">
-          <input name="Submit" type="submit" class="Estilo4" value="Seleccionar Soporte" />
-        </div>
-      </div></td>
-    </tr>
-  </table>
-</form>
+														$sq3 = "select cargo from usuarios2 where login = '$_SESSION[login]'";
+														$re3 = $cx->query($sq3);
+														$rw3 = $re3->fetch_array();
+														if ($rw3['cargo'] == "REVISOR") {
+															$ver_boton = "style=display:none";
+														}
 
-  <div align="center">
-    <?php
-	
-$a="";
-if(isset($_POST['nn']))
-{$a=$_POST['nn'];
-}
+														?>
+													</select>
+												</div>
+											</div>
+										</td>
+										<td width="190">
+											<div style="padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:10px;">
+												<div align="center">
+													<input id="btncomp" name="Submit" type="submit" class="Estilo4" value="Seleccionar Comprobante" />
+												</div>
+											</div>
+										</td>
+									</tr>
+								</table>
+							</form>
+							<form method="post" action="menu_cont.php">
+								<table width="800" border="0" align="center">
+									<tr>
+										<td width="600">
+											<div style="padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:10px;">
+												<div align="right"><span class="Estilo4"><strong>Seleccione el Soporte </strong>: </span>
+													<select name="nn" class="Estilo4" style="width: 350px;">
+														<?php
+														// Datos para mostrar listas
+														if (isset($_GET['ini'])) $ini = $_GET['ini'];
+														else $ini = 0;
+														if (isset($_GET['fin'])) $fin = $_GET['fin'];
+														else $fin = 0;
+														if (isset($_GET['k'])) $indice = $_GET['k'];
+														else $indice = 0;
+														$muestra = 250;
+														if (!$ini) {
+															$ini = 0;
+															$fin = $muestra;
+														}
 
-if(isset($_GET['a']))
-{$a=$_GET['a'];
-}
+														$strSQL = "SELECT * FROM dctos_fuente_soportes  WHERE id_emp = '$idxx' AND afecta_con = 'SI' ";
+														$rs = $cx->query($strSQL);
+														$nr = $rs->num_rows;
+														for ($i = 0; $i < $nr; $i++) {
+															$r = $rs->fetch_array();
+															echo "<OPTION VALUE=\"" . $r["cod"] . "\">" . $r["cod"] . " - " . $r["nombre"] . "</b></OPTION>";
+														}
+														?>
+													</select>
+												</div>
+											</div>
+										</td>
+										<td width="190">
+											<div style="padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:10px;">
+												<div align="center">
+													<input name="Submit" type="submit" class="Estilo4" value="Seleccionar Soporte" />
+												</div>
+											</div>
+										</td>
+									</tr>
+								</table>
+							</form>
+
+							<div align="center">
+								<?php
+
+								$a = "";
+								if (isset($_POST['nn'])) {
+									$a = isset($_POST['nn']) ? $_POST['nn'] : '';
+								}
+
+								if (isset($_GET['a'])) {
+									$a = $_GET['a'];
+								}
 
 
-$archivo ="menu_cont.php";  // Para que el formulario del filtro me procese el nombre del archivo como action
+								$archivo = "menu_cont.php";  // Para que el formulario del filtro me procese el nombre del archivo como action
 
-if ($a == 'CAIC')
-{
+								if ($a == 'CAIC') {
 
-?>
-<BR />
-<div class="Estilo4" style='padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:5px;'>
-      <div align="center" class="Estilo4"><strong>CAUSACION DE CARTERA - CAIC <BR />
-        <BR />
-        <BR />
-</strong></div></div>
-<?php include('../objetos/filtro.php');  
+								?>
+									<BR />
+									<div class="Estilo4" style='padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:5px;'>
+										<div align="center" class="Estilo4"><strong>CAUSACION DE CARTERA - CAIC <BR />
+												<BR />
+												<BR />
+											</strong></div>
+									</div>
+									<?php include('../objetos/filtro.php');
 
-if  ($pendiente =="") 
-{
+									if ($pendiente == "") {
+									} else {
+									?>
+										<br />
+										<div class="Estilo4" style='padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:5px;'><b>
+												LISTA DE RECONOCIMIENTOS ALMACENADOS</strong> &quot;SIN CONTABILIZAR&quot; </b><br />
+											Estos Reconocimientos pueden ser Modificados accediendo a la Opcion 2.4.1 del Menu Principal </div>
+							</div>
+						</div>
+						<BR />
 
-}else{
-?>
-<br />
-<div class="Estilo4" style='padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:5px;'><b>
-      LISTA DE RECONOCIMIENTOS  ALMACENADOS</strong> &quot;SIN CONTABILIZAR&quot; </b><br />
-      Estos Reconocimientos pueden ser Modificados accediendo a la Opcion 2.4.1 del Menu Principal </div>
-		</div></div>
-	<BR />
-	
-	<?php
-	//-------
-	
-	
-	if  ($_POST["buscar"] != "")
-	{
-	$filtro ="and (id_manu_reip LIKE  '%$buscar%' OR tercero LIKE  '%$buscar%') "; 
-	} 
-	
-	$a = "select distinct(consecutivo),sum(valor) as total, tercero , fecha_reg, id_manu_reip, valor from reip_ing where id_emp = '$idxx' and contab = 'NO'";
-	if (empty($tercero)){$c = "";}else{$c= "and tercero =$tercero2";}
-	if ($fecha2 == "MES"){$f= "and fecha_reg between '$f1' and '$f2'";}
-	if ($fecha2 == "DIA"){$f= "and fecha_reg ='$fechafil'";}
-	if ($fecha2 == "A�O"){$f= "and fecha_reg between '$a1' and '$a2'";}
-	$gby = "group by consecutivo";
-	$orden = "order by fecha_reg desc";
-	$sq2 = "$a $c $filtro $f $gby $orden"; 
+						<?php
+										//-------
 
-	$re = $cx->query($sq2);
-	
-	echo("
+
+										if ($_POST["buscar"] != "") {
+											$filtro = "and (id_manu_reip LIKE  '%$buscar%' OR tercero LIKE  '%$buscar%') ";
+										}
+
+										$a = "select distinct(consecutivo),sum(valor) as total, tercero , fecha_reg, id_manu_reip, valor from reip_ing where id_emp = '$idxx' and contab = 'NO'";
+										if (empty($tercero)) {
+											$c = "";
+										} else {
+											$c = "and tercero =$tercero2";
+										}
+										if ($fecha2 == "MES") {
+											$f = "and fecha_reg between '$f1' and '$f2'";
+										}
+										if ($fecha2 == "DIA") {
+											$f = "and fecha_reg ='$fechafil'";
+										}
+										if ($fecha2 == "A�O") {
+											$f = "and fecha_reg between '$a1' and '$a2'";
+										}
+										$gby = "group by consecutivo";
+										$orden = "order by fecha_reg desc";
+										$sq2 = "$a $c $filtro $f $gby $orden";
+
+										$re = $cx->query($sq2);
+
+										echo ("
 	<center>
 	<table width='100%' border='1' class=\"bordepunteado1\">
 	<thead>
@@ -794,10 +867,9 @@ if  ($pendiente =="")
 	</thead>
 	<tbody>
 	");
-	
-	while($rw = $re->fetch_array())
-	   {
-	printf("
+
+										while ($rw = $re->fetch_array()) {
+											printf("
 	
 	<tr>
 	<td align='center' >
@@ -817,58 +889,63 @@ if  ($pendiente =="")
 	</div>
 	</td>
 	
-	</tr>", $rw["fecha_reg"], $rw["id_manu_reip"], $rw["tercero"], $rw["total"], $rw["consecutivo"]); 
-	
-	
-	   }
-	
-	printf("</tbody></table></center>");
-	//--------  ------------------------------------------------------
-}
-	
+	</tr>", $rw["fecha_reg"], $rw["id_manu_reip"], $rw["tercero"], $rw["total"], $rw["consecutivo"]);
+										}
 
-if  ($registrado =="") 
-{
+										printf("</tbody></table></center>");
+										//--------  ------------------------------------------------------
+									}
 
-}else{
-	
-	?>
-	
-	
-	<BR />
-	<div class="Estilo4" style='padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:5px;'>
-		  <div align="center"><strong>      <span class="Estilo4">LISTA DE CAUSACIONES DE CARTERA ALMACENADAS Y </span></strong> <span class="Estilo4">&quot;CONTABILIZADAS&quot; <BR />
-			  <BR />
-			  <a href="../recaudos_tesoreria/recaudos_tesoreria.php" target="_parent">...::: IR A TESORERIA :::...      </a></span></div>
-		</div>
-	<BR />
 
-	<?php
-	$b='';
-	$limitar = "limit $ini,$fin";
-	
-	if  ($_POST["buscar"] != "")
-	{
-	$filtro ="and (consec_cartera LIKE  '%$buscar%' OR tercero LIKE  '%$buscar%') "; 
-	$limitar ='';
-	} 
-	
-	$a = "select * from cartera_cont where id_emp = '$idxx'";
-		if (empty($tercero)){$c = "";}else{$c= "and tercero =$tercero2";}
-		if ($fecha2 == "MES"){$f= "and fecha_causa between '$f1' and '$f2'";}
-		if ($fecha2 == "DIA"){$f= "and fecha_causa ='$fechafil'";}
-		if ($fecha2 == "A�O"){$f= "and fecha_causa between '$a1' and '$a2'";}
-		$gby = "";
-		$orden = "order by fecha_causa desc, id desc";
-		$sq = "$a $b $c $filtro $f $gby $orden"; 
-		$resf = $cx->query($sq);
-		$filas = $resf->num_rows;
-		$listas = ceil($filas / $muestra);
-		$sq2 = "$a $b $c $filtro $f $gby $orden $limitar";
-		
-	$re = $cx->query($sq2);
-	
-	echo("
+									if ($registrado == "") {
+									} else {
+
+						?>
+
+
+						<BR />
+						<div class="Estilo4" style='padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:5px;'>
+							<div align="center"><strong> <span class="Estilo4">LISTA DE CAUSACIONES DE CARTERA ALMACENADAS Y </span></strong> <span class="Estilo4">&quot;CONTABILIZADAS&quot; <BR />
+									<BR />
+									<a href="../recaudos_tesoreria/recaudos_tesoreria.php" target="_parent">...::: IR A TESORERIA :::... </a></span></div>
+						</div>
+						<BR />
+
+				<?php
+										$b = '';
+										$limitar = "limit $ini,$fin";
+
+										if ($_POST["buscar"] != "") {
+											$filtro = "and (consec_cartera LIKE  '%$buscar%' OR tercero LIKE  '%$buscar%') ";
+											$limitar = '';
+										}
+
+										$a = "select * from cartera_cont where id_emp = '$idxx'";
+										if (empty($tercero)) {
+											$c = "";
+										} else {
+											$c = "and tercero =$tercero2";
+										}
+										if ($fecha2 == "MES") {
+											$f = "and fecha_causa between '$f1' and '$f2'";
+										}
+										if ($fecha2 == "DIA") {
+											$f = "and fecha_causa ='$fechafil'";
+										}
+										if ($fecha2 == "A�O") {
+											$f = "and fecha_causa between '$a1' and '$a2'";
+										}
+										$gby = "";
+										$orden = "order by fecha_causa desc, id desc";
+										$sq = "$a $b $c $filtro $f $gby $orden";
+										$resf = $cx->query($sq);
+										$filas = $resf->num_rows;
+										$listas = ceil($filas / $muestra);
+										$sq2 = "$a $b $c $filtro $f $gby $orden $limitar";
+
+										$re = $cx->query($sq2);
+
+										echo ("
 	<center>
 	<table width='100%' border='1' class=\"bordepunteado1\" cellspacing='3'>
 	<thead>
@@ -893,23 +970,21 @@ if  ($registrado =="")
 	</thead>
 	<tbody>
 	");
-	
-	while($rw = $re->fetch_array())
-	   
-	   {
-	
-	$ab = $rw["id_reip"];
-	$td1 = $rw["tot_deb"];
-	$tc1 = $rw["tot_cre"];
-	
-	$sqlxx3 = "select fecha_reg, id_manu_reip from reip_ing where id_emp = '$idxx' and consecutivo ='$ab' ";
-	$resultadoxx3 = $cx->query($sqlxx3);
-	$rowxx3 = $resultadoxx3->fetch_array();
-	$fech_reip=$rowxx3["fecha_reg"];
-	$id_manu_reip=$rowxx3["id_manu_reip"];
-	
-	
-	printf("
+
+										while ($rw = $re->fetch_array()) {
+
+											$ab = $rw["id_reip"];
+											$td1 = $rw["tot_deb"];
+											$tc1 = $rw["tot_cre"];
+
+											$sqlxx3 = "select fecha_reg, id_manu_reip from reip_ing where id_emp = '$idxx' and consecutivo ='$ab' ";
+											$resultadoxx3 = $cx->query($sqlxx3);
+											$rowxx3 = $resultadoxx3->fetch_array();
+											$fech_reip = $rowxx3["fecha_reg"];
+											$id_manu_reip = $rowxx3["id_manu_reip"];
+
+
+											printf("
 	
 	<tr>
 	<td align='center'>
@@ -923,22 +998,19 @@ if  ($registrado =="")
 	<td align='center' ><span class='Estilo4'>%s</span></td>
 	<td align='left' ><span class='Estilo4'>&nbsp;%s</span></td>
 	<td align='right' ><span class='Estilo4'>&nbsp;%s</span></td>
-	", $rw["consec_cartera"], $rw["fecha_causa"], $id_manu_reip, $fech_reip, $rw["tercero"],$rw["tot_deb"]);
-	
-	if($td1 == '0' && $tc1== '0')
-	{
-	printf("
+	", $rw["consec_cartera"], $rw["fecha_causa"], $id_manu_reip, $fech_reip, $rw["tercero"], $rw["tot_deb"]);
+
+											if ($td1 == '0' && $tc1 == '0') {
+												printf("
 	<td align='center' bgcolor ='#990000' ><span class='Estilo4' style='color:#FFFF00'>NO</span></td>
 	");
-	}
-	else
-	{
-	printf("
+											} else {
+												printf("
 	<td align='center' ><span class='Estilo4'>SI</span></td>
 	");
-	}
-	
-	printf("
+											}
+
+											printf("
 	
 	<td align='center' >
 	<div style='padding-left:1px; padding-top:3px; padding-right:1px; padding-bottom:3px;'>
@@ -965,85 +1037,92 @@ if  ($registrado =="")
 	</td>
 
 	
-	</tr>",$rw["id_reip"], $fech_reip, $rw["consec_cartera"],$rw["consec_cartera"]); 
-	
-	}
-	
-	printf("</tbody></table>");
-	
-	echo "<br><&nbsp;";
-for ($i =0; $i<$listas;$i++)
-{
-	$inicio =($i*$muestra)+1;
-	$k =$i+1;
-	if ($k ==$indice) 
-	{
-		echo "<a href='$archivo?ini=$inicio&fin=$muestra&a=CAIC&k=$k&nn=CAIC'><b>$k</b></a>&nbsp;";
-	}else{
-		echo "<a href='$archivo?ini=$inicio&fin=$muestra&a=CAIC&k=$k&nn=CAIC'>$k</a>&nbsp;";
-	}
-}
-echo ">&nbsp; </center>";
-	
-	}
-	}
-	?>
-</div>
+	</tr>", $rw["id_reip"], $fech_reip, $rw["consec_cartera"], $rw["consec_cartera"]);
+										}
 
-<?php
-if(isset($_GET['id0'])){$b=$_GET['id0'];}
-if(isset($_POST['nn'])){$a=$_POST['nn'];}
+										printf("</tbody></table>");
 
-if ($a == 'OBCG' || $b == 'OBCG')
-{
+										echo "<br><&nbsp;";
+										for ($i = 0; $i < $listas; $i++) {
+											$inicio = ($i * $muestra) + 1;
+											$k = $i + 1;
+											if ($k == $indice) {
+												echo "<a href='$archivo?ini=$inicio&fin=$muestra&a=CAIC&k=$k&nn=CAIC'><b>$k</b></a>&nbsp;";
+											} else {
+												echo "<a href='$archivo?ini=$inicio&fin=$muestra&a=CAIC&k=$k&nn=CAIC'>$k</a>&nbsp;";
+											}
+										}
+										echo ">&nbsp; </center>";
+									}
+								}
+				?>
+				</div>
 
-?>
-<div class="Estilo4" style='padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:5px;'>
-  <div align="center" class="Estilo4">
-    <p><strong>OBLIGACION CONTABLE DEL GASTO - OBCG <br />
-       </strong></p>
-</div>  
-<br />
-<?php
-include('../objetos/filtro.php');  
+				<?php
+				if (isset($_GET['id0'])) {
+					$b = $_GET['id0'];
+				}
+				if (isset($_POST['nn'])) {
+					$a = isset($_POST['nn']) ? $_POST['nn'] : '';
+				}
 
-if  ($pendiente =="") 
-{
+				if ($a == 'OBCG' || $b == 'OBCG') {
 
-}else{
+				?>
+					<div class="Estilo4" style='padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:5px;'>
+						<div align="center" class="Estilo4">
+							<p><strong>OBLIGACION CONTABLE DEL GASTO - OBCG <br />
+								</strong></p>
+						</div>
+						<br />
+						<?php
+						include('../objetos/filtro.php');
 
-?>
-	<br />
-	<div class="Estilo4" style='padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:5px;'>
-	  <div align="center" class="Estilo4">
-		<p><strong>CERTIFICADOS DE OBLIGACION PRESUPUESTAL ALMACENADOS</strong> <span class="Estilo8">&quot;SIN CONTABILIZAR&quot;<br />
-		  </span>Estas Obligaciones pueden ser Modificadas accediendo a la Opcion 2.4.2 del Menu Principal <br />
-		  <br />
-		  <a href="../mvto_ppto_gas/mvto.php" target="_parent">...::: IR A MVTOS PPTO DE GASTOS :::...</a>    </p>
-	  </div>
-	</div>
-	<br />
-	
-	<?php
-	
-	
-	if  ($_POST["buscar"] != "")
-	{
-	$filtro ="and (id_manu_cobp LIKE  '%$buscar%' OR tercero LIKE  '%$buscar%') "; 
-	} 
-	
-	$a = "select distinct(id_auto_cobp), id_manu_cobp,  id_manu_crpp, id_manu_cdpp, fecha_cobp, tercero, tesoreria from cobp where id_emp = '$idxx' and contab='NO' and tesoreria ='NO'";
-	if (empty($tercero)){$c = "";}else{$c= "and tercero =$tercero2";}
-	if ($fecha2 == "MES"){$f= "and fecha_cobp between '$f1' and '$f2'";}
-	if ($fecha2 == "DIA"){$f= "and fecha_cobp ='$fechafil'";}
-	if ($fecha2 == "A�O"){$f= "and fecha_cobp between '$a1' and '$a2'";}
-	$gby = "";
-	$orden = "order by fecha_cobp desc";
-	$sq2 = "$a  $c $filtro $f $gby $orden"; 
+						if ($pendiente == "") {
+						} else {
 
-	$re2 = $cx->query($sq2);
-	
-	printf("
+						?>
+							<br />
+							<div class="Estilo4" style='padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:5px;'>
+								<div align="center" class="Estilo4">
+									<p><strong>CERTIFICADOS DE OBLIGACION PRESUPUESTAL ALMACENADOS</strong> <span class="Estilo8">&quot;SIN CONTABILIZAR&quot;<br />
+										</span>Estas Obligaciones pueden ser Modificadas accediendo a la Opcion 2.4.2 del Menu Principal <br />
+										<br />
+										<a href="../mvto_ppto_gas/mvto.php" target="_parent">...::: IR A MVTOS PPTO DE GASTOS :::...</a>
+									</p>
+								</div>
+							</div>
+							<br />
+
+						<?php
+
+
+							if ($_POST["buscar"] != "") {
+								$filtro = "and (id_manu_cobp LIKE  '%$buscar%' OR tercero LIKE  '%$buscar%') ";
+							}
+
+							$a = "select distinct(id_auto_cobp), id_manu_cobp,  id_manu_crpp, id_manu_cdpp, fecha_cobp, tercero, tesoreria from cobp where id_emp = '$idxx' and contab='NO' and tesoreria ='NO'";
+							if (empty($tercero)) {
+								$c = "";
+							} else {
+								$c = "and tercero =$tercero2";
+							}
+							if ($fecha2 == "MES") {
+								$f = "and fecha_cobp between '$f1' and '$f2'";
+							}
+							if ($fecha2 == "DIA") {
+								$f = "and fecha_cobp ='$fechafil'";
+							}
+							if ($fecha2 == "A�O") {
+								$f = "and fecha_cobp between '$a1' and '$a2'";
+							}
+							$gby = "";
+							$orden = "order by fecha_cobp desc";
+							$sq2 = "$a  $c $filtro $f $gby $orden";
+
+							$re2 = $cx->query($sq2);
+
+							printf("
 	<center>
 	
 	<table width='820' border='1' class=\"bordepunteado1\">
@@ -1066,16 +1145,15 @@ if  ($pendiente =="")
 	</thead>
 	<tbody>
 	");
-	
-	while($rw2 = $re2->fetch_array())
-	   {
-	
-	$a1a1=$rw2["id_auto_cobp"];
-	$resulta=$cx->query("select SUM(vr_digitado) AS TOTAL from cobp WHERE id_auto_cobp = '$a1a1' AND id_emp='$idxx'") ;
-	$row=$resulta->fetch_array();
-	$total=$row[0]; 
-	$nuevo_totala1 = $total;   
-	printf("
+
+							while ($rw2 = $re2->fetch_array()) {
+
+								$a1a1 = $rw2["id_auto_cobp"];
+								$resulta = $cx->query("select SUM(vr_digitado) AS TOTAL from cobp WHERE id_auto_cobp = '$a1a1' AND id_emp='$idxx'");
+								$row = $resulta->fetch_array();
+								$total = $row[0];
+								$nuevo_totala1 = $total;
+								printf("
 	
 	<tr>
 	<td align='left' bgcolor='#DCE9E5' width='100'>
@@ -1114,49 +1192,57 @@ if  ($pendiente =="")
 	</div>
 	</td>
 	
-	</tr>", $rw2["id_manu_cobp"], $rw2["fecha_cobp"], $rw2["tercero"], number_format($nuevo_totala1,2,',','.'), $rw2["id_auto_cobp"],$rw2["id_auto_cobp"],$rw2["id_auto_cobp"]); 
-	
-	}
-	
-	printf("</tbody></table></center>");
-	
-}
+	</tr>", $rw2["id_manu_cobp"], $rw2["fecha_cobp"], $rw2["tercero"], number_format($nuevo_totala1, 2, ',', '.'), $rw2["id_auto_cobp"], $rw2["id_auto_cobp"], $rw2["id_auto_cobp"]);
+							}
 
-?>
-	<br />
-	
-	<div class="Estilo4" style='padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:25px;'>
-	  <div align="center">
-		<span class="Estilo4"><strong>OBLIGACIONES CONTABLES DEL GASTO ALMACENADAS Y </strong> &quot;CONTABILIZADAS&quot;<br />
-		<br />
-		<a href="../pagos_tesoreria/pagos_tesoreria.php" target="_parent">...::: IR A TESORERIA :::...</a></span> </div>
-	</div>
-        <input type="button" name="boton" value="Imprimir Lotes" style="background:#72A0CF; color:#FFFFFF; border:none" onclick="window.open('imp_obcg_lte.php','_self')" />
-	<center>
-	<?php
-	$limitar = "limit $ini,$fin";
-	if  ($_POST["buscar"] != "")
-	{
-	$filtro ="and (id_manu_obcg LIKE  '%$buscar%' OR tercero LIKE  '%$buscar%') "; 
-	$limitar ='';
-	} 
-	
-	$a = "select * from obcg where id_emp = '$idxx'";
-	if (empty($tercero)){$c = "";}else{$c= "and tercero =$tercero2";}
-	if ($fecha2 == "MES"){$f= "and fecha_obcg between '$f1' and '$f2'";}
-	if ($fecha2 == "DIA"){$f= "and fecha_obcg ='$fechafil'";}
-	if ($fecha2 == "A�O"){$f= "and fecha_obcg between '$a1' and '$a2'";}
-	$gby = "";
-	$orden = "order by fecha_obcg desc, id desc";
-	$sq9 = "$a  $c $filtro $f $gby $orden"; 
-	$resf = $cx->query($sq9);
-	$filas = $resf->num_rows;
-	$listas = ceil($filas / $muestra);
-	$sq2 = "$a $c $filtro $f $gby $orden $limitar";
+							printf("</tbody></table></center>");
+						}
 
-	$re2 = $cx->query($sq2);
-	
-	printf("
+						?>
+						<br />
+
+						<div class="Estilo4" style='padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:25px;'>
+							<div align="center">
+								<span class="Estilo4"><strong>OBLIGACIONES CONTABLES DEL GASTO ALMACENADAS Y </strong> &quot;CONTABILIZADAS&quot;<br />
+									<br />
+									<a href="../pagos_tesoreria/pagos_tesoreria.php" target="_parent">...::: IR A TESORERIA :::...</a></span>
+							</div>
+						</div>
+						<input type="button" name="boton" value="Imprimir Lotes" style="background:#72A0CF; color:#FFFFFF; border:none" onclick="window.open('imp_obcg_lte.php','_self')" />
+						<center>
+							<?php
+							$limitar = "limit $ini,$fin";
+							if ($_POST["buscar"] != "") {
+								$filtro = "and (id_manu_obcg LIKE  '%$buscar%' OR tercero LIKE  '%$buscar%') ";
+								$limitar = '';
+							}
+
+							$a = "select * from obcg where id_emp = '$idxx'";
+							if (empty($tercero)) {
+								$c = "";
+							} else {
+								$c = "and tercero =$tercero2";
+							}
+							if ($fecha2 == "MES") {
+								$f = "and fecha_obcg between '$f1' and '$f2'";
+							}
+							if ($fecha2 == "DIA") {
+								$f = "and fecha_obcg ='$fechafil'";
+							}
+							if ($fecha2 == "A�O") {
+								$f = "and fecha_obcg between '$a1' and '$a2'";
+							}
+							$gby = "";
+							$orden = "order by fecha_obcg desc, id desc";
+							$sq9 = "$a  $c $filtro $f $gby $orden";
+							$resf = $cx->query($sq9);
+							$filas = $resf->num_rows;
+							$listas = ceil($filas / $muestra);
+							$sq2 = "$a $c $filtro $f $gby $orden $limitar";
+
+							$re2 = $cx->query($sq2);
+
+							printf("
 	<center>
 	<table width='900' BORDER='1' class='bordepunteado1'>
 	<thead>
@@ -1178,33 +1264,34 @@ if  ($pendiente =="")
 	<th align='center'><span class='Estilo4'><b></b></span></th>
 	<th align='center'><span class='Estilo4'><b></b>
 	<th align='center'><span class='Estilo4'><b></b>
-	",$mesh[$me+0],$an);
-	
-	while($rw2 = $re2->fetch_array())
-	   {
-	$idmanuobcg=$rw2["id_manu_obcg"]; 
-	$td=$rw2["tot_deb"]; 
-	$tc=$rw2["tot_cre"]; 
-	$startDate = $rw2["fecha_obcg"];
-	
-	$vara2=$rw2["id_auto_cobp"]; 
-	$resulta=$cx->query("select SUM(vr_digitado) AS TOTAL from cobp where id_emp = '$idxx' and id_auto_cobp ='$vara2'") ;
-	$row=$resulta->fetch_array();
-	$total=0;
-	if(isset($row[0])){$total=$row[0];}
-	//*************** edad
-	 $startDate = $rw2["fecha_obcg"];
-	 $endDate = date("Y/m/d");
-	 list($year, $month, $day) = explode('/', $startDate);  
-	 $startDate = mktime(0, 0, 0, $month, $day, $year);  
-	 list($year, $month, $day) = explode('/', $endDate);  
-	 $endDate = mktime(0, 0, 0, $month, $day, $year);  
-	 $totalDays = ($endDate - $startDate)/(60 * 60 * 24);  
-	//*****************
-	$sq3 ="select id_manu_cdpp from cobp where id_auto_cobp ='$vara2'";
-	$rs3 = $cx->query($sq3);
-	$rw3 = $rs3->fetch_array();
-	printf("
+	", $mesh[$me + 0], $an);
+
+							while ($rw2 = $re2->fetch_array()) {
+								$idmanuobcg = $rw2["id_manu_obcg"];
+								$td = $rw2["tot_deb"];
+								$tc = $rw2["tot_cre"];
+								$startDate = $rw2["fecha_obcg"];
+
+								$vara2 = $rw2["id_auto_cobp"];
+								$resulta = $cx->query("select SUM(vr_digitado) AS TOTAL from cobp where id_emp = '$idxx' and id_auto_cobp ='$vara2'");
+								$row = $resulta->fetch_array();
+								$total = 0;
+								if (isset($row[0])) {
+									$total = $row[0];
+								}
+								//*************** edad
+								$startDate = $rw2["fecha_obcg"];
+								$endDate = date("Y/m/d");
+								list($year, $month, $day) = explode('/', $startDate);
+								$startDate = mktime(0, 0, 0, $month, $day, $year);
+								list($year, $month, $day) = explode('/', $endDate);
+								$endDate = mktime(0, 0, 0, $month, $day, $year);
+								$totalDays = ($endDate - $startDate) / (60 * 60 * 24);
+								//*****************
+								$sq3 = "select id_manu_cdpp from cobp where id_auto_cobp ='$vara2'";
+								$rs3 = $cx->query($sq3);
+								$rw3 = $rs3->fetch_array();
+								printf("
 	
 	<tr>
 	<td align='left' bgcolor='#DCE9E5'>
@@ -1217,22 +1304,19 @@ if  ($pendiente =="")
 	<td align='left'><span class='Estilo4'>&nbsp;%s</span></td>
 	<td align='right'><span class='Estilo4'>&nbsp;%s</span></td>
 	<td align='center'><span class='Estilo4'>%s</span></td>
-	", $rw2["id_manu_obcg"],$rw3["id_manu_cdpp"], $rw2["fecha_obcg"], $rw2["tercero"], number_format($total,2,',','.'), number_format($totalDays,0,',','.').' Dias');
-	
-	if($td == '0' && $tc == '0')
-	{
-	printf("
+	", $rw2["id_manu_obcg"], $rw3["id_manu_cdpp"], $rw2["fecha_obcg"], $rw2["tercero"], number_format($total, 2, ',', '.'), number_format($totalDays, 0, ',', '.') . ' Dias');
+
+								if ($td == '0' && $tc == '0') {
+									printf("
 	<td align='center' bgcolor ='#990000'><span class='Estilo4' style='color:#FFFF00'>NO</span></td>
 	");
-	}
-	else
-	{
-	printf("
+								} else {
+									printf("
 	<td align='center'><span class='Estilo4'>SI</span></td>
 	");
-	}
-	
-	printf("
+								}
+
+								printf("
 	<td align='center' bgcolor='#DCE9E5'>
 	<div style='padding-left:1px; padding-top:3px; padding-right:1px; padding-bottom:3px;'>
 	<span class='Estilo4'>
@@ -1265,76 +1349,70 @@ if  ($pendiente =="")
 	</div>
 	</td>
 	
-	</tr>", $rw2["id_auto_obcg"], $rw2["id_auto_obcg"], $rw2["id_auto_obcg"],$rw2["id_auto_obcg"]); 
-	 }
-	printf("</tbody></table>");
-	echo "<br><&nbsp;";
-for ($i =0; $i<$listas;$i++)
-{
-	$inicio =($i*$muestra)+1;
-	$k =$i+1;
-	if ($k ==$indice) 
-	{
-		echo "<a href='$archivo?ini=$inicio&fin=$muestra&a=OBCG&k=$k&nn=OBCG'><b>$k</b></a>&nbsp;";
-	}else{
-		echo "<a href='$archivo?ini=$inicio&fin=$muestra&a=OBCG&k=$k&nn=OBCG'>$k</a>&nbsp;";
-	}
-}
-echo ">&nbsp; </center>";
+	</tr>", $rw2["id_auto_obcg"], $rw2["id_auto_obcg"], $rw2["id_auto_obcg"], $rw2["id_auto_obcg"]);
+							}
+							printf("</tbody></table>");
+							echo "<br><&nbsp;";
+							for ($i = 0; $i < $listas; $i++) {
+								$inicio = ($i * $muestra) + 1;
+								$k = $i + 1;
+								if ($k == $indice) {
+									echo "<a href='$archivo?ini=$inicio&fin=$muestra&a=OBCG&k=$k&nn=OBCG'><b>$k</b></a>&nbsp;";
+								} else {
+									echo "<a href='$archivo?ini=$inicio&fin=$muestra&a=OBCG&k=$k&nn=OBCG'>$k</a>&nbsp;";
+								}
+							}
+							echo ">&nbsp; </center>";
+						}
 
-	
+						if (isset($_POST['nn'])) $a = isset($_POST['nn']) ? $_POST['nn'] : '';
+						else $a = '';
 
-}
+						if (!isset($_POST['nn'])) $a = isset($_GET['nn']) ? $_GET['nn'] : '';
+						if ($a == 'NCON') {
 
-if(isset($_POST['nn'])) $a=$_POST['nn']; else $a='';
+							?>
+							<div class="Estilo4" style='padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:5px;'>
+								<div align="center"><span class="Estilo4"><strong> NOTA DE CONTABILIDAD - NCON <br />
+											<br />
 
-if  (!$_POST['nn']) $a=$_GET['nn'];
-if ($a == 'NCON')
-{
-
-?>
-<div class="Estilo4" style='padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:5px;'>
-  <div align="center"><span class="Estilo4"><strong> NOTA DE CONTABILIDAD - NCON <br />
-     <br />
-
-</strong></span></div></div></center>
-<div style="padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:5px;">
-  <div align="center">
-    <div style='padding-left:3px; padding-top:3px; padding-right:3px; padding-bottom:3px; background:#004080; width:300px'>
-      <div style='padding-left:5px; padding-top:5px; padding-right:5px; padding-bottom:5px; background:#FFFFFF'>
-        <div align="center"><a href='../mvto_contable2/recaudar1.php' target='_parent'>CREAR NUEVA NOTA DE CONTABILIDAD  </a> </div>
-      </div>
-    </div>
-  </div>
-</div>
-<BR />
+										</strong></span></div>
+							</div>
+						</center>
+						<div style="padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:5px;">
+							<div align="center">
+								<div style='padding-left:3px; padding-top:3px; padding-right:3px; padding-bottom:3px; background:#004080; width:300px'>
+									<div style='padding-left:5px; padding-top:5px; padding-right:5px; padding-bottom:5px; background:#FFFFFF'>
+										<div align="center"><a href='../mvto_contable2/recaudar1.php' target='_parent'>CREAR NUEVA NOTA DE CONTABILIDAD </a> </div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<BR />
 
 
 
-	   <div class="Estilo4" style='padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:5px;'>
-	  <div align="center"><span class="Estilo4"><strong>LISTA DE NOTAS CONTABILIDAD CREADAS HASTA LA FECHA</strong> </span><br />
-	  </div>
-	</div>
-	<br />
-   
-<?php include('../objetos/filtro.php');  
+						<div class="Estilo4" style='padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:5px;'>
+							<div align="center"><span class="Estilo4"><strong>LISTA DE NOTAS CONTABILIDAD CREADAS HASTA LA FECHA</strong> </span><br />
+							</div>
+						</div>
+						<br />
 
-if  ($registrado =="") 
-{
+						<?php include('../objetos/filtro.php');
 
-}else{
-	
-	if  ($_POST["buscar"] != "")
-	{
-	$filtro ="and (dcto LIKE  '%$buscar%' OR tercero LIKE  '%$buscar%' OR detalle LIKE  '%$buscar%') "; 
-	} 
-	$sq3 ="select DISTINCT id_auto from lib_aux2 where dcto like 'NCON%' order by fecha desc";
-	$re3 = $cx->query($sq3);
-	printf("
+							if ($registrado == "") {
+							} else {
+
+								if ($_POST["buscar"] != "") {
+									$filtro = "and (dcto LIKE  '%$buscar%' OR tercero LIKE  '%$buscar%' OR detalle LIKE  '%$buscar%') ";
+								}
+								$sq3 = "select DISTINCT id_auto from lib_aux2 where dcto like 'NCON%' order by fecha desc";
+								$re3 = $cx->query($sq3);
+								printf("
 		<center>
 		<table width='1000' BORDER='1' class='bordepunteado1'>
 		");
-	printf("
+								printf("
 		
 		<thead>
 		
@@ -1359,27 +1437,34 @@ if  ($registrado =="")
 		</tr>
 		</thead>
 		<tbody>
-		",$mesh[$me+0],$an);
-	while ($rw3 =$re3->fetch_Array())
-	
-	{
-		$a = "select * from lib_aux2 where id_auto ='$rw3[id_auto]' ";
-		if (empty($tercero)){$c = "";}else{$c= "and tercero =$tercero2";}
-		if ($fecha2 == "MES"){$f= "and fecha between '$f1' and '$f2'";}
-		if ($fecha2 == "DIA"){$f= "and fecha ='$fechafil'";}
-		if ($fecha2 == "A�O"){$f= "and fecha between '$a1' and '$a2'";}
-		$gby = "";
-		$orden = "order by fecha desc";
-		$sq2 = "$a  $c $filtro $f $gby $orden"; 
-		$re2 = $cx->query($sq2);
-		$rw2 = $re2->fetch_Array();
-		$sq4 ="select sum(debito) as total from lib_aux2 where id_auto ='$rw3[id_auto]' group by id_auto";
-		$re4 = $cx->query($sq4);
-		$rw4 = $re4->fetch_Array(); 
-		$debito = $rw4['total'];
-		if ($rw2["dcto"] !='')
-		{
-		printf("
+		", $mesh[$me + 0], $an);
+								while ($rw3 = $re3->fetch_Array()) {
+									$a = "select * from lib_aux2 where id_auto ='$rw3[id_auto]' ";
+									if (empty($tercero)) {
+										$c = "";
+									} else {
+										$c = "and tercero =$tercero2";
+									}
+									if ($fecha2 == "MES") {
+										$f = "and fecha between '$f1' and '$f2'";
+									}
+									if ($fecha2 == "DIA") {
+										$f = "and fecha ='$fechafil'";
+									}
+									if ($fecha2 == "A�O") {
+										$f = "and fecha between '$a1' and '$a2'";
+									}
+									$gby = "";
+									$orden = "order by fecha desc";
+									$sq2 = "$a  $c $filtro $f $gby $orden";
+									$re2 = $cx->query($sq2);
+									$rw2 = $re2->fetch_Array();
+									$sq4 = "select sum(debito) as total from lib_aux2 where id_auto ='$rw3[id_auto]' group by id_auto";
+									$re4 = $cx->query($sq4);
+									$rw4 = $re4->fetch_Array();
+									$debito = $rw4['total'];
+									if ($rw2["dcto"] != '') {
+										printf("
 		<tr>
 		<td align='left' bgcolor='#DCE9E5'>
 		<div style='padding-left:1px; padding-top:3px; padding-right:1px; padding-bottom:3px;'>
@@ -1427,67 +1512,60 @@ if  ($registrado =="")
 		</td>
 		
 						
-		</tr>", $rw2["dcto"], $rw2["fecha"], $rw2["tercero"], $rw2["detalle"], number_format($debito,2,',','.'), $rw2["id_auto"],$rw2["fecha"], $rw2["id_auto"], $rw2["id_auto"], $rw2["id_auto"]); 
-		}
-		   
-		}
-	printf("</tbody></table></center>");
-	
-	
-	
-	}
-	
-}	
+		</tr>", $rw2["dcto"], $rw2["fecha"], $rw2["tercero"], $rw2["detalle"], number_format($debito, 2, ',', '.'), $rw2["id_auto"], $rw2["fecha"], $rw2["id_auto"], $rw2["id_auto"], $rw2["id_auto"]);
+									}
+								}
+								printf("</tbody></table></center>");
+							}
+						}
 
-$a=$_POST['nn'];
+						$a = isset($_POST['nn']) ? $_POST['nn'] : '';
 
-if  (!$_POST['nn']) $a=$_GET['nn'];
-if ($a == 'NCSF')
-{
+						if (!isset($_POST['nn'])) $a = isset($_GET['nn']) ? $_GET['nn'] : '';
+						if ($a == 'NCSF') {
 
-?>
-<div class="Estilo4" style='padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:5px;'>
-  <div align="center"><span class="Estilo4"><strong> NOTA DE SALDO A FAVOR - NCSF <br />
-     <br />
+						?>
+						<div class="Estilo4" style='padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:5px;'>
+							<div align="center"><span class="Estilo4"><strong> NOTA DE SALDO A FAVOR - NCSF <br />
+										<br />
 
-</strong></span></div></div></center>
-<div style="padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:5px;">
-  <div align="center">
-    <div style='padding-left:3px; padding-top:3px; padding-right:3px; padding-bottom:3px; background:#004080; width:300px'>
-      <div style='padding-left:5px; padding-top:5px; padding-right:5px; padding-bottom:5px; background:#FFFFFF'>
-        <div align="center"><a href='../mvto_contable3/recaudar1.php' target='_parent'>CREAR NUEVA NOTA DE SALDO A FAVOR  </a> </div>
-      </div>
-    </div>
-  </div>
-</div>
-<BR />
+									</strong></span></div>
+						</div>
+						</center>
+						<div style="padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:5px;">
+							<div align="center">
+								<div style='padding-left:3px; padding-top:3px; padding-right:3px; padding-bottom:3px; background:#004080; width:300px'>
+									<div style='padding-left:5px; padding-top:5px; padding-right:5px; padding-bottom:5px; background:#FFFFFF'>
+										<div align="center"><a href='../mvto_contable3/recaudar1.php' target='_parent'>CREAR NUEVA NOTA DE SALDO A FAVOR </a> </div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<BR />
 
 
 
-	   <div class="Estilo4" style='padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:5px;'>
-	  <div align="center"><span class="Estilo4"><strong>LISTA DE NOTAS CONTABILIDAD CREADAS HASTA LA FECHA</strong> </span><br />
-	  </div>
-	</div>
-	<br />
-   
-<?php include('../objetos/filtro.php');  
+						<div class="Estilo4" style='padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:5px;'>
+							<div align="center"><span class="Estilo4"><strong>LISTA DE NOTAS CONTABILIDAD CREADAS HASTA LA FECHA</strong> </span><br />
+							</div>
+						</div>
+						<br />
 
-if  ($registrado =="") 
-{
+						<?php include('../objetos/filtro.php');
 
-}else{
-	
-	if  ($_POST["buscar"] != "")
-	{
-	$filtro ="and (dcto LIKE  '%$buscar%' OR tercero LIKE  '%$buscar%' OR detalle LIKE  '%$buscar%') "; 
-	} 
-	$sq3 ="select DISTINCT id_auto from lib_aux4 where dcto like 'NCSF%' order by fecha desc";
-	$re3 = $cx->query($sq3);
-	printf("
+							if ($registrado == "") {
+							} else {
+
+								if ($_POST["buscar"] != "") {
+									$filtro = "and (dcto LIKE  '%$buscar%' OR tercero LIKE  '%$buscar%' OR detalle LIKE  '%$buscar%') ";
+								}
+								$sq3 = "select DISTINCT id_auto from lib_aux4 where dcto like 'NCSF%' order by fecha desc";
+								$re3 = $cx->query($sq3);
+								printf("
 		<center>
 		<table width='1000' BORDER='1' class='bordepunteado1'>
 		");
-	printf("
+								printf("
 		
 		<thead>
 		
@@ -1512,26 +1590,34 @@ if  ($registrado =="")
 		</tr>
 		</thead>
 		<tbody>
-		",$mesh[$me+0],$an);
-	while ($rw3 = $re3->fetch_array())
-	{
-		$a = "select * from lib_aux4 where id_auto ='$rw3[id_auto]' ";
-		if (empty($tercero)){$c = "";}else{$c= "and tercero =$tercero2";}
-		if ($fecha2 == "MES"){$f= "and fecha between '$f1' and '$f2'";}
-		if ($fecha2 == "DIA"){$f= "and fecha ='$fechafil'";}
-		if ($fecha2 == "A�O"){$f= "and fecha between '$a1' and '$a2'";}
-		$gby = "";
-		$orden = "order by fecha desc";
-		$sq2 = "$a  $c $filtro $f $gby $orden"; 
-		$re2 = $cx->query($sq2);
-		$rw2 = $re2->fetch_array();
-		$sq4 ="select sum(debito) as total from lib_aux4 where id_auto ='$rw3[id_auto]' group by id_auto";
-		$re4 = $cx->query($sq4);
-		$rw4 = $re4->fetch_array();
-		$debito = $rw4['total'];
-		if ($rw2["dcto"] !='')
-		{
-		printf("
+		", $mesh[$me + 0], $an);
+								while ($rw3 = $re3->fetch_array()) {
+									$a = "select * from lib_aux4 where id_auto ='$rw3[id_auto]' ";
+									if (empty($tercero)) {
+										$c = "";
+									} else {
+										$c = "and tercero =$tercero2";
+									}
+									if ($fecha2 == "MES") {
+										$f = "and fecha between '$f1' and '$f2'";
+									}
+									if ($fecha2 == "DIA") {
+										$f = "and fecha ='$fechafil'";
+									}
+									if ($fecha2 == "A�O") {
+										$f = "and fecha between '$a1' and '$a2'";
+									}
+									$gby = "";
+									$orden = "order by fecha desc";
+									$sq2 = "$a  $c $filtro $f $gby $orden";
+									$re2 = $cx->query($sq2);
+									$rw2 = $re2->fetch_array();
+									$sq4 = "select sum(debito) as total from lib_aux4 where id_auto ='$rw3[id_auto]' group by id_auto";
+									$re4 = $cx->query($sq4);
+									$rw4 = $re4->fetch_array();
+									$debito = $rw4['total'];
+									if ($rw2["dcto"] != '') {
+										printf("
 		<tr>
 		<td align='left' bgcolor='#DCE9E5'>
 		<div style='padding-left:1px; padding-top:3px; padding-right:1px; padding-bottom:3px;'>
@@ -1579,74 +1665,76 @@ if  ($registrado =="")
 		</td>
 		
 						
-		</tr>", $rw2["dcto"], $rw2["fecha"], $rw2["tercero"], $rw2["detalle"], number_format($debito,2,',','.'), $rw2["id_auto"],$rw2["fecha"], $rw2["id_auto"], $rw2["id_auto"], $rw2["id_auto"]); 
-		}
-		   
-		}
-	printf("</tbody></table></center>");
-	
-	
-	
-	}
-	
-}	
+		</tr>", $rw2["dcto"], $rw2["fecha"], $rw2["tercero"], $rw2["detalle"], number_format($debito, 2, ',', '.'), $rw2["id_auto"], $rw2["fecha"], $rw2["id_auto"], $rw2["id_auto"], $rw2["id_auto"]);
+									}
+								}
+								printf("</tbody></table></center>");
+							}
+						}
 
 
-$a=$_POST['nn'];
-if ($a == 'CESP')
-{
+						$a = isset($_POST['nn']) ? $_POST['nn'] : '';
+						if ($a == 'CESP') {
 
 
-?>
-<div class="Estilo4" style='padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:5px;'>
-  <div align="center"><span class="Estilo4"><strong>COMPROBANTE DE EGRESO SIN AFECTACION PRESUPUESTAL - CESP <br />
-     <br />
-    <br />
-</strong></span></div></div>
-	
-	
-  
-<div style="padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:15px;">
-  <div align="center">
-    <div style='padding-left:3px; padding-top:3px; padding-right:3px; padding-bottom:3px; background:#004080; width:350px'>
-      <div style='padding-left:5px; padding-top:5px; padding-right:5px; padding-bottom:5px; background:#FFFFFF'>
-        <div align="center"><a href='nuevo_cesp.php' target='_parent'>CREAR NUEVO COMP DE EGRESO SIN AFECTACION PPTAL </a> </div>
-      </div>
-    </div>
-  </div>
-</div>
+						?>
+						<div class="Estilo4" style='padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:5px;'>
+							<div align="center"><span class="Estilo4"><strong>COMPROBANTE DE EGRESO SIN AFECTACION PRESUPUESTAL - CESP <br />
+										<br />
+										<br />
+									</strong></span></div>
+						</div>
 
 
- <div class="Estilo4" style='padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:5px;'>
-  <div align="center"><span class="Estilo4"><strong> LISTA DE CESP's CREADOS HASTA LA FECHA </strong> </span><br />
-  </div>
-</div>
-<?php
-include('../objetos/filtro.php'); 
-if  ($registrado =="") 
-{
 
-}else{
- 
-
-if  ($_POST["buscar"] != "")
-{
-$filtro ="and (id_manu_ncon LIKE  '%$buscar%' OR tercero LIKE  '%$buscar%' OR des_ncon LIKE  '%$buscar%') "; 
-} 
-
-$a = "select * from conta_cesp where id_emp = '$idxx'";
-	if (empty($tercero)){$c = "";}else{$c= "and tercero =$tercero2";}
-	if ($fecha2 == "MES"){$f= "and fecha_ncon between '$f1' and '$f2'";}
-	if ($fecha2 == "DIA"){$f= "and fecha_ncon ='$fechafil'";}
-	if ($fecha2 == "A�O"){$f= "and fecha_ncon between '$a1' and '$a2'";}
-	$gby = "";
-	$orden = "order by fecha_ncon desc, id desc";
-	$sq2p = "$a  $c $filtro $f $gby $orden"; 
+						<div style="padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:15px;">
+							<div align="center">
+								<div style='padding-left:3px; padding-top:3px; padding-right:3px; padding-bottom:3px; background:#004080; width:350px'>
+									<div style='padding-left:5px; padding-top:5px; padding-right:5px; padding-bottom:5px; background:#FFFFFF'>
+										<div align="center"><a href='nuevo_cesp.php' target='_parent'>CREAR NUEVO COMP DE EGRESO SIN AFECTACION PPTAL </a> </div>
+									</div>
+								</div>
+							</div>
+						</div>
 
 
-$re2 = $cx->query($sq2p);
+						<div class="Estilo4" style='padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:5px;'>
+							<div align="center"><span class="Estilo4"><strong> LISTA DE CESP's CREADOS HASTA LA FECHA </strong> </span><br />
+							</div>
+						</div>
+						<?php
+							include('../objetos/filtro.php');
+							if ($registrado == "") {
+							} else {
 
-printf("
+
+								if ($_POST["buscar"] != "") {
+									$filtro = "and (id_manu_ncon LIKE  '%$buscar%' OR tercero LIKE  '%$buscar%' OR des_ncon LIKE  '%$buscar%') ";
+								}
+
+								$a = "select * from conta_cesp where id_emp = '$idxx'";
+								if (empty($tercero)) {
+									$c = "";
+								} else {
+									$c = "and tercero =$tercero2";
+								}
+								if ($fecha2 == "MES") {
+									$f = "and fecha_ncon between '$f1' and '$f2'";
+								}
+								if ($fecha2 == "DIA") {
+									$f = "and fecha_ncon ='$fechafil'";
+								}
+								if ($fecha2 == "A�O") {
+									$f = "and fecha_ncon between '$a1' and '$a2'";
+								}
+								$gby = "";
+								$orden = "order by fecha_ncon desc, id desc";
+								$sq2p = "$a  $c $filtro $f $gby $orden";
+
+
+								$re2 = $cx->query($sq2p);
+
+								printf("
 <center>
 <table width='1000' BORDER='1' class='bordepunteado1'>
 <thead>
@@ -1673,12 +1761,11 @@ printf("
 </tr>
 </thead>
 <tbody>
-",$mesh[$me+0],$an);
+", $mesh[$me + 0], $an);
 
-while($rw2 = $re2->fetch_array())
-   {
+								while ($rw2 = $re2->fetch_array()) {
 
-printf("
+									printf("
 
 <tr>
 <td align='center' bgcolor='#DCE9E5'  width='100'>
@@ -1724,66 +1811,68 @@ printf("
 
 
 
-</tr>", $rw2["id_manu_ncon"], $rw2["fecha_ncon"], $rw2["tercero"], $rw2["des_ncon"], number_format($rw2["tot_deb"],2,',','.'), $rw2["id_auto_ncon"], $rw2["fecha_ncon"], $rw2["id_auto_ncon"], $rw2["id_auto_ncon"], $rw2['id']); 
+</tr>", $rw2["id_manu_ncon"], $rw2["fecha_ncon"], $rw2["tercero"], $rw2["des_ncon"], number_format($rw2["tot_deb"], 2, ',', '.'), $rw2["id_auto_ncon"], $rw2["fecha_ncon"], $rw2["id_auto_ncon"], $rw2["id_auto_ncon"], $rw2['id']);
+								}
 
-
-   }
-
-printf("</tbody></table></center>");
-
-}
-
-} // fin if 
+								printf("</tbody></table></center>");
+							}
+						} // fin if 
 
 
 
-$a=$_POST['nn'];
-if ($a == 'NCSP')
-{
-?>
-<div class="Estilo4" style='padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:5px;'>
-  <div align="center"><span class="Estilo4"><strong> NOTA CREDITO SIN AFECTACION PRESUPUESTAL - NCSP <br />
-    <br />
-    <br />
-    </strong> </span><br />
-  </div>
-</div>
+						$a = isset($_POST['nn']) ? $_POST['nn'] : '';
+						if ($a == 'NCSP') {
+						?>
+						<div class="Estilo4" style='padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:5px;'>
+							<div align="center"><span class="Estilo4"><strong> NOTA CREDITO SIN AFECTACION PRESUPUESTAL - NCSP <br />
+										<br />
+										<br />
+									</strong> </span><br />
+							</div>
+						</div>
 
-<div style="padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:15px;">
-  <div align="center">
-    <div style='padding-left:3px; padding-top:3px; padding-right:3px; padding-bottom:3px; background:#004080; width:350px'>
-      <div style='padding-left:5px; padding-top:5px; padding-right:5px; padding-bottom:5px; background:#FFFFFF'>
-        <div align="center"><a href='nuevo_ncsp.php' target='_parent'>CREAR NUEVA NOTA CREDITO SIN AFECTACION PPTAL </a> </div>
-      </div>
-    </div>
-  </div>
-</div>
+						<div style="padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:15px;">
+							<div align="center">
+								<div style='padding-left:3px; padding-top:3px; padding-right:3px; padding-bottom:3px; background:#004080; width:350px'>
+									<div style='padding-left:5px; padding-top:5px; padding-right:5px; padding-bottom:5px; background:#FFFFFF'>
+										<div align="center"><a href='nuevo_ncsp.php' target='_parent'>CREAR NUEVA NOTA CREDITO SIN AFECTACION PPTAL </a> </div>
+									</div>
+								</div>
+							</div>
+						</div>
 
-<?php
-include('../objetos/filtro.php');  
+						<?php
+							include('../objetos/filtro.php');
 
-if  ($registrado =="") 
-{
+							if ($registrado == "") {
+							} else {
 
-}else{
 
-	
-	if  ($_POST["buscar"] != "")
-	{
-	$filtro ="and (id_manu_ncon LIKE  '%$buscar%' OR tercero LIKE  '%$buscar%' OR des_ncon LIKE  '%$buscar%') "; 
-	} 
+								if ($_POST["buscar"] != "") {
+									$filtro = "and (id_manu_ncon LIKE  '%$buscar%' OR tercero LIKE  '%$buscar%' OR des_ncon LIKE  '%$buscar%') ";
+								}
 
-	$a = "select * from conta_ncsp where id_emp = '$idxx'";
-	if (empty($tercero)){$c = "";}else{$c= "and tercero =$tercero2";}
-	if ($fecha2 == "MES"){$f= "and fecha_ncon between '$f1' and '$f2'";}
-	if ($fecha2 == "DIA"){$f= "and fecha_ncon ='$fechafil'";}
-	if ($fecha2 == "A�O"){$f= "and fecha_ncon between '$a1' and '$a2'";}
-	$gby = "";
-	$orden = "order by fecha_ncon desc";
-	$sq2 = "$a  $c $filtro $f $gby $orden"; 
+								$a = "select * from conta_ncsp where id_emp = '$idxx'";
+								if (empty($tercero)) {
+									$c = "";
+								} else {
+									$c = "and tercero =$tercero2";
+								}
+								if ($fecha2 == "MES") {
+									$f = "and fecha_ncon between '$f1' and '$f2'";
+								}
+								if ($fecha2 == "DIA") {
+									$f = "and fecha_ncon ='$fechafil'";
+								}
+								if ($fecha2 == "A�O") {
+									$f = "and fecha_ncon between '$a1' and '$a2'";
+								}
+								$gby = "";
+								$orden = "order by fecha_ncon desc";
+								$sq2 = "$a  $c $filtro $f $gby $orden";
 
-$re2 = $cx->query($sq2);
-printf("
+								$re2 = $cx->query($sq2);
+								printf("
 <center>
 <table width='1000' BORDER='1' class='bordepunteado1'>
 <thead>
@@ -1811,12 +1900,11 @@ printf("
 </thead>
 <tbody>
 
-",$mesh[$me+0],$an);
+", $mesh[$me + 0], $an);
 
-while($rw2 = $re2->fetch_array())
-   {
+								while ($rw2 = $re2->fetch_array()) {
 
-printf("
+									printf("
 <tr>
 <td align='left' bgcolor='#DCE9E5'>
 <div style='padding-left:1px; padding-top:3px; padding-right:1px; padding-bottom:3px;'>
@@ -1854,66 +1942,70 @@ printf("
 </div>
 </td>
 
-</tr>", $rw2["id_manu_ncon"], $rw2["fecha_ncon"], $rw2["tercero"], $rw2["des_ncon"], number_format($rw2["tot_deb"],2,',','.'), $rw2["id_auto_ncon"],$rw2["fecha_ncon"], $rw2["id_auto_ncon"], $rw2["id_auto_ncon"]); 
-   }
+</tr>", $rw2["id_manu_ncon"], $rw2["fecha_ncon"], $rw2["tercero"], $rw2["des_ncon"], number_format($rw2["tot_deb"], 2, ',', '.'), $rw2["id_auto_ncon"], $rw2["fecha_ncon"], $rw2["id_auto_ncon"], $rw2["id_auto_ncon"]);
+								}
 
-printf("</tbody></table></center>");
+								printf("</tbody></table></center>");
+							}
+						}
+
+						$a = isset($_POST['nn']) ? $_POST['nn'] : '';
+						if ($a == 'NDSP') {
+						?>
+						<div class="Estilo4" style='padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:5px;'>
+							<div align="center"><span class="Estilo4"><strong> NOTA DEBITO SIN AFECTACION PRESUPUESTAL - NDSP<br />
+										<br />
+										<br />
+									</strong> </span><br />
+							</div>
+						</div>
+						<div style="padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:15px;">
+							<div align="center">
+								<div style='padding-left:3px; padding-top:3px; padding-right:3px; padding-bottom:3px; background:#004080; width:350px'>
+									<div style='padding-left:5px; padding-top:5px; padding-right:5px; padding-bottom:5px; background:#FFFFFF'>
+										<div align="center"><a href='nuevo_ndsp.php' target='_parent'>CREAR NUEVA NOTA DEBITO SIN AFECTACION PPTAL </a> </div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="Estilo4" style='padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:5px;'>
+							<div align="center"><span class="Estilo4"><strong>
+										<br />
+										LISTA DE NDSP's CREADOS HASTA LA FECHA </strong> </span><br />
+							</div>
+						</div>
+						<?php
+							include('../objetos/filtro.php');
+							if ($registrado == "") {
+							} else {
 
 
-}
-}
+								if ($_POST["buscar"] != "") {
+									$filtro = "and (id_manu_ncon LIKE  '%$buscar%' OR tercero LIKE  '%$buscar%' OR des_ncon LIKE  '%$buscar%') ";
+								}
 
-$a=$_POST['nn'];
-if ($a == 'NDSP')
-{
-?>
-<div class="Estilo4" style='padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:5px;'>
-  <div align="center"><span class="Estilo4"><strong> NOTA DEBITO SIN AFECTACION PRESUPUESTAL - NDSP<br />
-     <br />
-    <br />
-  </strong> </span><br />
-  </div>
-</div>
-<div style="padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:15px;">
-  <div align="center">
-    <div style='padding-left:3px; padding-top:3px; padding-right:3px; padding-bottom:3px; background:#004080; width:350px'>
-      <div style='padding-left:5px; padding-top:5px; padding-right:5px; padding-bottom:5px; background:#FFFFFF'>
-        <div align="center"><a href='nuevo_ndsp.php' target='_parent'>CREAR NUEVA NOTA DEBITO SIN AFECTACION PPTAL </a> </div>
-      </div>
-    </div>
-  </div>
-</div>
-<div class="Estilo4" style='padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:5px;'>
-  <div align="center"><span class="Estilo4"><strong>
-    <br />
-    LISTA DE NDSP's CREADOS HASTA LA FECHA </strong> </span><br />
-  </div>
-</div>
-<?php
-include('../objetos/filtro.php'); 
-if  ($registrado =="") 
-{
+								$a = "select * from conta_ndsp where id_emp = '$idxx'";
+								if (empty($tercero)) {
+									$c = "";
+								} else {
+									$c = "and tercero =$tercero2";
+								}
+								if ($fecha2 == "MES") {
+									$f = "and fecha_ncon between '$f1' and '$f2'";
+								}
+								if ($fecha2 == "DIA") {
+									$f = "and fecha_ncon ='$fechafil'";
+								}
+								if ($fecha2 == "A�O") {
+									$f = "and fecha_ncon between '$a1' and '$a2'";
+								}
+								$gby = "";
+								$orden = "order by fecha_ncon desc, id desc";
+								$sq2 = "$a $c $filtro $f $gby $orden";
 
-}else{
- 
+								$re2 = $cx->query($sq2);
 
-if  ($_POST["buscar"] != "")
-	{
-	$filtro ="and (id_manu_ncon LIKE  '%$buscar%' OR tercero LIKE  '%$buscar%' OR des_ncon LIKE  '%$buscar%') "; 
-	} 
-
-	$a = "select * from conta_ndsp where id_emp = '$idxx'";
-	if (empty($tercero)){$c = "";}else{$c= "and tercero =$tercero2";}
-	if ($fecha2 == "MES"){$f= "and fecha_ncon between '$f1' and '$f2'";}
-	if ($fecha2 == "DIA"){$f= "and fecha_ncon ='$fechafil'";}
-	if ($fecha2 == "A�O"){$f= "and fecha_ncon between '$a1' and '$a2'";}
-	$gby = "";
-	$orden = "order by fecha_ncon desc, id desc";
-	$sq2 = "$a $c $filtro $f $gby $orden"; 
-
-$re2 = $cx->query($sq2);
-
-printf("
+								printf("
 <center>
 <table width='1000' BORDER='1' class='bordepunteado1'>
 <thead>
@@ -1939,12 +2031,11 @@ printf("
 </tr>
 </thead>
 <tbody>
-",$mesh[$me+0],$an);
+", $mesh[$me + 0], $an);
 
-while($rw2 = $re2->fetch_array())
-   {
+								while ($rw2 = $re2->fetch_array()) {
 
-printf("
+									printf("
 
 <tr>
 <td align='left' bgcolor='#DCE9E5'>
@@ -1986,70 +2077,72 @@ printf("
 
 
 
-</tr>", $rw2["id_manu_ncon"], $rw2["fecha_ncon"], $rw2["tercero"], $rw2["des_ncon"],number_format($rw2["tot_deb"],2,',','.'), $rw2["id_auto_ncon"],$rw2["fecha_ncon"],$rw2["id_auto_ncon"], $rw2["id_auto_ncon"]); 
+</tr>", $rw2["id_manu_ncon"], $rw2["fecha_ncon"], $rw2["tercero"], $rw2["des_ncon"], number_format($rw2["tot_deb"], 2, ',', '.'), $rw2["id_auto_ncon"], $rw2["fecha_ncon"], $rw2["id_auto_ncon"], $rw2["id_auto_ncon"]);
+								}
+
+								printf("</tbody></table></center>");
+							}
+						} //FIN INF
+
+						$a = isset($_POST['nn']) ? $_POST['nn'] : '';
+						if ($a == 'TFIN') {
+						?>
+						<div class="Estilo4" style='padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:5px;'>
+							<div align="center"><span class="Estilo4"><strong>TRANSFERENCIA DE FONDOS INTERNOS - TFIN <br />
+									</strong> </span><br />
+							</div>
+						</div>
+						<div style="padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:15px;">
+							<div align="center">
+								<div style='padding-left:3px; padding-top:3px; padding-right:3px; padding-bottom:3px; background:#004080; width:350px'>
+									<div style='padding-left:5px; padding-top:5px; padding-right:5px; padding-bottom:5px; background:#FFFFFF'>
+										<div align="center"><a href='nuevo_tfin.php' target='_parent'>CREAR NUEVA TRANSFERENCIA DE FONDOS INTERNOS </a></div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="Estilo4" style='padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:5px;'>
+							<div align="center"><span class="Estilo4"><strong>
+										LISTA DE TFIN's CREADOS HASTA LA FECHA </strong> </span><br />
+							</div>
+						</div>
 
 
-   }
+						<?php
 
-printf("</tbody></table></center>");
-
-
-}
-} //FIN INF
-
-$a=$_POST['nn'];
-if ($a == 'TFIN')
-{
-?>
-<div class="Estilo4" style='padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:5px;'>
-  <div align="center"><span class="Estilo4"><strong>TRANSFERENCIA DE FONDOS INTERNOS - TFIN <br />
-    </strong> </span><br />
-  </div>
-</div>
-<div style="padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:15px;">
-  <div align="center">
-    <div style='padding-left:3px; padding-top:3px; padding-right:3px; padding-bottom:3px; background:#004080; width:350px'>
-      <div style='padding-left:5px; padding-top:5px; padding-right:5px; padding-bottom:5px; background:#FFFFFF'>
-        <div align="center"><a href='nuevo_tfin.php' target='_parent'>CREAR NUEVA TRANSFERENCIA DE FONDOS INTERNOS </a></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="Estilo4" style='padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:5px;'>
-  <div align="center"><span class="Estilo4"><strong>
-    LISTA DE TFIN's CREADOS HASTA LA FECHA </strong> </span><br />
-  </div>
-</div>
+							include('../objetos/filtro.php');
+							if ($registrado == "") {
+							} else {
 
 
-<?php
+								if ($_POST["buscar"] != "") {
+									$filtro = "and (id_manu_ncon LIKE  '%$buscar%' OR tercero LIKE  '%$buscar%' OR des_ncon LIKE  '%$buscar%') ";
+								}
 
-include('../objetos/filtro.php'); 
-if  ($registrado =="") 
-{
-
-}else{
- 
-
-if  ($_POST["buscar"] != "")
-	{
-	$filtro ="and (id_manu_ncon LIKE  '%$buscar%' OR tercero LIKE  '%$buscar%' OR des_ncon LIKE  '%$buscar%') "; 
-	} 
-
-	$a = "select * from conta_tfin where id_emp = '$idxx'";
-	if (empty($tercero)){$c = "";}else{$c= "and tercero =$tercero2";}
-	if ($fecha2 == "MES"){$f= "and fecha_ncon between '$f1' and '$f2'";}
-	if ($fecha2 == "DIA"){$f= "and fecha_ncon ='$fechafil'";}
-	if ($fecha2 == "A�O"){$f= "and fecha_ncon between '$a1' and '$a2'";}
-	$gby = "";
-	$orden = "order by fecha_ncon desc, id desc";
-	$sq2 = "$a $c $filtro $f $gby $orden"; 
+								$a = "select * from conta_tfin where id_emp = '$idxx'";
+								if (empty($tercero)) {
+									$c = "";
+								} else {
+									$c = "and tercero =$tercero2";
+								}
+								if ($fecha2 == "MES") {
+									$f = "and fecha_ncon between '$f1' and '$f2'";
+								}
+								if ($fecha2 == "DIA") {
+									$f = "and fecha_ncon ='$fechafil'";
+								}
+								if ($fecha2 == "A�O") {
+									$f = "and fecha_ncon between '$a1' and '$a2'";
+								}
+								$gby = "";
+								$orden = "order by fecha_ncon desc, id desc";
+								$sq2 = "$a $c $filtro $f $gby $orden";
 
 
-$re2 = $cx->query($sq2);	
+								$re2 = $cx->query($sq2);
 
-printf("
+								printf("
 <center>
 <table width='1000' BORDER='1' class='bordepunteado1'>
 <thead>
@@ -2075,13 +2168,11 @@ printf("
 </tr>
 </thead>
 <tbody>
-",$mesh[$me+0],$an);
+", $mesh[$me + 0], $an);
 
-while($rw2 = $re2->fetch_array())
-   
-   {
+								while ($rw2 = $re2->fetch_array()) {
 
-printf("
+									printf("
 
 <tr>
 <td align='left' bgcolor='#DCE9E5'>
@@ -2124,67 +2215,69 @@ printf("
 
 
 
-</tr>", $rw2["id_manu_ncon"], $rw2["fecha_ncon"], $rw2["tercero"], $rw2["des_ncon"], number_format($rw2["tot_deb"],2,',','.'), $rw2["id_auto_ncon"],$rw2["fecha_ncon"],  $rw2["id_auto_ncon"], $rw2["id_auto_ncon"]); 
+</tr>", $rw2["id_manu_ncon"], $rw2["fecha_ncon"], $rw2["tercero"], $rw2["des_ncon"], number_format($rw2["tot_deb"], 2, ',', '.'), $rw2["id_auto_ncon"], $rw2["fecha_ncon"],  $rw2["id_auto_ncon"], $rw2["id_auto_ncon"]);
+								}
+
+								printf("</tbody></table></center>");
+							}
+						}
+
+						$a = isset($_POST['nn']) ? $_POST['nn'] : '';
+						if (!isset($_POST['nn'])) $a = isset($_GET['nn']) ? $_GET['nn'] : '';
+						if ($a == 'COBA') {
+						?>
+						<div class="Estilo4" style='padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:5px;'>
+							<div align="center"><span class="Estilo4"><strong>CONSIGNACION BANCARIA - COBA <br />
+									</strong> </span><br />
+							</div>
+						</div>
+						<div style="padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:15px;">
+							<div align="center">
+								<div style='padding-left:3px; padding-top:3px; padding-right:3px; padding-bottom:3px; background:#004080; width:350px'>
+									<div style='padding-left:5px; padding-top:5px; padding-right:5px; padding-bottom:5px; background:#FFFFFF'>
+										<div align="center"><a href='nuevo_coba.php' target='_parent'>CREAR NUEVA CONSIGNACION BANCARIA </a></div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="Estilo4" style='padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:5px;'>
+							<div align="center"><span class="Estilo4"><strong>
+										LISTA DE COBA's CREADOS HASTA LA FECHA </strong> </span><br />
+							</div>
+						</div>
+					<?php
+							include('../objetos/filtro.php');
+							if ($registrado == "") {
+							} else {
 
 
-   }
+								if ($_POST["buscar"] != "") {
+									$filtro = "and (id_manu_ncon LIKE  '%$buscar%' OR tercero LIKE  '%$buscar%' OR des_ncon LIKE  '%$buscar%') ";
+								}
 
-printf("</tbody></table></center>");
+								$a = "select * from conta_coba where id_emp = '$idxx'";
+								if (empty($tercero)) {
+									$c = "";
+								} else {
+									$c = "and tercero =$tercero2";
+								}
+								if ($fecha2 == "MES") {
+									$f = "and fecha_ncon between '$f1' and '$f2'";
+								}
+								if ($fecha2 == "DIA") {
+									$f = "and fecha_ncon ='$fechafil'";
+								}
+								if ($fecha2 == "A�O") {
+									$f = "and fecha_ncon between '$a1' and '$a2'";
+								}
+								$gby = "";
+								$orden = "order by fecha_ncon desc, id desc";
+								$sq2 = "$a $c $filtro $f $gby $orden";
 
+								$re2 = $cx->query($sq2);
 
-}
-}
-
-$a=$_POST['nn'];
-if (!$_POST['nn']) $a = $_GET['nn'];
-if ($a == 'COBA')
-{
-?>
-<div class="Estilo4" style='padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:5px;'>
-  <div align="center"><span class="Estilo4"><strong>CONSIGNACION BANCARIA - COBA <br />
-   </strong> </span><br />
-  </div>
-</div>
-<div style="padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:15px;">
-  <div align="center">
-    <div style='padding-left:3px; padding-top:3px; padding-right:3px; padding-bottom:3px; background:#004080; width:350px'>
-      <div style='padding-left:5px; padding-top:5px; padding-right:5px; padding-bottom:5px; background:#FFFFFF'>
-        <div align="center"><a href='nuevo_coba.php' target='_parent'>CREAR NUEVA CONSIGNACION BANCARIA </a></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="Estilo4" style='padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:5px;'>
-  <div align="center"><span class="Estilo4"><strong>
-    LISTA DE COBA's CREADOS HASTA LA FECHA </strong> </span><br />
-  </div>
-</div>
-<?php
-include('../objetos/filtro.php'); 
-if  ($registrado =="") 
-{
-
-}else{
- 
-
-if  ($_POST["buscar"] != "")
-	{
-	$filtro ="and (id_manu_ncon LIKE  '%$buscar%' OR tercero LIKE  '%$buscar%' OR des_ncon LIKE  '%$buscar%') "; 
-	} 
-
-	$a = "select * from conta_coba where id_emp = '$idxx'";
-	if (empty($tercero)){$c = "";}else{$c= "and tercero =$tercero2";}
-	if ($fecha2 == "MES"){$f= "and fecha_ncon between '$f1' and '$f2'";}
-	if ($fecha2 == "DIA"){$f= "and fecha_ncon ='$fechafil'";}
-	if ($fecha2 == "A�O"){$f= "and fecha_ncon between '$a1' and '$a2'";}
-	$gby = "";
-	$orden = "order by fecha_ncon desc, id desc";
-	$sq2 = "$a $c $filtro $f $gby $orden"; 
-
-$re2 =$cx->query($sq2);
-
-printf("
+								printf("
 <center>
 <table width='1000' BORDER='1' class='bordepunteado1'>
 <thead>
@@ -2210,12 +2303,11 @@ printf("
 </tr>
 </thead>
 <tbody>
-",$mesh[$me+1],$an);
+", $mesh[$me + 1], $an);
 
-while($rw2 = $re2->fetch_array())
-   {
+								while ($rw2 = $re2->fetch_array()) {
 
-printf("
+									printf("
 
 <tr>
 <td align='left' bgcolor='#DCE9E5'>
@@ -2254,68 +2346,76 @@ printf("
 </div>
 </td>
 
-</tr>", $rw2["id_manu_ncon"], $rw2["fecha_ncon"], $rw2["tercero"], $rw2["des_ncon"], number_format($rw2["tot_deb"],2,',','.'), $rw2["id_auto_ncon"],$rw2["fecha_ncon"], $rw2["id_auto_ncon"], $rw2["id_auto_ncon"]); 
+</tr>", $rw2["id_manu_ncon"], $rw2["fecha_ncon"], $rw2["tercero"], $rw2["des_ncon"], number_format($rw2["tot_deb"], 2, ',', '.'), $rw2["id_auto_ncon"], $rw2["fecha_ncon"], $rw2["id_auto_ncon"], $rw2["id_auto_ncon"]);
+								}
 
-   }
+								printf("</tbody></table></center>");
+							}
+						}
+					?>
 
-printf("</tbody></table></center>");
+					</td>
+				</tr>
 
+				<tr>
+					<td colspan="3">
+						<div style="padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:5px;">
+							<div align="center">
 
-}
-}
-?>
+								<div style='padding-left:3px; padding-top:3px; padding-right:3px; padding-bottom:3px; background:#004080; width:150px'>
+									<div style='padding-left:5px; padding-top:5px; padding-right:5px; padding-bottom:5px; background:#FFFFFF'>
+										<div align="center"><a href='../user.php' target='_parent'>VOLVER </a> </div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="3">
+						<div style="padding-left:5px; padding-top:5px; padding-right:5px; padding-bottom:5px;">
+							<div align="center"> <span class="Estilo4">Fecha de esta Sesion:</span> <br />
+								<span class="Estilo4"> <strong>
+										<?php echo $ano; ?>
+									</strong> </span> <br />
+								<span class="Estilo4"><b>Usuario: </b><u><?php echo $_SESSION["login"]; ?></u> </span>
+							</div>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td width="266">
+						<div class="Estilo7" id="main_div" style="padding-left:3px; padding-top:5px; padding-right:3px; padding-bottom:3px;">
+							<div align="center"><?php include('../config.php');
+												echo $nom_emp ?><br />
+								<?php echo $dir_tel ?><BR />
+								<?php echo $muni ?> <br />
+								<?php echo $email ?> </div>
+						</div>
+					</td>
+					<td width="266">
+						<div class="Estilo7" id="main_div" style="padding-left:3px; padding-top:5px; padding-right:3px; padding-bottom:3px;">
+							<div align="center"><a href="../../politicas.php" target="_blank">POLITICAS DE PRIVACIDAD <BR />
+								</a><BR />
+								<a href="../../condiciones.php" target="_blank">CONDICIONES DE USO </a>
+							</div>
+						</div>
+					</td>
+					<td width="266">
+						<div class="Estilo7" id="main_div" style="padding-left:3px; padding-top:5px; padding-right:3px; padding-bottom:15px;">
+							<div align="center">Desarrollado por <br />
+								<a href="http://www.qualisoftsalud.com" target="_blank"><img src="../images/logoqsft2.png" width="150" height="69" border="0" /></a><br />
+								Derechos Reservados - 2009
+							</div>
+						</div>
+					</td>
+				</tr>
+			</table>
+		</body>
 
-</td>
-  </tr>
-  
-  <tr>
-    <td colspan="3">
-    <div style="padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:5px;">
-      <div align="center">
-      
-        <div style='padding-left:3px; padding-top:3px; padding-right:3px; padding-bottom:3px; background:#004080; width:150px'>
-          <div style='padding-left:5px; padding-top:5px; padding-right:5px; padding-bottom:5px; background:#FFFFFF'>
-            <div align="center"><a href='../user.php' target='_parent'>VOLVER </a> </div>
-          </div>
-        </div>
-        </div>
-    </div>  </td>
-  </tr>
-  <tr>
-    <td colspan="3"><div style="padding-left:5px; padding-top:5px; padding-right:5px; padding-bottom:5px;">
-      <div align="center"> <span class="Estilo4">Fecha de  esta Sesion:</span> <br />
-          <span class="Estilo4"> <strong>
-          <?php echo $ano;?>
-          </strong> </span> <br />
-          <span class="Estilo4"><b>Usuario: </b><u><?php echo $_SESSION["login"];?></u> </span> </div>
-    </div></td>
-  </tr>
-  <tr>
-    <td width="266">
-    <div class="Estilo7" id="main_div" style="padding-left:3px; padding-top:5px; padding-right:3px; padding-bottom:3px;">
-      <div align="center"><?php include('../config.php'); echo $nom_emp ?><br />
-        <?php echo $dir_tel ?><BR />
-        <?php echo $muni ?> <br />
-        <?php echo $email?> </div>
-    </div>  </td>
-    <td width="266">
-    <div class="Estilo7" id="main_div" style="padding-left:3px; padding-top:5px; padding-right:3px; padding-bottom:3px;">
-      <div align="center"><a href="../../politicas.php" target="_blank">POLITICAS DE PRIVACIDAD <BR />
-          </a><BR /> 
-        <a href="../../condiciones.php" target="_blank">CONDICIONES DE USO  </a></div>
-    </div>  </td>
-    <td width="266">
-    <div class="Estilo7" id="main_div" style="padding-left:3px; padding-top:5px; padding-right:3px; padding-bottom:15px;">
-      <div align="center">Desarrollado por <br />
-        <a href="http://www.qualisoftsalud.com" target="_blank"><img src="../images/logoqsft2.png" width="150" height="69" border="0" /></a><br />
-      Derechos Reservados - 2009    </div>
-    </div>  </td>
-  </tr>
-</table>
-</body>
-</html>
+		</html>
 <?php
-	}else{ // si no tiene persisos de usuario
+	} else { // si no tiene persisos de usuario
 		echo "<br><br><center>Usuario no tiene permisos en este m&oacute;dulo</center><br>";
 		echo "<center>Click <a href=\"../user.php\">aqu&iacute; para volver</a></center>";
 	}
