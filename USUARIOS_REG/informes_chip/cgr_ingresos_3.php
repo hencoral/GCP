@@ -1,4 +1,4 @@
-<?
+<?php
 set_time_limit(3600);
 $tipo=$_POST['tipo'];
 header("Content-type: application/vnd.ms-excel");
@@ -35,13 +35,14 @@ header("Expires: 0");
 <body>
 <?
 include("../config.php");
-
+global $server, $database, $dbpass, $dbuser, $charset;
+// Conexion con la base de datos
 $cx = new mysqli($server, $dbuser, $dbpass, $database);
-$reb =mysql_db_query($database,"select * from empresa",$cx);
-$rwb =mysql_fetch_array($reb);
+$reb =$cx->query("select * from empresa");
+$rwb = $reb->fetch_array();
 $cod_cgn = $rwb["cod_cgn"];
-$rea =mysql_db_query($database,"select * from cgr_aux_ing",$cx);
-$rwa =mysql_fetch_array($rea);
+$rea =$cx->query("select * from cgr_aux_ing");
+$rwa = $rea->fetch_array();
 $fecha = $rwa["fecha"];
 $fecha2 = explode("/", $fecha);
 $anno = $fecha2[0];

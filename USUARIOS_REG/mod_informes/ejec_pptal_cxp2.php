@@ -1,7 +1,7 @@
-<?
+<?php
 set_time_limit(1200);
 session_start();
-if(!session_is_registered("login"))
+if (!isset($_SESSION["login"])) 
 {
 header("Location: ../login.php");
 exit;
@@ -65,7 +65,6 @@ table.bordepunteado1 { border-style: solid; border-collapse:collapse; border-wid
 	
 <SCRIPT type="text/javascript" src="dhtmlgoodies_calendar/dhtmlgoodies_calendar.js?random=20060118"></script>
 <style type="text/css">
-<!--
 .Estilo10 {
 	color: #FFFFFF;
 	font-weight: bold;
@@ -87,35 +86,36 @@ table.bordepunteado1 { border-style: solid; border-collapse:collapse; border-wid
 <?php
 //-------
 include('../config.php');	
-$cxx = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
+global $server, $database, $dbpass, $dbuser, $charset;
+// Conexion con la base de datos
+$cx = new mysqli($server, $dbuser, $dbpass, $database);
 $sxx = "select * from fecha";
-$rxx = mysql_db_query($database, $sxx, $cxx);
-while($rowxxx = mysql_fetch_array($rxx)) 
+$rxx = $cx->query($sxx);
+while($rowxxx = $rxx->fetch_array())
    {
    $idxxx=$rowxxx["id_emp"];
    $id_emp=$rowxxx["id_emp"];
    $ano=$rowxxx["ano"];
    }
 $sxxq = "select * from fecha_ini_op";
-$rxxq = mysql_db_query($database, $sxxq, $cxx);
-while($rowxxxq = mysql_fetch_array($rxxq)) 
+$rxxq = $cx->query($sxxq);
+while($rowxxxq = $rxxq->fetch_array())
    {
    $fecha_ini_op=$rowxxxq["fecha_ini_op"];
    }   
-$cx2 = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
 $sq2 = "select * from empresa where cod_emp = '$idxxx'";
-$re2 = mysql_db_query($database, $sq2, $cx2);
-while($row2 = mysql_fetch_array($re2)) 
+$re2 = $cx->query($sq2);
+while($row2 = $re2->fetch_array())
    {
    $empresa = $row2["raz_soc"];
    }
 //--------	--------------------------------------------------------------------------------------------
 
-	$fecha_ini=$_POST['fecha_ini']; //printf("fecha ini : %s",$fecha_ini);
-	$fecha_fin=$_POST['fecha_fin'];	//printf("fecha fin : %s",$fecha_fin);
-	$tipo = $_POST['mov_mes'];
-	$fecha_per = $_POST['fecha_per'];
-	$mov_periodo = $_POST['mov_periodo'];
+	if(isset($_POST['fecha_ini']))	$fecha_ini=$_POST['fecha_ini'];  else $fecha_ini ='';
+	if(isset($_POST['fecha_fin']))	$fecha_fin=$_POST['fecha_fin'];  else $fecha_fin ='';
+	if(isset($_POST['mov_mes'])) $tipo = $_POST['mov_mes']; else $tipo = "";
+	if(isset($_POST['fecha_per'])) $fecha_per = $_POST['fecha_per']; else $fecha_per = "";
+	if(isset($_POST['mov_periodo'])) $mov_periodo = $_POST['mov_periodo']; else $mov_periodo = "";
 
 $anno = substr($ano,0,4);	
 // Para cargar la url e incluir imagenes al archivo que se genera
@@ -148,7 +148,7 @@ if($mov_periodo =='')
 </tr>
 </table>
 <p><br />
-  <?
+  <?php
 	printf("
 	<div style='padding-left:3px; padding-top:10px; padding-right:3px; padding-bottom:10px;'>
 	<center class ='Estilo4'>Usted ha seleccionado como <b>Fecha Inicial</b> : %s y como <b>Fecha Final</b> : %s</center>
@@ -159,10 +159,8 @@ if($mov_periodo =='')
     <p>
       <?php
     //-------
-    include('../config.php');				
-    $cx = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
     $sq = "select * from cxp where id_emp = '$id_emp' order by cod_pptal asc";
-    $re = mysql_db_query($database, $sq, $cx);
+    $re = $cx->query($sq);
     
 	// Si el usuario marco mostrar movimiento del mes
 	if ($tipo ==1)
@@ -192,7 +190,7 @@ if($mov_periodo =='')
     <td align='center' width='75'><span class='Estilo4'><b>Nivel</b></span></td>
 	");
 	        // Calculo de gastos por mes 
-        $mes = split("/",$fecha_fin);
+        $mes = explode("/",$fecha_fin);
         
         if ($mes[1]=="01") {$mes_ini = "$anno/01/01"; $mes_fin ="$anno/01/31";}
         if ($mes[1]=="02") {$mes_ini = "$anno/02/01"; $mes_fin ="$anno/02/29";}
@@ -208,10 +206,9 @@ if($mov_periodo =='')
         if ($mes[1]=="12") {$mes_ini = "$anno/12/01"; $mes_fin ="$anno/12/31";}
 
 	
-	while($rw = mysql_fetch_array($re)) 
+	while($rw = $re->fetch_array())
 	   {
 	
-	$link=mysql_connect($server,$dbuser,$dbpass);
 	
 	//****
 	
@@ -221,39 +218,39 @@ if($mov_periodo =='')
 	
 	//****
 	
-	$resultax=mysql_query("select SUM(ppto_aprob) AS TOTAL from cxp WHERE (ano between '$fecha_ini' and '$fecha_fin' ) and id_emp='$id_emp' and tip_dato ='D' and cod_pptal LIKE '$cod%'",$link) or die (mysql_error());
-	$rowx=mysql_fetch_row($resultax);
+	$resultax=$cx->query("select SUM(ppto_aprob) AS TOTAL from cxp WHERE (ano between '$fecha_ini' and '$fecha_fin' ) and id_emp='$id_emp' and tip_dato ='D' and cod_pptal LIKE '$cod%'");
+	$rowx=$resultax->fetch_array();
 	$inicial=$rowx[0];
 	//****
 	
-	$resulta=mysql_query("select SUM(valor_adi) AS TOTAL from adi_cxp WHERE (fecha_adi between '$fecha_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cod_pptal LIKE '$cod%'",$link) or die (mysql_error());
-	$row=mysql_fetch_row($resulta);
+	$resulta=$cx->query("select SUM(valor_adi) AS TOTAL from adi_cxp WHERE (fecha_adi between '$fecha_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cod_pptal LIKE '$cod%'");
+	$row=$resulta->fetch_array();
 	$total_adi=$row[0]; 
 	
-	$resulta1=mysql_query("select SUM(valor_adi) AS TOTAL from cancelaciones_cxp WHERE (fecha_adi between '$fecha_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cod_pptal LIKE '$cod%'",$link) or die (mysql_error());
-	$row1=mysql_fetch_row($resulta1);
+	$resulta1=$cx->query("select SUM(valor_adi) AS TOTAL from cancelaciones_cxp WHERE (fecha_adi between '$fecha_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cod_pptal LIKE '$cod%'");
+	$row1=$resulta1->fetch_array();
 	$total_can=$row1[0]; 
 	
 	$definitivo = $inicial + $total_adi - $total_can;
 	
-	$resulta2=mysql_query("select SUM(valor) AS TOTAL from cecp_cuenta WHERE (fecha_cecp between '$fecha_ini' and '$fecha_fin' ) and cuenta LIKE '$cod%'",$link) or die (mysql_error());
-	$row2=mysql_fetch_row($resulta2);
+	$resulta2=$cx->query("select SUM(valor) AS TOTAL from cecp_cuenta WHERE (fecha_cecp between '$fecha_ini' and '$fecha_fin' ) and cuenta LIKE '$cod%'");
+	$row2=$resulta2->fetch_array();
 	$total_cecp=$row2[0];
 	
 	$saldo_x_pagar = $definitivo - $total_cecp;
 	
 	// calculo mes 
 	
-	$resulta3=mysql_query("select SUM(valor_adi) AS TOTAL from adi_cxp WHERE (fecha_adi between '$mes_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cod_pptal LIKE '$cod%'",$link) or die (mysql_error());
-	$row3=mysql_fetch_row($resulta3);
+	$resulta3=$cx->query("select SUM(valor_adi) AS TOTAL from adi_cxp WHERE (fecha_adi between '$mes_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cod_pptal LIKE '$cod%'");
+	$row3=$resulta3->fetch_array();
 	$total_adi_mes=$row3[0]; 
 
-	$resulta4=mysql_query("select SUM(valor_adi) AS TOTAL from cancelaciones_cxp WHERE (fecha_adi between '$mes_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cod_pptal LIKE '$cod%'",$link) or die (mysql_error());
-	$row4=mysql_fetch_row($resulta4);
+	$resulta4=$cx->query("select SUM(valor_adi) AS TOTAL from cancelaciones_cxp WHERE (fecha_adi between '$mes_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cod_pptal LIKE '$cod%'");
+	$row4=$resulta4->fetch_array();
 	$total_can_mes=$row4[0]; 
 	
-	$resulta5=mysql_query("select SUM(valor) AS TOTAL from cecp_cuenta WHERE (fecha_cecp between '$mes_ini' and '$fecha_fin' ) and cuenta LIKE '$cod%'",$link) or die (mysql_error());
-	$row5=mysql_fetch_row($resulta5);
+	$resulta5=$cx->query("select SUM(valor) AS TOTAL from cecp_cuenta WHERE (fecha_cecp between '$mes_ini' and '$fecha_fin' ) and cuenta LIKE '$cod%'");
+	$row5=$resulta5->fetch_array();
 	$total_cecp_mes=$row5[0];
 
 
@@ -302,10 +299,9 @@ if($mov_periodo =='')
     <td align='center' width='75'><span class='Estilo4'><b>Nivel</b></span></td>
 	");
 	
-	while($rw = mysql_fetch_array($re)) 
+	while($rw = $re->fetch_array())
 	   {
 	
-	$link=mysql_connect($server,$dbuser,$dbpass);
 	
 	//****
 	
@@ -315,23 +311,23 @@ if($mov_periodo =='')
 	
 	//****
 	
-	$resultax=mysql_query("select SUM(ppto_aprob) AS TOTAL from cxp WHERE (ano between '$fecha_ini' and '$fecha_fin' ) and id_emp='$id_emp' and tip_dato ='D' and cod_pptal LIKE '$cod%'",$link) or die (mysql_error());
-	$rowx=mysql_fetch_row($resultax);
+	$resultax=$cx->query("select SUM(ppto_aprob) AS TOTAL from cxp WHERE (ano between '$fecha_ini' and '$fecha_fin' ) and id_emp='$id_emp' and tip_dato ='D' and cod_pptal LIKE '$cod%'");
+	$rowx=$resultax->fetch_array();
 	$inicial=$rowx[0];
 	//****
 	
-	$resulta=mysql_query("select SUM(valor_adi) AS TOTAL from adi_cxp WHERE (fecha_adi between '$fecha_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cod_pptal LIKE '$cod%'",$link) or die (mysql_error());
-	$row=mysql_fetch_row($resulta);
+	$resulta=$cx->query("select SUM(valor_adi) AS TOTAL from adi_cxp WHERE (fecha_adi between '$fecha_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cod_pptal LIKE '$cod%'");
+	$row=$resulta->fetch_array();
 	$total_adi=$row[0]; 
 	
-	$resulta1=mysql_query("select SUM(valor_adi) AS TOTAL from cancelaciones_cxp WHERE (fecha_adi between '$fecha_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cod_pptal LIKE '$cod%'",$link) or die (mysql_error());
-	$row1=mysql_fetch_row($resulta1);
+	$resulta1=$cx->query("select SUM(valor_adi) AS TOTAL from cancelaciones_cxp WHERE (fecha_adi between '$fecha_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cod_pptal LIKE '$cod%'");
+	$row1=$resulta1->fetch_array();
 	$total_can=$row1[0]; 
 	
 	$definitivo = $inicial + $total_adi - $total_can;
 	
-	$resulta2=mysql_query("select SUM(valor) AS TOTAL from cecp_cuenta WHERE (fecha_cecp between '$fecha_ini' and '$fecha_fin' ) and cuenta LIKE '$cod%'",$link) or die (mysql_error());
-	$row2=mysql_fetch_row($resulta2);
+	$resulta2=$cx->query("select SUM(valor) AS TOTAL from cecp_cuenta WHERE (fecha_cecp between '$fecha_ini' and '$fecha_fin' ) and cuenta LIKE '$cod%'");
+	$row2=$resulta2->fetch_array();
 	$total_cecp=$row2[0];
 	
 	$saldo_x_pagar = $definitivo - $total_cecp;
@@ -381,7 +377,7 @@ if($mov_periodo =='')
 </tr>
 </table>
 <p><br />
-  <?
+  <?php
 	printf("
 	<div style='padding-left:3px; padding-top:10px; padding-right:3px; padding-bottom:10px;'>
 	<center class ='Estilo4'>Usted ha seleccionado como <b>Fecha Inicial</b> : %s y como <b>Fecha Final</b> : %s</center>
@@ -392,10 +388,8 @@ if($mov_periodo =='')
     <p>
       <?php
     //-------
-    include('../config.php');				
-    $cx = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
     $sq = "select * from cxp where id_emp = '$id_emp' order by cod_pptal asc";
-    $re = mysql_db_query($database, $sq, $cx);
+    $re = $cx->query($sq);
     
 	// Si el usuario marco mostrar movimiento del mes
     printf("
@@ -417,7 +411,7 @@ if($mov_periodo =='')
     <td align='center' width='75'><span class='Estilo4'><b>Nivel</b></span></td>
 	");
 	        // Calculo de gastos por mes 
-        $mes = split("/",$fecha_fin);
+        $mes = explode("/",$fecha_fin);
         
         if ($mes[1]=="01") {$mes_ini = "$anno/01/01"; $mes_fin ="$anno/01/31";}
         if ($mes[1]=="02") {$mes_ini = "$anno/02/01"; $mes_fin ="$anno/02/29";}
@@ -433,10 +427,9 @@ if($mov_periodo =='')
         if ($mes[1]=="12") {$mes_ini = "$anno/12/01"; $mes_fin ="$anno/12/31";}
 
 	
-	while($rw = mysql_fetch_array($re)) 
+	while($rw = $re->fetch_array())
 	   {
 	
-	$link=mysql_connect($server,$dbuser,$dbpass);
 	
 	//****
 	
@@ -446,23 +439,23 @@ if($mov_periodo =='')
 	
 	//****
 	
-	$resultax=mysql_query("select SUM(ppto_aprob) AS TOTAL from cxp WHERE (ano between '$fecha_ini' and '$fecha_fin' ) and id_emp='$id_emp' and tip_dato ='D' and cod_pptal LIKE '$cod%'",$link) or die (mysql_error());
-	$rowx=mysql_fetch_row($resultax);
+	$resultax=$cx->query("select SUM(ppto_aprob) AS TOTAL from cxp WHERE (ano between '$fecha_ini' and '$fecha_fin' ) and id_emp='$id_emp' and tip_dato ='D' and cod_pptal LIKE '$cod%'");
+	$rowx=$resultax->fetch_assoc();
 	$inicial=$rowx[0];
 	//****
 	
-	$resulta=mysql_query("select SUM(valor_adi) AS TOTAL from adi_cxp WHERE (fecha_adi between '$fecha_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cod_pptal LIKE '$cod%'",$link) or die (mysql_error());
-	$row=mysql_fetch_row($resulta);
+	$resulta=$cx->query("select SUM(valor_adi) AS TOTAL from adi_cxp WHERE (fecha_adi between '$fecha_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cod_pptal LIKE '$cod%'");
+	$row=$resulta->fetch_assoc();
 	$total_adi=$row[0]; 
 	
-	$resulta1=mysql_query("select SUM(valor_adi) AS TOTAL from cancelaciones_cxp WHERE (fecha_adi between '$fecha_per' and '$fecha_fin' ) and id_emp='$id_emp' and cod_pptal LIKE '$cod%'",$link) or die (mysql_error());
-	$row1=mysql_fetch_row($resulta1);
+	$resulta1=$cx->query("select SUM(valor_adi) AS TOTAL from cancelaciones_cxp WHERE (fecha_adi between '$fecha_per' and '$fecha_fin' ) and id_emp='$id_emp' and cod_pptal LIKE '$cod%'");
+	$row1=$resulta1->fetch_assoc();
 	$total_can=$row1[0]; 
 	
 	$definitivo = $inicial + $total_adi - $total_can;
 	
-	$resulta2=mysql_query("select SUM(valor) AS TOTAL from cecp_cuenta WHERE (fecha_cecp between '$fecha_per' and '$fecha_fin' ) and cuenta LIKE '$cod%'",$link) or die (mysql_error());
-	$row2=mysql_fetch_row($resulta2);
+	$resulta2=$cx->query("select SUM(valor) AS TOTAL from cecp_cuenta WHERE (fecha_cecp between '$fecha_per' and '$fecha_fin' ) and cuenta LIKE '$cod%'");
+	$row2=$resulta2->fetch_assoc();
 	$total_cecp=$row2[0];
 	
 	$saldo_x_pagar = $definitivo - $total_cecp;
@@ -489,6 +482,6 @@ if($mov_periodo =='')
 </p>
 </body>
 </html>
-<?
+<?php
 }
 ?>

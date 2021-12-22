@@ -1,7 +1,7 @@
-<?
+<?php
 set_time_limit(1200);
 session_start();
-if(!session_is_registered("login"))
+if(isset($_SESSION['user']))
 {
 header("Location: ../login.php");
 exit;
@@ -71,18 +71,16 @@ table.bordepunteado1 { border-style: solid; border-collapse:collapse; border-wid
 <div align="center">
 <?php 
 include('../config.php');		
-		
-$connectionxx = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
-$cx1 = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
+global $server, $database, $dbpass, $dbuser, $charset;
+// Conexion con la base de datos
+$cx = new mysqli($server, $dbuser, $dbpass, $database);		
 
-$base=$database;
-$conexion=mysql_connect ($server, $dbuser, $dbpass);
 
 // ide emp
 $sqlxx = "select * from fecha";
-$resultadoxx = mysql_db_query($database, $sqlxx, $connectionxx);
+$resultadoxx = $cx->query($sqlxx);
 
-while($rowxx = mysql_fetch_array($resultadoxx)) 
+while($rowxx = $resultadoxx->fetch_array())
 {
   $id_emp=$rowxx["id_emp"];
 }
@@ -92,9 +90,9 @@ $anadir6="truncate TABLE ";
 $anadir6.=$tabla6;
 $anadir6.=" ";
 
-mysql_select_db ($base, $conexion);
 
-		if(mysql_query ($anadir6 ,$conexion)) 
+		if($cx->query($anadir6))
+		
 		{
 		echo "";
 		}
@@ -122,42 +120,31 @@ $anadir7.="
 
 )TYPE=MyISAM CHARSET=latin1 COLLATE=latin1_general_ci ";
 
-mysql_select_db ($base, $conexion);
-
-if(mysql_query ($anadir7 ,$conexion)) 
-{
-//echo "listo";
-}
-else
-{
-//echo "no se pudo";
-}
+		
 
 //corte
-$connectionxx = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
 $sqlxx = "select corte from aux_corte_cgn";
-$resultadoxx = mysql_db_query($database, $sqlxx, $connectionxx);
+$resultadoxx = $cx->query($sqlxx);
+while($rowxx = $resultadoxx->fetch_array())
 
-while($rowxx = mysql_fetch_array($resultadoxx)) 
 {
   $corte=$rowxx["corte"];
 }
 //fecha_ini_op
 $sqlxx1 = "select * from vf";
-$resultadoxx1 = mysql_db_query($database, $sqlxx1, $connectionxx);
+$resultadoxx1 = $cx->query($sqlxx1);
 
-while($rowxx1 = mysql_fetch_array($resultadoxx1)) 
+while($rowxx1 = $resultadoxx1->fetch_array())
 {
   $fecha_ini_op=$rowxx1["fecha_ini"];
 }
 
 //****	sacar el anio actual
-include('../config.php');				
-$connectionxx = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
 $sqlxx = "select * from fecha";
-$resultadoxx = mysql_db_query($database, $sqlxx, $connectionxx);
+$resultadoxx = $cx->query($sqlxx);
 
-while($rowxx = mysql_fetch_array($resultadoxx)) 
+while($rowxx = $resultadoxx->fetch_array())
+
 {
 $ano=$rowxx["ano"];
 }
@@ -187,8 +174,8 @@ $fecha_aux = $anio."/10/01";
 //********************************* si tienen sico y si tienen mvto en lib_aux
 //*********************************
 $sqlxx2 = "select lib_aux.cuenta from lib_aux inner join sico where lib_aux.cuenta = sico.cuenta group by lib_aux.cuenta";
-$resultadoxx2 = mysql_db_query($database, $sqlxx2, $connectionxx);
-while($rowxx2 = mysql_fetch_array($resultadoxx2)) 
+$resultadoxx2 = $cx->query($sqlxx2);
+while($rowxx2 = $resultadoxx2->fetch_array())
 {
 		// campo 1 ok
 					 $fecha=$corte;
@@ -199,17 +186,18 @@ while($rowxx2 = mysql_fetch_array($resultadoxx2))
 		// campo 3 ok			 
 		//********************************* NIVEL		  
 		$sql = "select * from pgcp where cod_pptal = '$cuenta'";
-		$result = mysql_query($sql, $connectionxx) or die(mysql_error());
-		if (mysql_num_rows($result) == 0)
+		$result = $cx->query($sql);
+		if ($result->num_rows== 0)
 		{
 		$nivel = 'error';
 		}
 		else
 		{
 			$sqlxx2a = "select * from pgcp where cod_pptal = '$cuenta'";
-			$resultadoxx2a = mysql_db_query($database, $sqlxx2a, $connectionxx);
+			$resultadoxx2a = $cx->query($sqlxx2a);
 			
-			while($rowxx2a = mysql_fetch_array($resultadoxx2a)) 
+			while($rowxx2a = $resultadoxx2a->fetch_array())
+			
 			{
 			$nivel=$rowxx2a["nivel"];
 			}
@@ -217,17 +205,18 @@ while($rowxx2 = mysql_fetch_array($resultadoxx2))
 		// campo 5 ok
 		//******************************** NOMBRE			  
 		$sql = "select * from pgcp where cod_pptal = '$cuenta'";
-		$result = mysql_query($sql, $connectionxx) or die(mysql_error());
-		if (mysql_num_rows($result) == 0)
+		$result = $cx->query($sql);
+		if ($result->num_rows == 0)
 		{
 		$nombre = 'error';
 		}
 		else
 		{
 		$sqlxx2a = "select * from pgcp where cod_pptal = '$cuenta'";
-		$resultadoxx2a = mysql_db_query($database, $sqlxx2a, $connectionxx);
+		$resultadoxx2a = $cx->query($sqlxx2a);
 		
-		while($rowxx2a = mysql_fetch_array($resultadoxx2a)) 
+		while($rowxx2a = $resultadoxx2a->fetch_array())
+		
 		{
 		$nombre=$rowxx2a["nom_rubro"];
 		}
@@ -250,31 +239,33 @@ while($rowxx2 = mysql_fetch_array($resultadoxx2))
 if($naturaleza == 'DEBITO')
 {
 				$sqlxx2a = "select * from sico where cuenta = '$cuenta'";
-				$resultadoxx2a = mysql_db_query($database, $sqlxx2a, $connectionxx);
+				$resultadoxx2a = $cx->query($sqlxx2a);
 				
-				while($rowxx2a = mysql_fetch_array($resultadoxx2a)) 
+				while($rowxx2a = $resultadoxx2a->fetch_array())
+				
 				{
 				   $debito_sico=$rowxx2a["debito"];
 				}
 				// calculo del inicial
 				$sqlxx2a = "select sum(debito) as debitos, sum(credito) as creditos from lib_aux where (fecha < '$fecha_aux') and cuenta = '$cuenta'";
-				$resultadoxx2a = mysql_db_query($database, $sqlxx2a, $connectionxx);
+				$resultadoxx2a = $cx->query($sqlxx2a);
+				while($rowxx2a = $resultadoxx2a->fetch_array())
 				
-				while($rowxx2a = mysql_fetch_array($resultadoxx2a)) 
 				{
-				   $saldo_inicial=$debito_sico + $rowxx2a[debitos] - $rowxx2a[creditos];	
+				   $saldo_inicial=$debito_sico + $rowxx2a['debitos'] - $rowxx2a['creditos'];	
 				
 				}
 				//calculo del tot deb y tot cre
 				
 				$sqlxx2a1 = "select sum(debito) as debitos, sum(credito) as creditos from lib_aux 
 				where (fecha >= '$fecha_aux' and fecha <= '$corte') and cuenta = '$cuenta'";
-				$resultadoxx2a1 = mysql_db_query($database, $sqlxx2a1, $connectionxx);
+				$resultadoxx2a1 = $cx->query($sqlxx2a1);
 				
-				while($rowxx2a1 = mysql_fetch_array($resultadoxx2a1)) 
+				while($rowxx2a1 = $resultadoxx2a1->fetch_array())
+				
 				{
-				   $total_debitos = $rowxx2a1[debitos];
-				   $total_creditos = $rowxx2a1[creditos];	
+				   $total_debitos = $rowxx2a1['debitos'];
+				   $total_creditos = $rowxx2a1['creditos'];	
 				
 				}
 				
@@ -287,19 +278,22 @@ if($naturaleza == 'DEBITO')
 else// else de la naturaleza
 {
 				$sqlxx2a = "select * from sico where cuenta = '$cuenta'";
-				$resultadoxx2a = mysql_db_query($database, $sqlxx2a, $connectionxx);
+				$resultadoxx2a = $cx->query($sqlxx2a);
 				
-				while($rowxx2a = mysql_fetch_array($resultadoxx2a)) 
+				while($rowxx2a = $resultadoxx2a->fetch_array())
+			
 				{
 				   $credito_sico=$rowxx2a["credito"];
 				}
 				//calculo del inicial
 				$sqlxx2a = "select sum(debito) as debitos, sum(credito) as creditos from lib_aux where (fecha < '$fecha_aux') and cuenta = '$cuenta'";
-				$resultadoxx2a = mysql_db_query($database, $sqlxx2a, $connectionxx);
+				$resultadoxx2a = $cx->query($sqlxx2a);
 				
-				while($rowxx2a = mysql_fetch_array($resultadoxx2a)) 
+				while($rowxx2a = $resultadoxx2a->fetch_array())
+				
+			
 				{
-				   $saldo_inicial=$credito_sico - $rowxx2a[debitos] + $rowxx2a[creditos];	
+				   $saldo_inicial=$credito_sico - $rowxx2a['debitos'] + $rowxx2a['creditos'];	
 				
 				}
 				
@@ -308,12 +302,12 @@ else// else de la naturaleza
 				
 				$sqlxx2a1 = "select sum(debito) as debitos, sum(credito) as creditos from lib_aux 
 				where (fecha >= '$fecha_aux' and fecha <= '$corte') and cuenta = '$cuenta'";
-				$resultadoxx2a1 = mysql_db_query($database, $sqlxx2a1, $connectionxx);
+				$resultadoxx2a1 = $cx->query($sqlxx2a1);
 				
-				while($rowxx2a1 = mysql_fetch_array($resultadoxx2a1)) 
+				while($rowxx2a1 = $resultadoxx2a1->fetch_array())
 				{
-				   $total_debitos = $rowxx2a1[debitos];
-				   $total_creditos = $rowxx2a1[creditos];	
+				   $total_debitos = $rowxx2a1['debitos'];
+				   $total_creditos = $rowxx2a1['creditos'];	
 				
 				}
 				//****************************** CALCULO SALDOS
@@ -326,16 +320,16 @@ $sql_ok = "INSERT INTO aux_contaduria_gral
 						(fecha,d,nivel,cuenta,nombre,inicial,debito,credito,saldo,corriente,no_corriente) 
 						VALUES 
 						('$fecha','$d','$nivel','$cuenta','$nombre','$saldo_inicial','$total_debitos','$total_creditos','$saldo_aux','$cte_aux','$n_cte_aux')";
-						mysql_query($sql_ok, $connectionxx) or die(mysql_error());				
+						$cx->query($sql_ok);			
 } 
 
 //*********************************
 //********************************* no tienen sico y si tienen mvto en lib_aux
 //*********************************
 $sqlxx2 = "SELECT distinct(lib_aux.cuenta) FROM lib_aux WHERE NOT EXISTS(select sico.cuenta from sico WHERE sico.cuenta=lib_aux.cuenta)";
-$resultadoxx2 = mysql_db_query($database, $sqlxx2, $connectionxx);
+$resultadoxx2 = $cx->query($sqlxx2);
 
-while($rowxx2 = mysql_fetch_array($resultadoxx2)) 
+while($rowxx2 = $resultadoxx2->fetch_array())
 {
 		  
 		// campo 1 ok
@@ -349,17 +343,18 @@ while($rowxx2 = mysql_fetch_array($resultadoxx2))
 		//********************************* NIVEL		  
 		
 		$sql = "select * from pgcp where cod_pptal = '$cuenta'";
-		$result = mysql_query($sql, $connectionxx) or die(mysql_error());
-		if (mysql_num_rows($result) == 0)
+		$result = $cx->query($sql);
+		if ($result->num_rows == 0)
 		{
 		$nivel = 'error';
 		}
 		else
 		{
 			$sqlxx2a = "select * from pgcp where cod_pptal = '$cuenta'";
-			$resultadoxx2a = mysql_db_query($database, $sqlxx2a, $connectionxx);
+			$resultadoxx2a = $cx->query($sqlxx2a);
 			
-			while($rowxx2a = mysql_fetch_array($resultadoxx2a)) 
+			while($rowxx2a = $resultadoxx2a->fetch_array())
+		
 			{
 			$nivel=$rowxx2a["nivel"];
 			}
@@ -370,17 +365,19 @@ while($rowxx2 = mysql_fetch_array($resultadoxx2))
 		//******************************** NOMBRE			  
 					  
 		$sql = "select * from pgcp where cod_pptal = '$cuenta'";
-		$result = mysql_query($sql, $connectionxx) or die(mysql_error());
-		if (mysql_num_rows($result) == 0)
+		$result = $cx->query($sql);
+		if ($result->num_rows == 0)
 		{
 		$nombre = 'error';
 		}
 		else
 		{
 		$sqlxx2a = "select * from pgcp where cod_pptal = '$cuenta'";
-		$resultadoxx2a = mysql_db_query($database, $sqlxx2a, $connectionxx);
+		$resultadoxx2a = $cx->query($sqlxx2a);
 		
-		while($rowxx2a = mysql_fetch_array($resultadoxx2a)) 
+		while($rowxx2a = $resultadoxx2a->fetch_array())
+		
+		
 		{
 		$nombre=$rowxx2a["nom_rubro"];
 		}
@@ -411,23 +408,25 @@ if($naturaleza == 'DEBITO')
 				
 				// calculo del inicial
 				$sqlxx2a = "select sum(debito) as debitos, sum(credito) as creditos from lib_aux where (fecha < '$fecha_aux') and cuenta = '$cuenta'";
-				$resultadoxx2a = mysql_db_query($database, $sqlxx2a, $connectionxx);
+				$resultadoxx2a = $cx->query($sqlxx2a);
 				
-				while($rowxx2a = mysql_fetch_array($resultadoxx2a)) 
+				while($rowxx2a = $resultadoxx2a->fetch_array())
+			
 				{
-				   $saldo_inicial=$debito_sico + $rowxx2a[debitos] - $rowxx2a[creditos];	
+				   $saldo_inicial=$debito_sico + $rowxx2a['debitos'] - $rowxx2a['creditos'];	
 				
 				}
 				//calculo del tot deb y tot cre
 				
 				$sqlxx2a1 = "select sum(debito) as debitos, sum(credito) as creditos from lib_aux 
 				where (fecha >= '$fecha_aux' and fecha <= '$corte') and cuenta = '$cuenta'";
-				$resultadoxx2a1 = mysql_db_query($database, $sqlxx2a1, $connectionxx);
+				$resultadoxx2a1 = $cx->query($sqlxx2a1);
 				
-				while($rowxx2a1 = mysql_fetch_array($resultadoxx2a1)) 
+				while($rowxx2a1 = $resultadoxx2a1->fetch_array())
+	
 				{
-				   $total_debitos = $rowxx2a1[debitos];
-				   $total_creditos = $rowxx2a1[creditos];	
+				   $total_debitos = $rowxx2a1['debitos'];
+				   $total_creditos = $rowxx2a1['creditos'];	
 				
 				}
 				
@@ -444,11 +443,12 @@ else// else de la naturaleza
 				
 				//calculo del inicial
 				$sqlxx2a = "select sum(debito) as debitos, sum(credito) as creditos from lib_aux where (fecha < '$fecha_aux') and cuenta = '$cuenta'";
-				$resultadoxx2a = mysql_db_query($database, $sqlxx2a, $connectionxx);
+				$resultadoxx2a = $cx->query($sqlxx2a);
 				
-				while($rowxx2a = mysql_fetch_array($resultadoxx2a)) 
+				while($rowxx2a = $resultadoxx2a->fetch_array())
+
 				{
-				   $saldo_inicial=$credito_sico - $rowxx2a[debitos] + $rowxx2a[creditos];	
+				   $saldo_inicial=$credito_sico - $rowxx2a['debitos'] + $rowxx2a['creditos'];	
 				
 				}
 				
@@ -457,12 +457,13 @@ else// else de la naturaleza
 				
 				$sqlxx2a1 = "select sum(debito) as debitos, sum(credito) as creditos from lib_aux 
 				where (fecha >= '$fecha_aux' and fecha <= '$corte') and cuenta = '$cuenta'";
-				$resultadoxx2a1 = mysql_db_query($database, $sqlxx2a1, $connectionxx);
+				$resultadoxx2a1 = $cx->query($sqlxx2a1);
 				
-				while($rowxx2a1 = mysql_fetch_array($resultadoxx2a1)) 
+				while($rowxx2a1 = $resultadoxx2a1->fetch_array())
+	
 				{
-				   $total_debitos = $rowxx2a1[debitos];
-				   $total_creditos = $rowxx2a1[creditos];	
+				   $total_debitos = $rowxx2a1['debitos'];
+				   $total_creditos = $rowxx2a1['creditos'];	
 				
 				}
 				
@@ -486,7 +487,7 @@ $sql_ok = "INSERT INTO aux_contaduria_gral
 						(fecha,d,nivel,cuenta,nombre,inicial,debito,credito,saldo,corriente,no_corriente) 
 						VALUES 
 						('$fecha','$d','$nivel','$cuenta','$nombre','$saldo_inicial','$total_debitos','$total_creditos','$saldo_aux','$cte_aux','$n_cte_aux')";
-						mysql_query($sql_ok, $connectionxx) or die(mysql_error());				
+						$cx->query($sql_ok);		
 				
 				
 				
@@ -498,9 +499,9 @@ $sql_ok = "INSERT INTO aux_contaduria_gral
 //********************************* si tienen sico y no tienen mvto en lib_aux
 //*********************************
 $sqlxx2 = "SELECT cuenta, debito, credito FROM sico where not exists (select cuenta from lib_aux where sico.cuenta=lib_aux.cuenta)";
-$resultadoxx2 = mysql_db_query($database, $sqlxx2, $connectionxx);
+$resultadoxx2 = $cx->query($sqlxx2);
 
-while($rowxx2 = mysql_fetch_array($resultadoxx2)) 
+while($rowxx2 = $resultadoxx2->fetch_array())
 {
 		  
 $cuenta=$rowxx2["cuenta"];
@@ -510,9 +511,9 @@ $fecha=$fecha_ini_op;
 $d='D';
 			 
 $sqlxx2a = "select * from pgcp where cod_pptal = '$cuenta'";
-$resultadoxx2a = mysql_db_query($database, $sqlxx2a, $connectionxx);
+$resultadoxx2a = $cx->query($sqlxx2a);
 
-while($rowxx2a = mysql_fetch_array($resultadoxx2a)) 
+while($rowxx2a = $resultadoxx2a->fetch_array())
 {			 
 	$tip_dato =	 $rowxx2a["tip_dato"];
 		
@@ -530,17 +531,18 @@ while($rowxx2a = mysql_fetch_array($resultadoxx2a))
 			 //********************************* NIVEL		  
 				
 			  	$sql = "select * from pgcp where cod_pptal = '$cuenta'";
-				$result = mysql_query($sql, $connectionxx) or die(mysql_error());
-				if (mysql_num_rows($result) == 0)
+				$result = $cx->query($sql);
+				if ($result->num_rows == 0)
 				{
 				  $nivel = 'error';
 				}
 				else
 				{
 					$sqlxx2a = "select * from pgcp where cod_pptal = '$cuenta'";
-					$resultadoxx2a = mysql_db_query($database, $sqlxx2a, $connectionxx);
+					$resultadoxx2a = $cx->query($sqlxx2a);
 					
-					while($rowxx2a = mysql_fetch_array($resultadoxx2a)) 
+					while($rowxx2a = $resultadoxx2a->fetch_array())
+				
 					{
 					  $nivel=$rowxx2a["nivel"];
 					}
@@ -549,17 +551,18 @@ while($rowxx2a = mysql_fetch_array($resultadoxx2a))
 			//******************************** NOMBRE			  
 			  
 			     $sql = "select * from pgcp where cod_pptal = '$cuenta'";
-				$result = mysql_query($sql, $connectionxx) or die(mysql_error());
-				if (mysql_num_rows($result) == 0)
+				$result = $cx->query($sql);
+				if ($result->num_rows == 0)
 				{
 				  $nombre = 'error';
 				}
 				else
 				{
 					$sqlxx2a = "select * from pgcp where cod_pptal = '$cuenta'";
-					$resultadoxx2a = mysql_db_query($database, $sqlxx2a, $connectionxx);
+					$resultadoxx2a = $cx->query($sqlxx2a);
 					
-					while($rowxx2a = mysql_fetch_array($resultadoxx2a)) 
+					while($rowxx2a = $resultadoxx2a->fetch_array())
+				
 					{
 					  $nombre=$rowxx2a["nom_rubro"];
 					}
@@ -612,7 +615,7 @@ while($rowxx2a = mysql_fetch_array($resultadoxx2a))
 											VALUES 																						
 											('$fecha','$d','$nivel','$cuenta','$nombre','$saldo_sico',
 											'$debito','$credito','$saldo','$cte_sico','$n_cte_sico')";
-											mysql_query($sql_ok, $connectionxx) or die(mysql_error());				
+											$cx->query($sql_ok);				
 				
 				
 	}		//fin else
@@ -626,9 +629,9 @@ while($rowxx2a = mysql_fetch_array($resultadoxx2a))
 //*********************************		  
 		  
 $sqlxx2 = "select * from aux_cta_0 group by cuenta order by cuenta asc";
-$resultadoxx2 = mysql_db_query($database, $sqlxx2, $connectionxx);
+$resultadoxx2 = $cx->query($sqlxx2);
 
-while($rowxx2 = mysql_fetch_array($resultadoxx2)) 
+while($rowxx2 =  $resultadoxx2->fetch_array())
 {
 		  
 			 
@@ -641,17 +644,18 @@ $d='D';
 			 //********************************* NIVEL		  
 				
 			  	$sql = "select * from pgcp where cod_pptal = '$cuenta'";
-				$result = mysql_query($sql, $connectionxx) or die(mysql_error());
-				if (mysql_num_rows($result) == 0)
+				$result = $cx->query($sql);
+				if ($result->num_rows == 0)
 				{
 				  $nivel = 'error';
 				}
 				else
 				{
 					$sqlxx2a = "select * from pgcp where cod_pptal = '$cuenta'";
-					$resultadoxx2a = mysql_db_query($database, $sqlxx2a, $connectionxx);
+					$resultadoxx2a = $cx->query($sqlxx2a);
 					
-					while($rowxx2a = mysql_fetch_array($resultadoxx2a)) 
+					while($rowxx2a = $resultadoxx2a->fetch_array())
+				
 					{
 					  $nivel=$rowxx2a["nivel"];
 					}
@@ -660,17 +664,18 @@ $d='D';
 			//******************************** NOMBRE			  
 			  
 			     $sql = "select * from pgcp where cod_pptal = '$cuenta'";
-				$result = mysql_query($sql, $connectionxx) or die(mysql_error());
-				if (mysql_num_rows($result) == 0)
+				$result = $cx->query($sql);
+				if ($result->num_rows == 0)
 				{
 				  $nombre = 'error';
 				}
 				else
 				{
 					$sqlxx2a = "select * from pgcp where cod_pptal = '$cuenta'";
-					$resultadoxx2a = mysql_db_query($database, $sqlxx2a, $connectionxx);
+					$resultadoxx2a = $cx->query($sqlxx2a);
 					
-					while($rowxx2a = mysql_fetch_array($resultadoxx2a)) 
+					while($rowxx2a = $resultadoxx2a->fetch_array())
+				
 					{
 					  $nombre=$rowxx2a["nom_rubro"];
 					}
@@ -701,23 +706,26 @@ $debito_sico= 0 ;
 
 // calculo del inicial
 $sqlxx2a = "select sum(debito) as debitos, sum(credito) as creditos from aux_cta_0 where (fecha < '$fecha_aux') and cuenta = '$cuenta'";
-$resultadoxx2a = mysql_db_query($database, $sqlxx2a, $connectionxx);
+$resultadoxx2a = $cx->query($sqlxx2a);
 
-while($rowxx2a = mysql_fetch_array($resultadoxx2a)) 
+while($rowxx2a = $resultadoxx2a->fetch_assoc())
+
 {
-   $saldo_inicial=$debito_sico + $rowxx2a[debitos] - $rowxx2a[creditos];	
+   $saldo_inicial=$debito_sico + $rowxx2a['debitos'] - $rowxx2a['creditos'];	
 
 }
 //calculo del tot deb y tot cre
 
 $sqlxx2a1 = "select sum(debito) as debitos, sum(credito) as creditos from aux_cta_0 
 where (fecha >= '$fecha_aux' and fecha <= '$corte') and cuenta = '$cuenta'";
-$resultadoxx2a1 = mysql_db_query($database, $sqlxx2a1, $connectionxx);
+$resultadoxx2a1 = $cx->query($sqlxx2a1);
 
-while($rowxx2a1 = mysql_fetch_array($resultadoxx2a1)) 
+while($rowxx2a1 = $resultadoxx2a1->fetch_assoc())
+
+
 {
-   $total_debitos = $rowxx2a1[debitos];
-   $total_creditos = $rowxx2a1[creditos];	
+   $total_debitos = $rowxx2a1['debitos'];
+   $total_creditos = $rowxx2a1['creditos'];	
 
 }
 
@@ -737,11 +745,12 @@ $credito_sico= 0 ;
 
 //calculo del inicial
 $sqlxx2a = "select sum(debito) as debitos, sum(credito) as creditos from aux_cta_0 where (fecha < '$fecha_aux') and cuenta = '$cuenta'";
-$resultadoxx2a = mysql_db_query($database, $sqlxx2a, $connectionxx);
+$resultadoxx2a = $cx->query($sqlxx2a);
 
-while($rowxx2a = mysql_fetch_array($resultadoxx2a)) 
+while($rowxx2a = $resultadoxx2a->fetch_assoc())
+
 {
-$saldo_inicial=$credito_sico + $rowxx2a[debitos] - $rowxx2a[creditos];	
+$saldo_inicial=$credito_sico + $rowxx2a['debitos'] - $rowxx2a['creditos'];	
 
 }
 
@@ -750,12 +759,12 @@ $saldo_inicial=$credito_sico + $rowxx2a[debitos] - $rowxx2a[creditos];
 
 $sqlxx2a1 = "select sum(debito) as debitos, sum(credito) as creditos from aux_cta_0 
 where (fecha >= '$fecha_aux' and fecha <= '$corte') and cuenta = '$cuenta'";
-$resultadoxx2a1 = mysql_db_query($database, $sqlxx2a1, $connectionxx);
+$resultadoxx2a1 = $cx->query($sqlxx2a1);
 
-while($rowxx2a1 = mysql_fetch_array($resultadoxx2a1)) 
+while($rowxx2a1 = $resultadoxx2a1->fetch_assoc())
 {
-$total_debitos = $rowxx2a1[debitos];
-$total_creditos = $rowxx2a1[creditos];	
+$total_debitos = $rowxx2a1['debitos'];
+$total_creditos = $rowxx2a1['creditos'];	
 
 }
 
@@ -776,7 +785,7 @@ $saldo_aux = $saldo_inicial - $total_debitos + $total_creditos;
 											VALUES 																						
 											('$corte','$d','$nivel','$cuenta','$nombre','$saldo_inicial',
 											'$total_debitos','$total_creditos','$saldo_aux','$cte_sico','$n_cte_sico')";
-											mysql_query($sql_ok, $connectionxx) or die(mysql_error());				
+											$cx->query($sql_ok);			
 				
 				
 				
@@ -806,6 +815,6 @@ $saldo_aux = $saldo_inicial - $total_debitos + $total_creditos;
 </table>
 </body>
 </html>
-<?
+<?php
 }
 ?>

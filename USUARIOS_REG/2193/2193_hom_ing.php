@@ -1,17 +1,20 @@
-<?
+<?php
 session_start();
-if(!session_is_registered("login"))
+include('../config.php');
+global $server, $database, $dbpass, $dbuser, $charset;
+// Conexion con la base de datos
+$cx = new mysqli($server, $dbuser, $dbpass, $database);
+
+if (!isset($_SESSION["login"]))
 {
 header("Location: ../login.php");
 exit;
 } else {
 		// verifico permisos del usuario
-		include('../config.php');
-		$cx = mysql_connect("$server","$dbuser","$dbpass")or die ("Conexion no Exitosa");
-		mysql_select_db("$database"); 
-       	$sql="SELECT info FROM usuarios2 where login = '$_SESSION[login]'";
-		$res=mysql_db_query($database,$sql,$cx);
-		$rw =mysql_fetch_array($res);
+		
+   	$sql="SELECT info FROM usuarios2 where login = '$_SESSION[login]'";
+		$res=$cx->query($sql);
+		$rw =$res->fetch_array();
 if ($rw['info']=='SI')
 {
 
@@ -123,13 +126,10 @@ table.bordepunteado1 { border-style: solid; border-collapse:collapse; border-wid
     <td colspan="3"><div align="center">
       <?php
 //-------
-include('../config.php');	
-
-$connection = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
 $sql = "select * from fecha";
-$resultado = mysql_db_query($database, $sql, $connection);
+$resultado = $cx->query($sql);
 
-while($row = mysql_fetch_array($resultado)) 
+while($row = $resultado->fetch_array())
    {
    
    $id=$row["id_emp"];
@@ -139,9 +139,8 @@ while($row = mysql_fetch_array($resultado))
    }
 
 			
-$cx = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
 $sq = "select * from car_ppto_ing where id_emp = '$id' order by cod_pptal asc ";
-$re = mysql_db_query($database, $sq, $cx);
+$re = $cx->query($sq);
 
 printf("
 <center>
@@ -164,7 +163,8 @@ printf("
 
 ");
 $cont=0;
-while($rw = mysql_fetch_array($re)) 
+while($rw = $re->fetch_array())
+   
    {
 $vr_aprob=$rw["ppto_aprob"];
 $cod_pptal=$rw["cod_pptal"];
@@ -199,8 +199,8 @@ printf("<td align='center'>
 </td>",$rw["cod_pptal"]);
 
 	$sql = "select * from 2193_ing_ok where cod_pptal='$cod_pptal'";
-	$result = mysql_query($sql, $cx) or die(mysql_error());
-	if (mysql_num_rows($result) == 0)
+	$result = $cx->query($sql);
+	if ($result->num_rows == 0)
 	{
 	printf("
 	<td align='center' bgcolor ='#990000' style='color:#FFFF00' class='Estilo4' valign='middle'>SIN CONFIGURAR</td>");
@@ -209,9 +209,9 @@ printf("<td align='center'>
 	{
 	
 			$sql3 = "select * from 2193_ing_ok where cod_pptal='$cod_pptal'";
-			$resultado3 = mysql_db_query($database, $sql3, $connection);
+			$resultado3 = $cx->query($sql3);
 			
-			while($row3 = mysql_fetch_array($resultado3)) 
+			while($row3 = $resultado3->fetch_array())
 			   {
 			   
 			   $concepto=$row3["concepto"];
@@ -261,28 +261,28 @@ printf("</table></center>");
     <td colspan="3"><div style="padding-left:5px; padding-top:5px; padding-right:5px; padding-bottom:5px;">
       <div align="center"> <span class="Estilo4">Fecha de  esta Sesion:</span> <br />
           <span class="Estilo4"> <strong>
-          <? include('../config.php');				
-$connectionxx = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
+          <?php 			
 $sqlxx = "select * from fecha";
-$resultadoxx = mysql_db_query($database, $sqlxx, $connectionxx);
+$resultadoxx = $cx->query($sqlxx);
 
-while($rowxx = mysql_fetch_array($resultadoxx)) 
+while($rowxx = $resultadoxx->fetch_array())
+
 {
   $ano=$rowxx["ano"];
 }
 echo $ano;
 ?>
           </strong> </span> <br />
-          <span class="Estilo4"><b>Usuario: </b><u><? echo $_SESSION["login"];?></u> </span> </div>
+          <span class="Estilo4"><b>Usuario: </b><u><?php echo $_SESSION["login"];?></u> </span> </div>
     </div></td>
   </tr>
   <tr>
     <td width="266">
 	<div class="Estilo7" id="main_div" style="padding-left:3px; padding-top:5px; padding-right:3px; padding-bottom:3px;">
-	  <div align="center"><?PHP include('../config.php'); echo $nom_emp ?><br />
-	    <?PHP echo $dir_tel ?><BR />
-	    <?PHP echo $muni ?> <br />
-	    <?PHP echo $email?>	</div>
+	  <div align="center"><?php  echo $nom_emp ?><br />
+	    <?php echo $dir_tel ?><BR />
+	    <?php echo $muni ?> <br />
+	    <?php echo $email?>	</div>
 	</div>	</td>
     <td width="266">
 	<div class="Estilo7" id="main_div" style="padding-left:3px; padding-top:5px; padding-right:3px; padding-bottom:3px;">
@@ -306,7 +306,7 @@ echo $ano;
 
 
 
-<?
+<?php
 }else{ // si no tiene persisos de usuario
 	echo "<br><br><center>Usuario no tiene permisos en este m&oacute;dulo</center><br>";
 	echo "<center>Click <a href=\"../user.php\">aqu&iacute; para volver</a></center>";

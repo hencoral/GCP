@@ -1,7 +1,7 @@
 <?php
 session_start();
 $b='';
-//$_POST['nn']='';
+$_POST['nn']='OBCG';
 //echo $_GET['nn'];
 $_POST['buscar']='';
 $ver_boton='';
@@ -13,12 +13,12 @@ header("Location: ../login.php");
 exit;
 } else {
 include('../config.php');     
-	// verifico permisos del usuario
-	global $server, $database, $dbpass, $dbuser, $charset;
-	// Conexion con la base de datos
-	$cx = new mysqli($server, $dbuser, $dbpass, $database);
+// verifico permisos del usuario
+global $server, $database, $dbpass, $dbuser, $charset;
+// Conexion con la base de datos
+$cx = new mysqli($server, $dbuser, $dbpass, $database);
        	$sql="SELECT conta FROM usuarios2 where login = '$_SESSION[login]'";
-		$res=$cx->query($sql);
+		$res= $cx->query($sql);
 		$rw = mysqli_fetch_array($res);
 if ($rw['conta']=='SI')
 {
@@ -37,8 +37,8 @@ while($rowxx = mysqli_fetch_array($resultadoxx))
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-<head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
-
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <title>CONTAFACIL</title>
 
 <style type="text/css">
@@ -114,7 +114,6 @@ function quitarh(){
  document.getElementById("caja14").style.display = "none";
 }
 </SCRIPT>
-<!--muestra - oculta juridicos -->
 <SCRIPT language="javascript">
 function MostrarOcultar2 (objetoVisualizar) 
 {
@@ -142,7 +141,6 @@ function MostrarOcultar2 (objetoVisualizar)
 
 
 <script language="JavaScript">
-
 var nav4 = window.Event ? true : false;
 function acceptNum(evt){
 // NOTE: Backspace = 8, Enter = 13, '0' = 48, '9' = 57
@@ -583,7 +581,6 @@ $('#tabla10').dataTable( {
 <SCRIPT TYPE="text/javascript" LANGUAGE="javascript">
 
 
-
 function waitPreloadPage() { //DOM
 if (document.getElementById){
 document.getElementById('prepage').style.visibility='hidden';
@@ -643,7 +640,7 @@ document.all.prepage.style.visibility = 'hidden';
     <div style="padding-left:0px; padding-top:5px; padding-right:0px; padding-bottom:5px;">
 <form method="post" action="menu_cont.php">
   <table width="800" border="0" align="center">
-    <tr>
+    <tr >
       <td width="600">
         <div style="padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:10px;">
           <div align="right"><span class="Estilo4"><strong>Seleccione el Comprobante </strong>: </span>
@@ -686,11 +683,12 @@ if ($rw3['cargo'] == "REVISOR")
             <select name="nn" class="Estilo4" style="width: 350px;">
               <?php
 			  	// Datos para mostrar listas
+				  $_GET['ini'] = 0;
 	if(isset($_GET['ini'])) $ini=$_GET['ini']; else $ini=0;
 	if(isset($_GET['fin'])) $fin=$_GET['fin']; else $fin=0;
-	if(isset($_GET['k'])) $indice =$_GET['k']; else $indice=0;
+	if(isset($_GET['k'])) $indice=$_GET['k']; else $indice="";
 	$muestra = 250;
-	if (!$ini) 
+	if (!$_GET['ini']) 
 	{
 		$ini=0;
 		$fin=$muestra;	
@@ -844,7 +842,6 @@ if  ($registrado =="")
 	<BR />
 
 	<?php
-	$b='';
 	$limitar = "limit $ini,$fin";
 	
 	if  ($_POST["buscar"] != "")
@@ -1027,98 +1024,111 @@ if  ($pendiente =="")
 	<?php
 	
 	
-	if  ($_POST["buscar"] != "")
-	{
-	$filtro ="and (id_manu_cobp LIKE  '%$buscar%' OR tercero LIKE  '%$buscar%') "; 
-	} 
-	
-	$a = "select distinct(id_auto_cobp), id_manu_cobp,  id_manu_crpp, id_manu_cdpp, fecha_cobp, tercero, tesoreria from cobp where id_emp = '$idxx' and contab='NO' and tesoreria ='NO'";
-	if (empty($tercero)){$c = "";}else{$c= "and tercero =$tercero2";}
-	if ($fecha2 == "MES"){$f= "and fecha_cobp between '$f1' and '$f2'";}
-	if ($fecha2 == "DIA"){$f= "and fecha_cobp ='$fechafil'";}
-	if ($fecha2 == "A�O"){$f= "and fecha_cobp between '$a1' and '$a2'";}
-	$gby = "";
-	$orden = "order by fecha_cobp desc";
-	$sq2 = "$a  $c $filtro $f $gby $orden"; 
+if  ($_POST["buscar"] != "")
+{
+$filtro ="and (id_manu_crpp LIKE  '%$buscar%' OR tercero LIKE  '%$buscar%' OR detalle_crpp LIKE '%$buscar%' or id_manu_cdpp like '%$buscar%')";
 
-	$re2 = $cx->query($sq2);
-	
-	printf("
-	<center>
-	
-	<table width='820' border='1' class=\"bordepunteado1\">
-	<thead>
-	<tr bgcolor='#DCE9E5'>
-	<th align='center'>
-	<div style='padding-left:5px; padding-top:5px; padding-right:5px; padding-bottom:5px;'>
-	<span class='Estilo4'><b>COBP</b></span>
-	</div>
-	</th>
-	
-	<th align='center'><span class='Estilo4'><b>FECHA</b></span></th>
-	<th align='center'><span class='Estilo4'><b>TERCERO</b></span></th>
-	<th align='center'><span class='Estilo4'><b>X VALOR DE</b></span></th>
-	<th align='center'><span class='Estilo4'><b></b></span></th>
-	<th align='center'><span class='Estilo4'><b></b></span></th>
-	<th align='center'><span class='Estilo4'><b></b></span></th>
-	
-	</tr>
-	</thead>
-	<tbody>
-	");
-	
-	while($rw2 = $re2->fetch_array())
-	   {
-	
-	$a1a1=$rw2["id_auto_cobp"];
-	$resulta=$cx->query("select SUM(vr_digitado) AS TOTAL from cobp WHERE id_auto_cobp = '$a1a1' AND id_emp='$idxx'") ;
-	$row=$resulta->fetch_array();
-	$total=$row[0]; 
-	$nuevo_totala1 = $total;   
-	printf("
-	
-	<tr>
-	<td align='left' bgcolor='#DCE9E5' width='100'>
-	<div style='padding-left:1px; padding-top:3px; padding-right:1px; padding-bottom:3px;'>
-	<span class='Estilo4'>&nbsp;%s</span>
-	</div>
-	</td>
-	
-	
-	<td align='center'><span class='Estilo4'>%s</span></td>
-	<td align='left'><span class='Estilo4'>%s</span></td>
-	<td align='right'><span class='Estilo4'>%s</span></td>
-	
-	
-	<td align='center' bgcolor='#DCE9E5' width='100'>
-	<div style='padding-left:1px; padding-top:3px; padding-right:1px; padding-bottom:3px;'>
-	<span class='Estilo4'>
-	<a $ver_boton href=\"nuevo_obcg.php?id0=%s\" style='color:#0033FF'>Contabilizar</a>
-	</span>
-	</div>
-	</td>
-	
-	<td align='center' bgcolor='#DCE9E5' width='130'>
-	<div style='padding-left:1px; padding-top:3px; padding-right:1px; padding-bottom:3px;'>
-	<span class='Estilo4'>
-	<a $ver_boton href=\"proc_atesoreria.php?id2=%s\" style='color:#0033FF'>Enviar a Tesoreria</a>
-	</span>
-	</div>
-	</td>
-	
-	<td align='center' bgcolor='#DCE9E5'>
-	<div style='padding-left:1px; padding-top:3px; padding-right:1px; padding-bottom:3px;'>
-	<span class='Estilo4'>
-	<a href=\"../mvto_ppto_gas/imp_cobp.php?id2=%s\" target='_blank' ><img src='../simbolos/fuentes/imprimir.png' width='20' height='20' border='0' title='Imprimir OBCG'></a>
-	</span>
-	</div>
-	</td>
-	
-	</tr>", $rw2["id_manu_cobp"], $rw2["fecha_cobp"], $rw2["tercero"], number_format($nuevo_totala1,2,',','.'), $rw2["id_auto_cobp"],$rw2["id_auto_cobp"],$rw2["id_auto_cobp"]); 
-	
-	}
-	
-	printf("</tbody></table></center>");
+} 
+$id_emp="2";
+$a = "select id_auto_crpp,id_auto_cdpp, id_manu_crpp, id_manu_cdpp, fecha_crpp, tercero , contrato, t_humano, inversion, subsidiado  from crpp where ctrl = 'NO' ";
+	if (empty($tercero)){$c = "";}else{$c= "and tercero =$tercero2";}
+	if ($fecha2 == "MES"){$f= "and fecha_crpp between '$f1' and '$f2'";}
+	if ($fecha2 == "DIA"){$f= "and fecha_crpp ='$fechafil'";}
+	if ($fecha2 == "A�O"){$f= "and fecha_crpp <= '$a2'";}
+	$gby = "group by id_auto_crpp";
+	$orden = "order by fecha_crpp,id_manu_crpp desc";
+	$sq2 = "$a $b $c $filtro $f $gby $orden";
+
+$re2 = $cx->query($sq2);
+
+printf("
+<center>
+<table width='900' BORDER='1' class='bordepunteado1'>
+
+<tr bgcolor='#DCE9E5'>
+<td align='center'>
+<div style='padding-left:5px; padding-top:5px; padding-right:5px; padding-bottom:5px;'>
+<span class='Estilo4'><b>CRPP</b></span>
+</div>
+</td>
+
+<td align='center'><span class='Estilo4'><b>CDPP</b></span></td>
+<td align='center'><span class='Estilo4'><b>FECHA</b></span></td>
+<td align='center'><span class='Estilo4'><b>TERCERO</b></span></td>
+<td align='center'><span class='Estilo4'><b>VALOR CRPP</b></span></td>
+<td align='center'><span class='Estilo4'><b>X OBLIGAR</b></span></td>
+
+<td align='center' colspan=3><span class='Estilo4'><b></b></span></td>
+
+</tr>
+
+");
+
+while($rw2 = $re2->fetch_array())
+   {
+   
+$axz11=$rw2["id_auto_crpp"];
+$resulta=$cx->query("select SUM(vr_digitado) AS TOTAL from crpp WHERE id_auto_crpp = '$axz11' AND id_emp='$id_emp'");
+$row=$resulta->fetch_array();
+$total=$row[0];
+$resulta2=$cx->query("select SUM(vr_digitado) AS TOTAL from cobp WHERE id_auto_crpp = '$axz11' AND id_emp='$id_emp'");
+$row2=$resulta2->fetch_array();
+$total2=$row2[0]; 
+ 
+$nuevo_total11 = $total;
+$saldo = $total  - $total2;    
+   
+printf("
+<span class='Estilo4'>
+<tr>
+<td align='left' bgcolor='#DCE9E5'>
+<div style='padding-left:1px; padding-top:3px; padding-right:1px; padding-bottom:3px;'>
+<span class='Estilo4'>&nbsp;%s</span>
+</div>
+</td>
+
+<td align='left'><span class='Estilo4'>&nbsp;%s</span></td>
+<td align='center'><span class='Estilo4'>%s</span></td>
+<td align='left'><div style='padding-left:10px; padding-top:3px; padding-right:3px; padding-bottom:3px;'><span class='Estilo4'> %s </span></div></td>
+<td align='right'><span class='Estilo4'>%s&nbsp;</span></td>
+<td align='right'><span class='Estilo4'>%s&nbsp;</span></td>
+
+
+
+<td align='center' bgcolor='#DCE9E5'>
+<div style='padding-left:1px; padding-top:3px; padding-right:1px; padding-bottom:3px;'>
+<span class='Estilo4'>
+<a $ver_boton href=\"../expert/index.php?id0=%s\" style='color:#0033FF'>Obligar</a>
+</span>
+</div>
+</td>
+
+
+
+
+<td align='center' bgcolor='#DCE9E5'>
+<a href=\"imp_crpp.php?id2=%s\" target=\"_blank\" title='Imprimir'>
+<img src='../simbolos/fuentes/imprimir.png' width='20' height='20' border='0' title='Imprimir'></a>
+</a>
+</span>
+</td>
+
+<td align='center' bgcolor='#DCE9E5'>
+<a href=\"hiscrp.php?vr=%s\" target=\"_blank\" onClick=\"window.open(this.href, this.target, 'width=1000,height=600,scrollbars=yes'); return false;\"  title ='Historia del Documento'>
+<img $ver_boton src='../simbolos/fuentes/historia.png' width='20' height='20' border='0' title='Historia del Documento'></a>
+</a>
+</td>
+
+
+
+</tr>", $rw2["id_manu_crpp"], $rw2["id_manu_cdpp"], $rw2["fecha_crpp"], $rw2["tercero"], number_format($nuevo_total11,2,',','.'), number_format($saldo,2,',','.'), $rw2["id_auto_crpp"],  $rw2["id_auto_crpp"], $rw2["id_auto_crpp"]);
+
+   }
+
+printf("</table></center>");
+
+
+
 	
 }
 
@@ -1188,7 +1198,7 @@ if  ($pendiente =="")
 	$startDate = $rw2["fecha_obcg"];
 	
 	$vara2=$rw2["id_auto_cobp"]; 
-	$resulta=$cx->query("select SUM(vr_digitado) AS TOTAL from cobp where id_emp = '$idxx' and id_auto_cobp ='$vara2'") ;
+	$resulta=$cx->query("select SUM(vr_digitado) AS TOTAL from cobp where id_emp = '$idxx' and id_auto_cobp ='$vara2'");
 	$row=$resulta->fetch_array();
 	$total=0;
 	if(isset($row[0])){$total=$row[0];}
@@ -1286,7 +1296,7 @@ echo ">&nbsp; </center>";
 
 }
 
-if(isset($_POST['nn'])) $a=$_POST['nn']; else $a='';
+$a=$_POST['nn'];
 
 if  (!$_POST['nn']) $a=$_GET['nn'];
 if ($a == 'NCON')
@@ -1294,7 +1304,7 @@ if ($a == 'NCON')
 
 ?>
 <div class="Estilo4" style='padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:5px;'>
-  <div align="center"><span class="Estilo4"><strong> NOTA DE CONTABILIDAD - NCON <br />
+  <div align="center"><span class="Estilo4"><strong> NOTA DE RECLASIFICACION POR CONVERGENCIA <br />
      <br />
 
 </strong></span></div></div></center>
@@ -1302,7 +1312,7 @@ if ($a == 'NCON')
   <div align="center">
     <div style='padding-left:3px; padding-top:3px; padding-right:3px; padding-bottom:3px; background:#004080; width:300px'>
       <div style='padding-left:5px; padding-top:5px; padding-right:5px; padding-bottom:5px; background:#FFFFFF'>
-        <div align="center"><a href='../mvto_contable2/recaudar1.php' target='_parent'>CREAR NUEVA NOTA DE CONTABILIDAD  </a> </div>
+        <div align="center"><a href='../mvto_contable2/recaudar1.php' target='_parent'>NOTA DE RECLASIFICACION POR CONVERGENCIA </a> </div>
       </div>
     </div>
   </div>
@@ -1312,7 +1322,7 @@ if ($a == 'NCON')
 
 
 	   <div class="Estilo4" style='padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:5px;'>
-	  <div align="center"><span class="Estilo4"><strong>LISTA DE NOTAS CONTABILIDAD CREADAS HASTA LA FECHA</strong> </span><br />
+	  <div align="center"><span class="Estilo4"><strong>LISTA NOTA DE RECLASIFICACION POR CONVERGENCIA CREADAS HASTA LA FECHA</strong> </span><br />
 	  </div>
 	</div>
 	<br />
@@ -1360,8 +1370,7 @@ if  ($registrado =="")
 		</thead>
 		<tbody>
 		",$mesh[$me+0],$an);
-	while ($rw3 =$re3->fetch_Array())
-	
+	while ($rw3 = $re3->fetch_array())
 	{
 		$a = "select * from lib_aux2 where id_auto ='$rw3[id_auto]' ";
 		if (empty($tercero)){$c = "";}else{$c= "and tercero =$tercero2";}
@@ -1372,10 +1381,10 @@ if  ($registrado =="")
 		$orden = "order by fecha desc";
 		$sq2 = "$a  $c $filtro $f $gby $orden"; 
 		$re2 = $cx->query($sq2);
-		$rw2 = $re2->fetch_Array();
+		$rw2 = $re2->fetch_array();
 		$sq4 ="select sum(debito) as total from lib_aux2 where id_auto ='$rw3[id_auto]' group by id_auto";
 		$re4 = $cx->query($sq4);
-		$rw4 = $re4->fetch_Array(); 
+		$rw4 =	$re4->fetch_array();
 		$debito = $rw4['total'];
 		if ($rw2["dcto"] !='')
 		{
@@ -1742,7 +1751,7 @@ if ($a == 'NCSP')
 {
 ?>
 <div class="Estilo4" style='padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:5px;'>
-  <div align="center"><span class="Estilo4"><strong> NOTA CREDITO SIN AFECTACION PRESUPUESTAL - NCSP <br />
+  <div align="center"><span class="Estilo4"><strong> NOTA AJUSTES POR ERROR <br />
     <br />
     <br />
     </strong> </span><br />
@@ -1753,7 +1762,7 @@ if ($a == 'NCSP')
   <div align="center">
     <div style='padding-left:3px; padding-top:3px; padding-right:3px; padding-bottom:3px; background:#004080; width:350px'>
       <div style='padding-left:5px; padding-top:5px; padding-right:5px; padding-bottom:5px; background:#FFFFFF'>
-        <div align="center"><a href='nuevo_ncsp.php' target='_parent'>CREAR NUEVA NOTA CREDITO SIN AFECTACION PPTAL </a> </div>
+        <div align="center"><a href='nuevo_ncsp.php' target='_parent'>CREAR NOTA AJUSTES POR ERROR</a> </div>
       </div>
     </div>
   </div>
@@ -1783,6 +1792,7 @@ if  ($registrado =="")
 	$sq2 = "$a  $c $filtro $f $gby $orden"; 
 
 $re2 = $cx->query($sq2);
+
 printf("
 <center>
 <table width='1000' BORDER='1' class='bordepunteado1'>
@@ -1868,7 +1878,7 @@ if ($a == 'NDSP')
 {
 ?>
 <div class="Estilo4" style='padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:5px;'>
-  <div align="center"><span class="Estilo4"><strong> NOTA DEBITO SIN AFECTACION PRESUPUESTAL - NDSP<br />
+  <div align="center"><span class="Estilo4"><strong> NOTA AJUSTES POR CONVERGENCIA - NDSP<br />
      <br />
     <br />
   </strong> </span><br />
@@ -1878,7 +1888,7 @@ if ($a == 'NDSP')
   <div align="center">
     <div style='padding-left:3px; padding-top:3px; padding-right:3px; padding-bottom:3px; background:#004080; width:350px'>
       <div style='padding-left:5px; padding-top:5px; padding-right:5px; padding-bottom:5px; background:#FFFFFF'>
-        <div align="center"><a href='nuevo_ndsp.php' target='_parent'>CREAR NUEVA NOTA DEBITO SIN AFECTACION PPTAL </a> </div>
+        <div align="center"><a href='nuevo_ndsp.php' target='_parent'>CREAR NOTA AJUSTES POR CONVERGENCIA </a> </div>
       </div>
     </div>
   </div>
@@ -1911,7 +1921,7 @@ if  ($_POST["buscar"] != "")
 	$orden = "order by fecha_ncon desc, id desc";
 	$sq2 = "$a $c $filtro $f $gby $orden"; 
 
-$re2 = $cx->query($sq2);
+$re2 =$cx->query($sq2);
 
 printf("
 <center>
@@ -2047,7 +2057,7 @@ if  ($_POST["buscar"] != "")
 	$sq2 = "$a $c $filtro $f $gby $orden"; 
 
 
-$re2 = $cx->query($sq2);	
+$re2 = $cx->query($sq2);
 
 printf("
 <center>
@@ -2078,7 +2088,6 @@ printf("
 ",$mesh[$me+0],$an);
 
 while($rw2 = $re2->fetch_array())
-   
    {
 
 printf("
@@ -2182,7 +2191,7 @@ if  ($_POST["buscar"] != "")
 	$orden = "order by fecha_ncon desc, id desc";
 	$sq2 = "$a $c $filtro $f $gby $orden"; 
 
-$re2 =$cx->query($sq2);
+$re2 = $cx->query($sq2);
 
 printf("
 <center>
@@ -2293,7 +2302,7 @@ printf("</tbody></table></center>");
   <tr>
     <td width="266">
     <div class="Estilo7" id="main_div" style="padding-left:3px; padding-top:5px; padding-right:3px; padding-bottom:3px;">
-      <div align="center"><?php include('../config.php'); echo $nom_emp ?><br />
+      <div align="center"><?php echo $nom_emp ?><br />
         <?php echo $dir_tel ?><BR />
         <?php echo $muni ?> <br />
         <?php echo $email?> </div>
@@ -2315,10 +2324,9 @@ printf("</tbody></table></center>");
 </body>
 </html>
 <?php
-	}else{ // si no tiene persisos de usuario
-		echo "<br><br><center>Usuario no tiene permisos en este m&oacute;dulo</center><br>";
-		echo "<center>Click <a href=\"../user.php\">aqu&iacute; para volver</a></center>";
-	}
+}else{ // si no tiene persisos de usuario
+	echo "<br><br><center>Usuario no tiene permisos en este m&oacute;dulo</center><br>";
+	echo "<center>Click <a href=\"../user.php\">aqu&iacute; para volver</a></center>";
 }
-
+}
 ?>

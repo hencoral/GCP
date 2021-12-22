@@ -1,7 +1,7 @@
-<?
+<?php
 set_time_limit(1800);
 session_start();
-if(!session_is_registered("login"))
+if (!isset($_SESSION["login"])) 
 {
 header("Location: ../login.php");
 exit;
@@ -87,25 +87,28 @@ table.bordepunteado1 { border-style: solid; border-collapse:collapse; border-wid
 <?php
 //-------
 include('../config.php');	
-$cxx = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
+
+global $server, $database, $dbpass, $dbuser, $charset;
+// Conexion con la base de datos
+$cx = new mysqli($server, $dbuser, $dbpass, $database);
 $sxx = "select * from fecha";
-$rxx = mysql_db_query($database, $sxx, $cxx);
-while($rowxxx = mysql_fetch_array($rxx)) 
+$rxx = $cx->query($sxx);
+while($rowxxx = $rxx->fetch_array())
    {
    $idxxx=$rowxxx["id_emp"];
    $id_emp=$rowxxx["id_emp"];
    $ano=$rowxxx["ano"];
    }
 $sxxq = "select * from fecha_ini_op";
-$rxxq = mysql_db_query($database, $sxxq, $cxx);
-while($rowxxxq = mysql_fetch_array($rxxq)) 
+$rxxq = $cx->query($sxxq);
+while($rowxxxq = $rxxq->fetch_array())
    {
    $fecha_ini_op=$rowxxxq["fecha_ini_op"];
    }   
-$cx2 = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
 $sq2 = "select * from empresa where cod_emp = '$idxxx'";
-$re2 = mysql_db_query($database, $sq2, $cx2);
-while($row2 = mysql_fetch_array($re2)) 
+$re2 = $cx->query($sq2);
+while($row2 = $re2->fetch_array())
+   
    {
    $empresa = $row2["raz_soc"];
    }
@@ -113,10 +116,10 @@ while($row2 = mysql_fetch_array($re2))
 
 	$fecha_ini=$_POST['fecha_ini']; //printf("fecha ini : %s",$fecha_ini);
 	$fecha_fin=$_POST['fecha_fin'];	//printf("fecha fin : %s",$fecha_fin);
-	$tipo = $_POST['mov_mes'];
+	if(isset($_POST['mov_mes'])) $tipo = $_POST['mov_mes']; else $tipo = "";
 	$fecha_per = $_POST['fecha_per'];
-	$mov_periodo = $_POST['mov_periodo'];
-	$consolida = $_POST['consolida'];
+	if(isset($_POST['mov_periodo'])) $mov_periodo = $_POST['mov_periodo']; else $mov_periodo = "";
+	if(isset($_POST['consolida'])) $consolida = $_POST['consolida']; else $consolida = "";
 
 $anno = substr($ano,0,4);	
 // Para cargar la url e incluir imagenes al archivo que se genera
@@ -150,10 +153,8 @@ if($mov_periodo =='')
 
 <?php
 	// ************************************ EJECUCION CON CORTE POR MES **************************************************************************************
-	include('../config.php');				
-	$cx = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
 	$sq = "select * from car_ppto_gas where id_emp = '$id_emp' order by cod_pptal asc ";
-	$re = mysql_db_query($database, $sq, $cx);
+	$re = $cx->query($sq);
 	
 	if ($tipo ==1 && $consolida='')
 	{
@@ -197,7 +198,7 @@ if($mov_periodo =='')
 	
 	
 	// Calculo de gastos por mes 
-	$mes = split("/",$fecha_fin);
+	$mes = explode("/",$fecha_fin);
 	
 	if ($mes[1]=="01") {$mes_ini = "$anno/01/01"; $mes_fin ="$anno/01/31";}
 	if ($mes[1]=="02") {$mes_ini = "$anno/02/01"; $mes_fin ="$anno/02/29";}
@@ -212,53 +213,52 @@ if($mov_periodo =='')
 	if ($mes[1]=="11") {$mes_ini = "$anno/11/01"; $mes_fin ="$anno/11/30";}
 	if ($mes[1]=="12") {$mes_ini = "$anno/12/01"; $mes_fin ="$anno/12/31";}
 	
-	while($rw = mysql_fetch_array($re)) 
+	while($rw = $re->fetch_assoc())
 	{
-		$link=mysql_connect($server,$dbuser,$dbpass);
 		//****
 		$cod=$rw["cod_pptal"];
 		//****
 		//****  SALDOS ACUMULADOS
-		$resultax=mysql_query("select SUM(ppto_aprob) AS TOTAL from car_ppto_gas WHERE ano <= '$fecha_fin' and id_emp='$id_emp' and tip_dato ='D' and cod_pptal LIKE '$cod%'",$link) or die (mysql_error());
-		$rowx=mysql_fetch_row($resultax);
+		$resultax=$cx->query("select SUM(ppto_aprob) AS TOTAL from car_ppto_gas WHERE ano <= '$fecha_fin' and id_emp='$id_emp' and tip_dato ='D' and cod_pptal LIKE '$cod%'");
+		$rowx=$resultax->fetch_assoc();
 		$inicial=$rowx[0]; 
 		//****
-		$resulta=mysql_query("select SUM(valor_adi) AS TOTAL from adi_ppto_gas WHERE fecha_adi <= '$fecha_fin' and id_emp='$id_emp' and cod_pptal LIKE '$cod%'",$link) or die (mysql_error());
-		$row=mysql_fetch_row($resulta);
+		$resulta=$cx->query("select SUM(valor_adi) AS TOTAL from adi_ppto_gas WHERE fecha_adi <= '$fecha_fin' and id_emp='$id_emp' and cod_pptal LIKE '$cod%'");
+		$row=$resulta->fetch_assoc();
 		$total_adi=$row[0]; 
 		
-		$resulta2=mysql_query("select SUM(valor_adi) AS TOTAL from red_ppto_gas WHERE fecha_adi <= '$fecha_fin' and id_emp='$id_emp' and cod_pptal LIKE '$cod%'",$link) or die (mysql_error());
-		$row2=mysql_fetch_row($resulta2);
+		$resulta2=$cx->query("select SUM(valor_adi) AS TOTAL from red_ppto_gas WHERE fecha_adi <= '$fecha_fin' and id_emp='$id_emp' and cod_pptal LIKE '$cod%'");
+		$row2=$resulta2->fetch_assoc();
 		$total_red=$row2[0];
 		
-		$resulta3=mysql_query("select SUM(valor_adi) AS TOTAL from creditos WHERE fecha_adi <= '$fecha_fin' and id_emp='$id_emp' and cod_pptal LIKE '$cod%'",$link) or die (mysql_error());
-		$row3=mysql_fetch_row($resulta3);
+		$resulta3=$cx->query("select SUM(valor_adi) AS TOTAL from creditos WHERE fecha_adi <= '$fecha_fin' and id_emp='$id_emp' and cod_pptal LIKE '$cod%'");
+		$row3=$resulta3->fetch_assoc();
 		$total_cre=$row3[0];
 		
-		$resulta4=mysql_query("select SUM(valor_adi) AS TOTAL from contracreditos WHERE fecha_adi <= '$fecha_fin'  and id_emp='$id_emp' and cod_pptal LIKE '$cod%'",$link) or die (mysql_error());
-		$row4=mysql_fetch_row($resulta4);
+		$resulta4=$cx->query("select SUM(valor_adi) AS TOTAL from contracreditos WHERE fecha_adi <= '$fecha_fin'  and id_emp='$id_emp' and cod_pptal LIKE '$cod%'");
+		$row4=$resulta4->fetch_assoc();
 		$total_ccre=$row4[0];
 		
 		$definitivo = $inicial + $total_adi - $total_red + $total_cre - $total_ccre;
-		$resulta5=mysql_query("select SUM(valor) AS TOTAL from cdpp WHERE fecha_reg <= '$fecha_fin' and id_emp='$id_emp' and cuenta LIKE '$cod%'",$link) or die (mysql_error());
-		$row5=mysql_fetch_row($resulta5);
+		$resulta5=$cx->query("select SUM(valor) AS TOTAL from cdpp WHERE fecha_reg <= '$fecha_fin' and id_emp='$id_emp' and cuenta LIKE '$cod%'");
+		$row5=$resulta5->fetch_assoc();
 		$total_cdpp=$row5[0];
 		
-		$resulta6=mysql_query("select SUM(vr_digitado) AS TOTAL from crpp WHERE fecha_crpp <= '$fecha_fin' and id_emp='$id_emp' and cuenta LIKE '$cod%' and vr_digitado <> '0'",$link) or die (mysql_error());
-		$row6=mysql_fetch_row($resulta6);
+		$resulta6=$cx->query("select SUM(vr_digitado) AS TOTAL from crpp WHERE fecha_crpp <= '$fecha_fin' and id_emp='$id_emp' and cuenta LIKE '$cod%' and vr_digitado <> '0'");
+		$row6=$resulta6->fetch_assoc();
 		$total_crpp=$row6[0];
 		
-		$resulta7=mysql_query("select SUM(vr_digitado) AS TOTAL from cobp WHERE fecha_cobp <= '$fecha_fin' and id_emp='$id_emp' and cuenta LIKE '$cod%' and vr_digitado <> '0'",$link) or die (mysql_error());
-		$row7=mysql_fetch_row($resulta7);
+		$resulta7=$cx->query("select SUM(vr_digitado) AS TOTAL from cobp WHERE fecha_cobp <= '$fecha_fin' and id_emp='$id_emp' and cuenta LIKE '$cod%' and vr_digitado <> '0'");
+		$row7=$resulta7->fetch_assoc();
 		$total_cobp=$row7[0];
 		
-		$sqlceva = mysql_query("SELECT SUM(vr_digitado) AS TOTAL FROM cobp INNER JOIN ceva ON cobp.id_auto_cobp = ceva.id_auto_cobp WHERE ceva.fecha_ceva <= '$fecha_fin'  AND cobp.cuenta LIKE '$cod%' AND ceva.id_emp ='$id_emp' AND cobp.vr_digitado <> '0' AND cobp.pagado ='SI' ",$link) or die (mysql_error());
-		$row8=mysql_fetch_row($sqlceva);
+		$sqlceva = $cx->query("SELECT SUM(vr_digitado) AS TOTAL FROM cobp INNER JOIN ceva ON cobp.id_auto_cobp = ceva.id_auto_cobp WHERE ceva.fecha_ceva <= '$fecha_fin'  AND cobp.cuenta LIKE '$cod%' AND ceva.id_emp ='$id_emp' AND cobp.vr_digitado <> '0' AND cobp.pagado ='SI' ");
+		$row8=$sqlceva->fetch_assoc();
 		$total_ceva1=$row8[0];
 		
 		$sq3 = "select sum(vr_digitado) as total2 from cobp INNER JOIN ceva ON cobp.ceva =ceva.id_auto_ceva where ceva.fecha_ceva <= '$fecha_fin'  AND cobp.cuenta LIKE '$cod%' AND ceva.id_emp ='$id_emp' AND cobp.vr_digitado <> '0' AND cobp.pagado ='SI' ";
-		$rs3 = mysql_db_query($database,$sq3,$cx);
-		$rw3 = mysql_fetch_array ($rs3);
+		$rs3 = $cx->query($sq3);
+		$rw3 = $rs3->fetch_assoc();
 		$total_ceva_acum = $rw3['total2'];
 		
 		$total_ceva = $total_ceva1 + $total_ceva_acum;
@@ -268,44 +268,44 @@ if($mov_periodo =='')
 		$cxp = $total_cobp - $total_ceva;
 		
 		// Calculos gastos del mes 
-		$resulta55=mysql_query("select SUM(valor) AS TOTAL from cdpp WHERE (fecha_reg between '$mes_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cuenta LIKE '$cod%'",$link) or die (mysql_error());
-		$row55=mysql_fetch_row($resulta55);
+		$resulta55=$cx->query("select SUM(valor) AS TOTAL from cdpp WHERE (fecha_reg between '$mes_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cuenta LIKE '$cod%'");
+		$row55=$resulta55->fetch_assoc();
 		$total_cdpp_mes=$row55[0];
 
-		$resulta10=mysql_query("select SUM(vr_digitado) AS TOTAL from crpp WHERE (fecha_crpp between '$mes_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cuenta LIKE '$cod%' and vr_digitado <> '0'",$link) or die (mysql_error());
-		$row10=mysql_fetch_row($resulta10);
+		$resulta10=$cx->query("select SUM(vr_digitado) AS TOTAL from crpp WHERE (fecha_crpp between '$mes_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cuenta LIKE '$cod%' and vr_digitado <> '0'");
+		$row10=$resulta10->fetch_assoc();
 		$total_crpp_mes=$row10[0];
 		
-		$resulta11=mysql_query("select SUM(vr_digitado) AS TOTAL from cobp WHERE (fecha_cobp between '$mes_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cuenta LIKE '$cod%' and vr_digitado <> '0'",$link) or die (mysql_error());
-		$row11=mysql_fetch_row($resulta11);
+		$resulta11=$cx->query("select SUM(vr_digitado) AS TOTAL from cobp WHERE (fecha_cobp between '$mes_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cuenta LIKE '$cod%' and vr_digitado <> '0'");
+		$row11=$resulta11->fetch_assoc();
 		$total_cobp_mes=$row11[0];
 		
-		$sqlcevam = mysql_query("SELECT SUM(vr_digitado) AS TOTAL FROM cobp INNER JOIN ceva ON cobp.id_auto_cobp = ceva.id_auto_cobp WHERE (ceva.fecha_ceva between '$mes_ini' AND '$fecha_fin' ) AND cobp.cuenta LIKE '$cod%' AND ceva.id_emp ='$id_emp' AND cobp.vr_digitado <> '0' AND cobp.pagado ='SI' ",$link) or die (mysql_error());
-		$row12=mysql_fetch_row($sqlcevam);
+		$sqlcevam = $cx->query("SELECT SUM(vr_digitado) AS TOTAL FROM cobp INNER JOIN ceva ON cobp.id_auto_cobp = ceva.id_auto_cobp WHERE (ceva.fecha_ceva between '$mes_ini' AND '$fecha_fin' ) AND cobp.cuenta LIKE '$cod%' AND ceva.id_emp ='$id_emp' AND cobp.vr_digitado <> '0' AND cobp.pagado ='SI' ");
+		$row12=$sqlcevam->fetch_assoc();
 		$total_ceva_mes1=$row12[0];
 		
 		$sq4 = "select sum(vr_digitado) as total2 from cobp INNER JOIN ceva ON cobp.ceva =ceva.id_auto_ceva where (ceva.fecha_ceva between '$mes_ini' AND '$fecha_fin' ) AND cobp.cuenta LIKE '$cod%' AND ceva.id_emp ='$id_emp' AND cobp.vr_digitado <> 0 AND cobp.pagado ='SI' ";
-		$rs4 = mysql_db_query($database,$sq4,$cx);
-		$rw4 = mysql_fetch_array ($rs4);
+		$rs4 = $cx->query($sq4);
+		$rw4 = $rs4->fetch_assoc();
 		$total_ceva_acum_mes = $rw4['total2'];
 		
 		$total_ceva_mes = $total_ceva_mes1 + $total_ceva_acum_mes;
 		
 	// modificaciones mes
-		$resulta=mysql_query("select SUM(valor_adi) AS TOTAL from adi_ppto_gas WHERE (fecha_adi between '$mes_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cod_pptal LIKE '$cod%'",$link) or die (mysql_error());
-		$row=mysql_fetch_row($resulta);
+		$resulta=$cx->query("select SUM(valor_adi) AS TOTAL from adi_ppto_gas WHERE (fecha_adi between '$mes_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cod_pptal LIKE '$cod%'");
+		$row=$resulta->fetch_assoc();
 		$total_adi_mes=$row[0];
 		
-		$resulta=mysql_query("select SUM(valor_adi) AS TOTAL from red_ppto_gas WHERE (fecha_adi between '$mes_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cod_pptal LIKE '$cod%'",$link) or die (mysql_error());
-		$row=mysql_fetch_row($resulta);
+		$resulta=$cx->query("select SUM(valor_adi) AS TOTAL from red_ppto_gas WHERE (fecha_adi between '$mes_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cod_pptal LIKE '$cod%'");
+		$row=$resulta->fetch_assoc();
 		$total_red_mes=$row[0]; 
 			
-		$resulta=mysql_query("select SUM(valor_adi) AS TOTAL from creditos WHERE (fecha_adi between '$mes_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cod_pptal LIKE '$cod%'",$link) or die (mysql_error());
-		$row=mysql_fetch_row($resulta);
+		$resulta=$cx->query("select SUM(valor_adi) AS TOTAL from creditos WHERE (fecha_adi between '$mes_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cod_pptal LIKE '$cod%'");
+		$row=$resulta->fetch_assoc();
 		$total_cre_mes=$row[0];
 		
-		$resulta=mysql_query("select SUM(valor_adi) AS TOTAL from contracreditos WHERE (fecha_adi between '$mes_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cod_pptal LIKE '$cod%'",$link) or die (mysql_error());
-		$row=mysql_fetch_row($resulta);
+		$resulta=$cx->query("select SUM(valor_adi) AS TOTAL from contracreditos WHERE (fecha_adi between '$mes_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cod_pptal LIKE '$cod%'");
+		$row=$resulta->fetch_assoc();
 		$total_ccr_mes=$row[0];
 		
 		printf("
@@ -385,7 +385,7 @@ if ($tipo ==1 && $consolida='1')
 	");
 	
 	// Calculo de gastos por mes 
-	$mes = split("/",$fecha_fin);
+	$mes = explode("/",$fecha_fin);
 	
 	if ($mes[1]=="01") {$mes_ini = "$anno/01/01"; $mes_fin ="$anno/01/31";}
 	if ($mes[1]=="02") {$mes_ini = "$anno/02/01"; $mes_fin ="$anno/02/29";}
@@ -400,9 +400,8 @@ if ($tipo ==1 && $consolida='1')
 	if ($mes[1]=="11") {$mes_ini = "$anno/11/01"; $mes_fin ="$anno/11/30";}
 	if ($mes[1]=="12") {$mes_ini = "$anno/12/01"; $mes_fin ="$anno/12/31";}
 	
-	while($rw = mysql_fetch_array($re)) 
+	while($rw = $re->fetch_assoc())
 	{
-		$link=mysql_connect($server,$dbuser,$dbpass);
 		//****
 		$cod=$rw["cod_pptal"];
 		$tip_dato=$rw["tip_dato"];
@@ -436,46 +435,46 @@ if ($tipo ==1 && $consolida='1')
 		
 		
 		//****  SALDOS ACUMULADOS
-		$resultax=mysql_query("select SUM(ppto_aprob) AS TOTAL from car_ppto_gas WHERE ano <= '$fecha_fin' and id_emp='$id_emp' and tip_dato ='D' and cod_pptal LIKE '$cod%'",$link) or die (mysql_error());
-		$rowx=mysql_fetch_row($resultax);
+		$resultax=$cx->query("select SUM(ppto_aprob) AS TOTAL from car_ppto_gas WHERE ano <= '$fecha_fin' and id_emp='$id_emp' and tip_dato ='D' and cod_pptal LIKE '$cod%'");
+		$rowx=$resultax->fetch_assoc();
 		$inicial=$rowx[0]; 
 		//****
-		$resulta=mysql_query("select SUM(valor_adi) AS TOTAL from adi_ppto_gas WHERE fecha_adi <= '$fecha_fin' and id_emp='$id_emp' and cod_pptal LIKE '$cod%'",$link) or die (mysql_error());
-		$row=mysql_fetch_row($resulta);
+		$resulta=$cx->query("select SUM(valor_adi) AS TOTAL from adi_ppto_gas WHERE fecha_adi <= '$fecha_fin' and id_emp='$id_emp' and cod_pptal LIKE '$cod%'");
+		$row=$resulta->fetch_assoc();
 		$total_adi=$row[0]; 
 		
-		$resulta2=mysql_query("select SUM(valor_adi) AS TOTAL from red_ppto_gas WHERE fecha_adi <= '$fecha_fin' and id_emp='$id_emp' and cod_pptal LIKE '$cod%'",$link) or die (mysql_error());
-		$row2=mysql_fetch_row($resulta2);
+		$resulta2=$cx->query("select SUM(valor_adi) AS TOTAL from red_ppto_gas WHERE fecha_adi <= '$fecha_fin' and id_emp='$id_emp' and cod_pptal LIKE '$cod%'");
+		$row2=$resulta2->fetch_assoc();
 		$total_red=$row2[0];
 		
-		$resulta3=mysql_query("select SUM(valor_adi) AS TOTAL from creditos WHERE fecha_adi <= '$fecha_fin' and id_emp='$id_emp' and cod_pptal LIKE '$cod%'",$link) or die (mysql_error());
-		$row3=mysql_fetch_row($resulta3);
+		$resulta3=$cx->query("select SUM(valor_adi) AS TOTAL from creditos WHERE fecha_adi <= '$fecha_fin' and id_emp='$id_emp' and cod_pptal LIKE '$cod%'");
+		$row3=$resulta3->fetch_assoc();
 		$total_cre=$row3[0];
 		
-		$resulta4=mysql_query("select SUM(valor_adi) AS TOTAL from contracreditos WHERE fecha_adi <= '$fecha_fin'  and id_emp='$id_emp' and cod_pptal LIKE '$cod%'",$link) or die (mysql_error());
-		$row4=mysql_fetch_row($resulta4);
+		$resulta4=$cx->query("select SUM(valor_adi) AS TOTAL from contracreditos WHERE fecha_adi <= '$fecha_fin'  and id_emp='$id_emp' and cod_pptal LIKE '$cod%'");
+		$row4=$resulta4->fetch_assoc();
 		$total_ccre=$row4[0];
 		
 		$definitivo = $inicial + $total_adi - $total_red + $total_cre - $total_ccre;
-		$resulta5=mysql_query("select SUM(valor) AS TOTAL from cdpp WHERE fecha_reg <= '$fecha_fin' and id_emp='$id_emp' and cuenta LIKE '$cod%'",$link) or die (mysql_error());
-		$row5=mysql_fetch_row($resulta5);
+		$resulta5=$cx->query("select SUM(valor) AS TOTAL from cdpp WHERE fecha_reg <= '$fecha_fin' and id_emp='$id_emp' and cuenta LIKE '$cod%'");
+		$row5=$resulta5->fetch_assoc();
 		$total_cdpp=$row5[0];
 		
-		$resulta6=mysql_query("select SUM(vr_digitado) AS TOTAL from crpp WHERE fecha_crpp <= '$fecha_fin' and id_emp='$id_emp' and cuenta LIKE '$cod%' and vr_digitado <> '0'",$link) or die (mysql_error());
-		$row6=mysql_fetch_row($resulta6);
+		$resulta6=$cx->query("select SUM(vr_digitado) AS TOTAL from crpp WHERE fecha_crpp <= '$fecha_fin' and id_emp='$id_emp' and cuenta LIKE '$cod%' and vr_digitado <> '0'");
+		$row6=$resulta6->fetch_assoc();
 		$total_crpp=$row6[0];
 		
-		$resulta7=mysql_query("select SUM(vr_digitado) AS TOTAL from cobp WHERE fecha_cobp <= '$fecha_fin' and id_emp='$id_emp' and cuenta LIKE '$cod%' and vr_digitado <> '0'",$link) or die (mysql_error());
-		$row7=mysql_fetch_row($resulta7);
+		$resulta7=$cx->query("select SUM(vr_digitado) AS TOTAL from cobp WHERE fecha_cobp <= '$fecha_fin' and id_emp='$id_emp' and cuenta LIKE '$cod%' and vr_digitado <> '0'");
+		$row7=$resulta7->fetch_assoc();
 		$total_cobp=$row7[0];
 		
-		$sqlceva = mysql_query("SELECT SUM(vr_digitado) AS TOTAL FROM cobp INNER JOIN ceva ON cobp.id_auto_cobp = ceva.id_auto_cobp WHERE ceva.fecha_ceva <= '$fecha_fin'  AND cobp.cuenta LIKE '$cod%' AND ceva.id_emp ='$id_emp' AND cobp.vr_digitado <> '0' AND cobp.pagado ='SI' ",$link) or die (mysql_error());
-		$row8=mysql_fetch_row($sqlceva);
+		$sqlceva = $cx->query("SELECT SUM(vr_digitado) AS TOTAL FROM cobp INNER JOIN ceva ON cobp.id_auto_cobp = ceva.id_auto_cobp WHERE ceva.fecha_ceva <= '$fecha_fin'  AND cobp.cuenta LIKE '$cod%' AND ceva.id_emp ='$id_emp' AND cobp.vr_digitado <> '0' AND cobp.pagado ='SI' ");
+		$row8=$sqlceva->fetch_assoc();
 		$total_ceva1=$row8[0];
 		
 		$sq3 = "select sum(vr_digitado) as total2 from cobp INNER JOIN ceva ON cobp.ceva =ceva.id_auto_ceva where ceva.fecha_ceva <= '$fecha_fin'  AND cobp.cuenta LIKE '$cod%' AND ceva.id_emp ='$id_emp' AND cobp.vr_digitado <> '0' AND cobp.pagado ='SI' ";
-		$rs3 = mysql_db_query($database,$sq3,$cx);
-		$rw3 = mysql_fetch_array ($rs3);
+		$rs3 = $cx->query($sq3);
+		$rw3 = $rs3->fetch_assoc();
 		$total_ceva_acum = $rw3['total2'];
 		
 		$total_ceva = $total_ceva1 + $total_ceva_acum;
@@ -485,44 +484,44 @@ if ($tipo ==1 && $consolida='1')
 		$cxp = $total_cobp - $total_ceva;
 		
 		// Calculos gastos del mes 
-		$resulta55=mysql_query("select SUM(valor) AS TOTAL from cdpp WHERE (fecha_reg between '$mes_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cuenta LIKE '$cod%'",$link) or die (mysql_error());
-		$row55=mysql_fetch_row($resulta55);
+		$resulta55=$cx->query("select SUM(valor) AS TOTAL from cdpp WHERE (fecha_reg between '$mes_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cuenta LIKE '$cod%'");
+		$row55=$resulta55->fetch_assoc();
 		$total_cdpp_mes=$row55[0];
 
-		$resulta10=mysql_query("select SUM(vr_digitado) AS TOTAL from crpp WHERE (fecha_crpp between '$mes_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cuenta LIKE '$cod%' and vr_digitado <> '0'",$link) or die (mysql_error());
-		$row10=mysql_fetch_row($resulta10);
+		$resulta10=$cx->query("select SUM(vr_digitado) AS TOTAL from crpp WHERE (fecha_crpp between '$mes_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cuenta LIKE '$cod%' and vr_digitado <> '0'");
+		$row10=$resulta10->fetch_assoc();
 		$total_crpp_mes=$row10[0];
 		
-		$resulta11=mysql_query("select SUM(vr_digitado) AS TOTAL from cobp WHERE (fecha_cobp between '$mes_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cuenta LIKE '$cod%' and vr_digitado <> '0'",$link) or die (mysql_error());
-		$row11=mysql_fetch_row($resulta11);
+		$resulta11=$cx->query("select SUM(vr_digitado) AS TOTAL from cobp WHERE (fecha_cobp between '$mes_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cuenta LIKE '$cod%' and vr_digitado <> '0'");
+		$row11=$resulta11->fetch_assoc();
 		$total_cobp_mes=$row11[0];
 		
-		$sqlcevam = mysql_query("SELECT SUM(vr_digitado) AS TOTAL FROM cobp INNER JOIN ceva ON cobp.id_auto_cobp = ceva.id_auto_cobp WHERE (ceva.fecha_ceva between '$mes_ini' AND '$fecha_fin' ) AND cobp.cuenta LIKE '$cod%' AND ceva.id_emp ='$id_emp' AND cobp.vr_digitado <> '0' AND cobp.pagado ='SI' ",$link) or die (mysql_error());
-		$row12=mysql_fetch_row($sqlcevam);
+		$sqlcevam = $cx->query("SELECT SUM(vr_digitado) AS TOTAL FROM cobp INNER JOIN ceva ON cobp.id_auto_cobp = ceva.id_auto_cobp WHERE (ceva.fecha_ceva between '$mes_ini' AND '$fecha_fin' ) AND cobp.cuenta LIKE '$cod%' AND ceva.id_emp ='$id_emp' AND cobp.vr_digitado <> '0' AND cobp.pagado ='SI' ");
+		$row12=$sqlcevam->fetch_assoc();
 		$total_ceva_mes1=$row12[0];
 		
 		$sq4 = "select sum(vr_digitado) as total2 from cobp INNER JOIN ceva ON cobp.ceva =ceva.id_auto_ceva where (ceva.fecha_ceva between '$mes_ini' AND '$fecha_fin' ) AND cobp.cuenta LIKE '$cod%' AND ceva.id_emp ='$id_emp' AND cobp.vr_digitado <> 0 AND cobp.pagado ='SI' ";
-		$rs4 = mysql_db_query($database,$sq4,$cx);
-		$rw4 = mysql_fetch_array ($rs4);
+		$rs4 = $cx->query($sq4);
+		$rw4 = $rs4->fetch_assoc();
 		$total_ceva_acum_mes = $rw4['total2'];
 		
 		$total_ceva_mes = $total_ceva_mes1 + $total_ceva_acum_mes;
 		
 	// modificaciones mes
-		$resulta=mysql_query("select SUM(valor_adi) AS TOTAL from adi_ppto_gas WHERE (fecha_adi between '$mes_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cod_pptal LIKE '$cod%'",$link) or die (mysql_error());
-		$row=mysql_fetch_row($resulta);
+		$resulta=$cx->query("select SUM(valor_adi) AS TOTAL from adi_ppto_gas WHERE (fecha_adi between '$mes_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cod_pptal LIKE '$cod%'");
+		$row=$resulta->fetch_assoc();
 		$total_adi_mes=$row[0];
 		
-		$resulta=mysql_query("select SUM(valor_adi) AS TOTAL from red_ppto_gas WHERE (fecha_adi between '$mes_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cod_pptal LIKE '$cod%'",$link) or die (mysql_error());
-		$row=mysql_fetch_row($resulta);
+		$resulta=$cx->query("select SUM(valor_adi) AS TOTAL from red_ppto_gas WHERE (fecha_adi between '$mes_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cod_pptal LIKE '$cod%'");
+		$row=$resulta->fetch_assoc();
 		$total_red_mes=$row[0]; 
 			
-		$resulta=mysql_query("select SUM(valor_adi) AS TOTAL from creditos WHERE (fecha_adi between '$mes_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cod_pptal LIKE '$cod%'",$link) or die (mysql_error());
-		$row=mysql_fetch_row($resulta);
+		$resulta=$cx->query("select SUM(valor_adi) AS TOTAL from creditos WHERE (fecha_adi between '$mes_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cod_pptal LIKE '$cod%'");
+		$row=$resulta->fetch_assoc();
 		$total_cre_mes=$row[0];
 		
-		$resulta=mysql_query("select SUM(valor_adi) AS TOTAL from contracreditos WHERE (fecha_adi between '$mes_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cod_pptal LIKE '$cod%'",$link) or die (mysql_error());
-		$row=mysql_fetch_row($resulta);
+		$resulta=$cx->query("select SUM(valor_adi) AS TOTAL from contracreditos WHERE (fecha_adi between '$mes_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cod_pptal LIKE '$cod%'");
+		$row=$resulta->fetch_assoc();
 		$total_ccr_mes=$row[0];
 
 		
@@ -592,54 +591,53 @@ if ($tipo ==1 && $consolida='1')
 	<td align='center' width='75'><span class='Estilo4'><b>Tipo</b></span></td>
 	<td align='center' width='75'><span class='Estilo4'><b>Nivel</b></span></td>
 	");
-	while($rw = mysql_fetch_array($re)) 
+	while($rw = $re->fetch_assoc())
 	   {
-	$link=mysql_connect($server,$dbuser,$dbpass);
 	//****
 	$cod=$rw["cod_pptal"];
 	//****
 	//****
-	$resultax=mysql_query("select SUM(ppto_aprob) AS TOTAL from car_ppto_gas WHERE ano <= '$fecha_fin'  and id_emp='$id_emp' and tip_dato ='D' and cod_pptal LIKE '$cod%'",$link) or die (mysql_error());
-	$rowx=mysql_fetch_row($resultax);
+	$resultax=$cx->query("select SUM(ppto_aprob) AS TOTAL from car_ppto_gas WHERE ano <= '$fecha_fin'  and id_emp='$id_emp' and tip_dato ='D' and cod_pptal LIKE '$cod%'");
+	$rowx=$resultax->fetch_assoc();
 	$inicial=$rowx[0]; 
 	//****
-	$resulta=mysql_query("select SUM(valor_adi) AS TOTAL from adi_ppto_gas WHERE fecha_adi <= '$fecha_fin' and id_emp='$id_emp' and cod_pptal LIKE '$cod%'",$link) or die (mysql_error());
-	$row=mysql_fetch_row($resulta);
+	$resulta=$cx->query("select SUM(valor_adi) AS TOTAL from adi_ppto_gas WHERE fecha_adi <= '$fecha_fin' and id_emp='$id_emp' and cod_pptal LIKE '$cod%'");
+	$row=$resulta->fetch_assoc();
 	$total_adi=$row[0]; 
 	
-	$resulta2=mysql_query("select SUM(valor_adi) AS TOTAL from red_ppto_gas WHERE fecha_adi <= '$fecha_fin' and id_emp='$id_emp' and cod_pptal LIKE '$cod%'",$link) or die (mysql_error());
-	$row2=mysql_fetch_row($resulta2);
+	$resulta2=$cx->query("select SUM(valor_adi) AS TOTAL from red_ppto_gas WHERE fecha_adi <= '$fecha_fin' and id_emp='$id_emp' and cod_pptal LIKE '$cod%'");
+	$row2=$resulta2->fetch_assoc();
 	$total_red=$row2[0];
 	
-	$resulta3=mysql_query("select SUM(valor_adi) AS TOTAL from creditos WHERE fecha_adi <= '$fecha_fin' and id_emp='$id_emp' and cod_pptal LIKE '$cod%'",$link) or die (mysql_error());
-	$row3=mysql_fetch_row($resulta3);
+	$resulta3=$cx->query("select SUM(valor_adi) AS TOTAL from creditos WHERE fecha_adi <= '$fecha_fin' and id_emp='$id_emp' and cod_pptal LIKE '$cod%'");
+	$row3=$resulta3->fetch_assoc();
 	$total_cre=$row3[0];
 	
-	$resulta4=mysql_query("select SUM(valor_adi) AS TOTAL from contracreditos WHERE fecha_adi<= '$fecha_fin' and id_emp='$id_emp' and cod_pptal LIKE '$cod%'",$link) or die (mysql_error());
-	$row4=mysql_fetch_row($resulta4);
+	$resulta4=$cx->query("select SUM(valor_adi) AS TOTAL from contracreditos WHERE fecha_adi<= '$fecha_fin' and id_emp='$id_emp' and cod_pptal LIKE '$cod%'");
+	$row4=$resulta4->fetch_assoc();
 	$total_ccre=$row4[0];
 	
 	$definitivo = $inicial + $total_adi - $total_red + $total_cre - $total_ccre;
-	$resulta5=mysql_query("select SUM(valor) AS TOTAL from cdpp WHERE fecha_reg <= '$fecha_fin'  and id_emp='$id_emp' and cuenta LIKE '$cod%'",$link) or die (mysql_error());
-	$row5=mysql_fetch_row($resulta5);
+	$resulta5=$cx->query("select SUM(valor) AS TOTAL from cdpp WHERE fecha_reg <= '$fecha_fin'  and id_emp='$id_emp' and cuenta LIKE '$cod%'");
+	$row5=$resulta5->fetch_assoc();
 	$total_cdpp=$row5[0];
 	
-	$resulta6=mysql_query("select SUM(vr_digitado) AS TOTAL from crpp WHERE fecha_crpp <= '$fecha_fin' and id_emp='$id_emp' and cuenta LIKE '$cod%' and vr_digitado <> '0'",$link) or die (mysql_error());
-	$row6=mysql_fetch_row($resulta6);
+	$resulta6=$cx->query("select SUM(vr_digitado) AS TOTAL from crpp WHERE fecha_crpp <= '$fecha_fin' and id_emp='$id_emp' and cuenta LIKE '$cod%' and vr_digitado <> '0'");
+	$row6=$resulta6->fetch_assoc();
 	$total_crpp=$row6[0];
 	
-	$resulta7=mysql_query("select SUM(vr_digitado) AS TOTAL from cobp WHERE fecha_cobp <= '$fecha_fin'  and id_emp='$id_emp' and cuenta LIKE '$cod%' and vr_digitado <> '0'",$link) or die (mysql_error());
-	$row7=mysql_fetch_row($resulta7);
+	$resulta7=$cx->query("select SUM(vr_digitado) AS TOTAL from cobp WHERE fecha_cobp <= '$fecha_fin'  and id_emp='$id_emp' and cuenta LIKE '$cod%' and vr_digitado <> '0'");
+	$row7=$resulta7->fetch_assoc();
 	$total_cobp=$row7[0];
 	
-	$sqlceva = mysql_query("SELECT SUM(vr_digitado) AS TOTAL FROM cobp INNER JOIN ceva ON cobp.id_auto_cobp = ceva.id_auto_cobp WHERE ceva.fecha_ceva <= '$fecha_fin'  AND cobp.cuenta LIKE '$cod%' AND ceva.id_emp ='$id_emp' AND cobp.vr_digitado <> '0' AND cobp.pagado ='SI'",$link) or die (mysql_error());
-	$row8=mysql_fetch_row($sqlceva);
+	$sqlceva = $cx->query("SELECT SUM(vr_digitado) AS TOTAL FROM cobp INNER JOIN ceva ON cobp.id_auto_cobp = ceva.id_auto_cobp WHERE ceva.fecha_ceva <= '$fecha_fin'  AND cobp.cuenta LIKE '$cod%' AND ceva.id_emp ='$id_emp' AND cobp.vr_digitado <> '0' AND cobp.pagado ='SI'");
+	$row8=$sqlceva->fetch_assoc();
 	$total_ceva1=$row8[0];
 
 	
 	$sq3 = "select sum(vr_digitado) as total2 from cobp INNER JOIN ceva ON cobp.ceva =ceva.id_auto_ceva where ceva.fecha_ceva <= '$fecha_fin'  AND cobp.cuenta LIKE '$cod%' AND ceva.id_emp ='$id_emp' AND cobp.vr_digitado <> '0' AND cobp.pagado ='SI' ";
-	$rs3 = mysql_db_query($database,$sq3,$cx);
-	$rw3 = mysql_fetch_array ($rs3);
+	$rs3 = $cx->query($sq3);
+	$rw3 = $rs3->fetch_assoc();
 	$total_ceva_acum = $rw3['total2'];
 	
 	$total_ceva = $total_ceva1 + $total_ceva_acum;
@@ -713,10 +711,8 @@ if ($tipo ==1 && $consolida='1')
 
 <?php
 	// ************************************ EJECUCION CON CORTE  **************************************************************************************
-	include('../config.php');				
-	$cx = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
 	$sq = "select * from car_ppto_gas where id_emp = '$id_emp' order by cod_pptal asc ";
-	$re = mysql_db_query($database, $sq, $cx);
+	$re = $cx->query($sq);
 	
 	printf("
 	<center>
@@ -741,7 +737,7 @@ if ($tipo ==1 && $consolida='1')
 	");
 	
 	// Calculo de gastos por mes 
-	$mes = split("/",$fecha_fin);
+	$mes = explode("/",$fecha_fin);
 	
 	if ($mes[1]=="01") {$mes_ini = "$anno/01/01"; $mes_fin ="$anno/01/31";}
 	if ($mes[1]=="02") {$mes_ini = "$anno/02/01"; $mes_fin ="$anno/02/29";}
@@ -756,71 +752,70 @@ if ($tipo ==1 && $consolida='1')
 	if ($mes[1]=="11") {$mes_ini = "$anno/11/01"; $mes_fin ="$anno/11/30";}
 	if ($mes[1]=="12") {$mes_ini = "$anno/12/01"; $mes_fin ="$anno/12/31";}
 	
-	while($rw = mysql_fetch_array($re)) 
+	while($rw = $re->fetch_assoc())
 	{
-		$link=mysql_connect($server,$dbuser,$dbpass);
 		//****
 		$cod=$rw["cod_pptal"];
 		//****
 		//****
-		$resultax=mysql_query("select SUM(ppto_aprob) AS TOTAL from car_ppto_gas WHERE (ano between '$fecha_ini' and '$fecha_fin' ) and id_emp='$id_emp' and tip_dato ='D' and cod_pptal LIKE '$cod%'",$link) or die (mysql_error());
-		$rowx=mysql_fetch_row($resultax);
+		$resultax=$cx->query("select SUM(ppto_aprob) AS TOTAL from car_ppto_gas WHERE (ano between '$fecha_ini' and '$fecha_fin' ) and id_emp='$id_emp' and tip_dato ='D' and cod_pptal LIKE '$cod%'");
+		$rowx=$resultax->fetch_assoc();
 		$inicial=$rowx[0]; 
 		//****
-		$resulta=mysql_query("select SUM(valor_adi) AS TOTAL from adi_ppto_gas WHERE (fecha_adi between '$fecha_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cod_pptal LIKE '$cod%'",$link) or die (mysql_error());
-		$row=mysql_fetch_row($resulta);
+		$resulta=$cx->query("select SUM(valor_adi) AS TOTAL from adi_ppto_gas WHERE (fecha_adi between '$fecha_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cod_pptal LIKE '$cod%'");
+		$row=$resulta->fetch_assoc();
 		$total_adi=$row[0]; 
 		
-		$resulta2=mysql_query("select SUM(valor_adi) AS TOTAL from red_ppto_gas WHERE (fecha_adi between '$fecha_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cod_pptal LIKE '$cod%'",$link) or die (mysql_error());
-		$row2=mysql_fetch_row($resulta2);
+		$resulta2=$cx->query("select SUM(valor_adi) AS TOTAL from red_ppto_gas WHERE (fecha_adi between '$fecha_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cod_pptal LIKE '$cod%'");
+		$row2=$resulta2->fetch_assoc();
 		$total_red=$row2[0];
 		
-		$resulta3=mysql_query("select SUM(valor_adi) AS TOTAL from creditos WHERE (fecha_adi between '$fecha_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cod_pptal LIKE '$cod%'",$link) or die (mysql_error());
-		$row3=mysql_fetch_row($resulta3);
+		$resulta3=$cx->query("select SUM(valor_adi) AS TOTAL from creditos WHERE (fecha_adi between '$fecha_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cod_pptal LIKE '$cod%'");
+		$row3=	$resulta3->fetch_assoc();
 		$total_cre=$row3[0];
 		
-		$resulta4=mysql_query("select SUM(valor_adi) AS TOTAL from contracreditos WHERE (fecha_adi between '$fecha_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cod_pptal LIKE '$cod%'",$link) or die (mysql_error());
-		$row4=mysql_fetch_row($resulta4);
+		$resulta4=$cx->query("select SUM(valor_adi) AS TOTAL from contracreditos WHERE (fecha_adi between '$fecha_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cod_pptal LIKE '$cod%'");
+		$row4=$resulta4->fetch_assoc();
 		$total_ccre=$row4[0];
 		
 		$definitivo = $inicial + $total_adi - $total_red + $total_cre - $total_ccre;
 		
 		//****
-		$resulta=mysql_query("select SUM(valor_adi) AS TOTAL from adi_ppto_gas WHERE (fecha_adi between '$fecha_per' and '$fecha_fin' ) and id_emp='$id_emp' and cod_pptal LIKE '$cod%'",$link) or die (mysql_error());
-		$row=mysql_fetch_row($resulta);
+		$resulta=$cx->query("select SUM(valor_adi) AS TOTAL from adi_ppto_gas WHERE (fecha_adi between '$fecha_per' and '$fecha_fin' ) and id_emp='$id_emp' and cod_pptal LIKE '$cod%'");
+		$row=$resulta->fetch_assoc();
 		$total_adi_p=$row[0]; 
 		
-		$resulta2=mysql_query("select SUM(valor_adi) AS TOTAL from red_ppto_gas WHERE (fecha_adi between '$fecha_per' and '$fecha_fin' ) and id_emp='$id_emp' and cod_pptal LIKE '$cod%'",$link) or die (mysql_error());
-		$row2=mysql_fetch_row($resulta2);
+		$resulta2=$cx->query("select SUM(valor_adi) AS TOTAL from red_ppto_gas WHERE (fecha_adi between '$fecha_per' and '$fecha_fin' ) and id_emp='$id_emp' and cod_pptal LIKE '$cod%'");
+		$row2=$resulta2->fetch_assoc();
 		$total_red_p=$row2[0];
 		
-		$resulta3=mysql_query("select SUM(valor_adi) AS TOTAL from creditos WHERE (fecha_adi between '$fecha_per' and '$fecha_fin' ) and id_emp='$id_emp' and cod_pptal LIKE '$cod%'",$link) or die (mysql_error());
-		$row3=mysql_fetch_row($resulta3);
+		$resulta3=$cx->query("select SUM(valor_adi) AS TOTAL from creditos WHERE (fecha_adi between '$fecha_per' and '$fecha_fin' ) and id_emp='$id_emp' and cod_pptal LIKE '$cod%'");
+		$row3=	$resulta3->fetch_assoc();
 		$total_cre_p=$row3[0];
 		
-		$resulta4=mysql_query("select SUM(valor_adi) AS TOTAL from contracreditos WHERE (fecha_adi between '$fecha_per' and '$fecha_fin' ) and id_emp='$id_emp' and cod_pptal LIKE '$cod%'",$link) or die (mysql_error());
-		$row4=mysql_fetch_row($resulta4);
+		$resulta4=$cx->query("select SUM(valor_adi) AS TOTAL from contracreditos WHERE (fecha_adi between '$fecha_per' and '$fecha_fin' ) and id_emp='$id_emp' and cod_pptal LIKE '$cod%'");
+		$row4=$resulta4->fetch_assoc();
 		$total_ccre_p=$row4[0];
 		
-		$resulta5=mysql_query("select SUM(valor) AS TOTAL from cdpp WHERE (fecha_reg between '$fecha_ini' and '$fecha_per' ) and id_emp='$id_emp' and cuenta LIKE '$cod%'",$link) or die (mysql_error());
-		$row5=mysql_fetch_row($resulta5);
+		$resulta5=$cx->query("select SUM(valor) AS TOTAL from cdpp WHERE (fecha_reg between '$fecha_ini' and '$fecha_per' ) and id_emp='$id_emp' and cuenta LIKE '$cod%'");
+		$row5=$resulta5->fetch_assoc();
 		$total_cdpp=$row5[0];
 		
-		$resulta6=mysql_query("select SUM(vr_digitado) AS TOTAL from crpp WHERE (fecha_crpp between '$fecha_per' and '$fecha_fin' ) and id_emp='$id_emp' and cuenta LIKE '$cod%' and vr_digitado <> '0'",$link) or die (mysql_error());
-		$row6=mysql_fetch_row($resulta6);
+		$resulta6=$cx->query("select SUM(vr_digitado) AS TOTAL from crpp WHERE (fecha_crpp between '$fecha_per' and '$fecha_fin' ) and id_emp='$id_emp' and cuenta LIKE '$cod%' and vr_digitado <> '0'");
+		$row6=$resulta6->fetch_assoc();
 		$total_crpp=$row6[0];
 		
-		$resulta7=mysql_query("select SUM(vr_digitado) AS TOTAL from cobp WHERE (fecha_cobp between '$fecha_per' and '$fecha_fin' ) and id_emp='$id_emp' and cuenta LIKE '$cod%' and vr_digitado <> '0'",$link) or die (mysql_error());
-		$row7=mysql_fetch_row($resulta7);
+		$resulta7=$cx->query("select SUM(vr_digitado) AS TOTAL from cobp WHERE (fecha_cobp between '$fecha_per' and '$fecha_fin' ) and id_emp='$id_emp' and cuenta LIKE '$cod%' and vr_digitado <> '0'");
+		$row7=$resulta7->fetch_assoc();
 		$total_cobp=$row7[0];
 		
-		$sqlceva = mysql_query("SELECT SUM(vr_digitado) AS TOTAL FROM cobp INNER JOIN ceva ON cobp.id_auto_cobp = ceva.id_auto_cobp WHERE (ceva.fecha_ceva between '$fecha_per' AND '$fecha_fin' ) AND cobp.cuenta LIKE '$cod%' AND ceva.id_emp ='$id_emp' AND cobp.vr_digitado <> '0' AND cobp.pagado ='SI' ",$link) or die (mysql_error());
-		$row8=mysql_fetch_row($sqlceva);
+		$sqlceva = $cx->query("SELECT SUM(vr_digitado) AS TOTAL FROM cobp INNER JOIN ceva ON cobp.id_auto_cobp = ceva.id_auto_cobp WHERE (ceva.fecha_ceva between '$fecha_per' AND '$fecha_fin' ) AND cobp.cuenta LIKE '$cod%' AND ceva.id_emp ='$id_emp' AND cobp.vr_digitado <> '0' AND cobp.pagado ='SI' ");
+		$row8=$sqlceva->fetch_assoc();
 		$total_ceva1=$row8[0];
 		
 		$sq3 = "select sum(vr_digitado) as total2 from cobp INNER JOIN ceva ON cobp.ceva =ceva.id_auto_ceva where (ceva.fecha_ceva between '$fecha_per' AND '$fecha_fin' ) AND cobp.cuenta LIKE '$cod%' AND ceva.id_emp ='$id_emp' AND cobp.vr_digitado <> '0' AND cobp.pagado ='SI' ";
-		$rs3 = mysql_db_query($database,$sq3,$cx);
-		$rw3 = mysql_fetch_array ($rs3);
+		$rs3 = $cx->query($sq3);
+		$rw3 = $rs3->fetch_assoc();
 		$total_ceva_acum = $rw3['total2'];
 		
 		$total_ceva = $total_ceva1 + $total_ceva_acum;
@@ -831,21 +826,21 @@ if ($tipo ==1 && $consolida='1')
 		
 		// Calculos gastos del mes
 		
-		$resulta10=mysql_query("select SUM(vr_digitado) AS TOTAL from crpp WHERE (fecha_crpp between '$mes_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cuenta LIKE '$cod%' and vr_digitado <> '0'",$link) or die (mysql_error());
-		$row10=mysql_fetch_row($resulta10);
+		$resulta10=$cx->query("select SUM(vr_digitado) AS TOTAL from crpp WHERE (fecha_crpp between '$mes_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cuenta LIKE '$cod%' and vr_digitado <> '0'");
+		$row10=$resulta10->fetch_assoc();
 		$total_crpp_mes=$row10[0];
 		
-		$resulta11=mysql_query("select SUM(vr_digitado) AS TOTAL from cobp WHERE (fecha_cobp between '$mes_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cuenta LIKE '$cod%' and vr_digitado <> '0'",$link) or die (mysql_error());
-		$row11=mysql_fetch_row($resulta11);
+		$resulta11=$cx->query("select SUM(vr_digitado) AS TOTAL from cobp WHERE (fecha_cobp between '$mes_ini' and '$fecha_fin' ) and id_emp='$id_emp' and cuenta LIKE '$cod%' and vr_digitado <> '0'");
+		$row11=$resulta11->fetch_assoc();
 		$total_cobp_mes=$row11[0];
 		
-		$sqlcevam = mysql_query("SELECT SUM(vr_digitado) AS TOTAL FROM cobp INNER JOIN ceva ON cobp.id_auto_cobp = ceva.id_auto_cobp WHERE (ceva.fecha_ceva between '$mes_ini' AND '$fecha_fin' ) AND cobp.cuenta LIKE '$cod%' AND ceva.id_emp ='$id_emp' AND cobp.vr_digitado <> '0' AND cobp.pagado ='SI' ",$link) or die (mysql_error());
-		$row12=mysql_fetch_row($sqlcevam);
+		$sqlcevam = $cx->query("SELECT SUM(vr_digitado) AS TOTAL FROM cobp INNER JOIN ceva ON cobp.id_auto_cobp = ceva.id_auto_cobp WHERE (ceva.fecha_ceva between '$mes_ini' AND '$fecha_fin' ) AND cobp.cuenta LIKE '$cod%' AND ceva.id_emp ='$id_emp' AND cobp.vr_digitado <> '0' AND cobp.pagado ='SI' ");
+		$row12=$sqlcevam->fetch_assoc();
 		$total_ceva_mes1=$row12[0];
 		
 		$sq4 = "select sum(vr_digitado) as total2 from cobp INNER JOIN ceva ON cobp.ceva =ceva.id_auto_ceva where (ceva.fecha_ceva between '$mes_ini' AND '$fecha_fin' ) AND cobp.cuenta LIKE '$cod%' AND ceva.id_emp ='$id_emp' AND cobp.vr_digitado <> '0' AND cobp.pagado ='SI' ";
-		$rs4 = mysql_db_query($database,$sq4,$cx);
-		$rw4 = mysql_fetch_array ($rs4);
+		$rs4 = $cx->query($sq4);
+		$rw4 = $rs4->fetch_assoc();
 		$total_ceva_acum_mes = $rw4['total2'];
 		
 		$total_ceva_mes = $total_ceva_mes1 + $total_ceva_acum_mes;
@@ -877,6 +872,6 @@ if ($tipo ==1 && $consolida='1')
 <br />
 </body>
 </html>
-<?
+<?php
 }
 ?>

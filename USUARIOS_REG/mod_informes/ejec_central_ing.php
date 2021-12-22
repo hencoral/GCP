@@ -1,7 +1,7 @@
-<?
+<?php
 set_time_limit(1200);
 session_start();
-if(!session_is_registered("login"))
+if (!isset($_SESSION["login"])) 
 {
 header("Location: ../login.php");
 exit;
@@ -106,25 +106,29 @@ table.bordepunteado1 { border-style: solid; border-collapse:collapse; border-wid
 <?php
 //-------
 include('../config.php');	
-$cxx = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
+
+global $server, $database, $dbpass, $dbuser, $charset;
+// Conexion con la base de datos
+$cx = new mysqli($server, $dbuser, $dbpass, $database);
 $sxx = "select * from fecha";
-$rxx = mysql_db_query($database, $sxx, $cxx);
-while($rowxxx = mysql_fetch_array($rxx)) 
+$rxx = $cx->query($sxx);
+while($rowxxx = $rxx->fetch_array())
    {
    $idxxx=$rowxxx["id_emp"];
    $id_emp=$rowxxx["id_emp"];
    $ano=$rowxxx["ano"];
    }
 $sxxq = "select * from fecha_ini_op";
-$rxxq = mysql_db_query($database, $sxxq, $cxx);
-while($rowxxxq = mysql_fetch_array($rxxq)) 
+$rxxq = $cx->query($sxxq);
+while($rowxxxq = $rxxq->fetch_array())
+   
    {
    $fecha_ini_op=$rowxxxq["fecha_ini_op"];
    }   
-$cx2 = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
 $sq2 = "select * from empresa where cod_emp = '$idxxx'";
-$re2 = mysql_db_query($database, $sq2, $cx2);
-while($row2 = mysql_fetch_array($re2)) 
+$re2 = $cx->query($sq2);
+while($row2 = $re2->fetch_array())
+   
    {
    $empresa = $row2["raz_soc"];
    }
@@ -166,7 +170,7 @@ $ruta_img = "http://$_SERVER[HTTP_HOST]/USUARIOS_REG/images/PLANTILLA PNG PARA L
 </tr>
 </table>
 <br />
-<?
+<?php
 
 
 	printf("
@@ -192,11 +196,9 @@ $ruta_img = "http://$_SERVER[HTTP_HOST]/USUARIOS_REG/images/PLANTILLA PNG PARA L
 	");
 	
 	// Calculo de gastos por mes 
-include('../config.php');				
-$cx = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
 $sq = "select * from z_central_ing  order by cod asc ";
-$re = mysql_db_query($database, $sq, $cx);
-while($rw = mysql_fetch_array($re)) 
+$re = $cx->query($sq);
+while($rw = $re->fetch_assoc())
 {
 	
 	$cod=$rw["cod"];
@@ -205,38 +207,38 @@ while($rw = mysql_fetch_array($re))
 	
 	//****
 	$sql="select SUM(def) AS TOTAL from z_central_ing WHERE tip ='D' and cod LIKE '$cod%' and hom !='' and hom !='V' and hom !='S' and hom != 'T' and hom !='E'";
-	$rs1=mysql_query($sql,$cx);
-	$rw1=mysql_fetch_row($rs1);
+	$rs1=$cx->query($sql);
+	$rw1=$rs1->fetch_assoc();
 	$def=$rw1[0];
 	
 	$sq2="select SUM(adi) AS TOTAL from z_central_ing WHERE tip ='D' and cod LIKE '$cod%' and hom !='' and hom !='V' and hom !='S' and hom != 'T' and hom !='E'";
-	$rs2=mysql_query($sq2,$cx);
-	$rw2=mysql_fetch_row($rs2);
+	$rs2=$cx->query($sq2);
+	$rw2=$rs2->fetch_assoc();
 	$adi=$rw2[0];
 	
 	$sq7="select SUM(red) AS TOTAL from z_central_ing WHERE tip ='D' and cod LIKE '$cod%' and hom !='' and hom !='V' and hom !='S' and hom != 'T' and hom !='E'";
-	$rs7=mysql_query($sq7,$cx);
-	$rw7=mysql_fetch_row($rs7);
+	$rs7=$cx->query($sq7);
+	$rw7=$rs7->fetch_assoc();
 	$red=$rw7[0];
 	
 	$sq3="select SUM(cre) AS TOTAL from z_central_ing WHERE tip ='D' and cod LIKE '$cod%' and hom !='' and hom !='V' and hom !='S' and hom != 'T' and hom !='E'";
-	$rs3=mysql_query($sq3,$cx);
-	$rw3=mysql_fetch_row($rs3);
+	$rs3=$cx->query($sq3);
+	$rw3=$rs3->fetch_assoc();
 	$cre=$rw3[0];
 	
 	$sq4="select SUM(ccre) AS TOTAL from z_central_ing WHERE tip ='D' and cod LIKE '$cod%' and hom !='' and hom !='V' and hom !='S' and hom != 'T' and hom !='E'";
-	$rs4=mysql_query($sq4,$cx);
-	$rw4=mysql_fetch_row($rs4);
+	$rs4=$cx->query($sq4);
+	$rw4=$rs4->fetch_assoc();
 	$ccre=$rw4[0];
 	
 	$sq5="select SUM(rec) AS TOTAL from z_central_ing WHERE tip ='D' and cod LIKE '$cod%' and hom !='' and hom !='V' and hom !='S' and hom != 'T' and hom !='E'";
-	$rs5=mysql_query($sq5,$cx);
-	$rw5=mysql_fetch_row($rs5);
+	$rs5=$cx->query($sq5);
+	$rw5=$rs5->fetch_assoc();
 	$rec=$rw5[0];
 	
 	$sq6="select SUM(gir) AS TOTAL from z_central_ing WHERE tip ='D' and cod LIKE '$cod%' and hom !='' and hom !='V' and hom !='S' and hom != 'T' and hom !='E'";
-	$rs6=mysql_query($sq6,$cx);
-	$rw6=mysql_fetch_row($rs6);
+	$rs6=$cx->query($sq6);
+	$rw6=$rs6->fetch_assoc();
 	$gir=$rw5[0];
 	
 	
@@ -277,6 +279,6 @@ while($rw = mysql_fetch_array($re))
 <br />
 </body>
 </html>
-<?
+<?php
 }
 ?>

@@ -1,18 +1,21 @@
-<?
+<?php
 set_time_limit(1200);
 session_start();
-if(!session_is_registered("login"))
+include('../config.php');
+global $server, $database, $dbpass, $dbuser, $charset;
+// Conexion con la base de datos
+$cx = new mysqli($server, $dbuser, $dbpass, $database);
+
+if (!isset($_SESSION["login"])) 
 {
 header("Location: ../login.php");
 exit;
 } else {
 		// verifico permisos del usuario
-		include('../config.php');
-		$cx = mysql_connect("$server","$dbuser","$dbpass")or die ("Conexion no Exitosa");
-		mysql_select_db("$database"); 
+	
        	$sql="SELECT info FROM usuarios2 where login = '$_SESSION[login]'";
-		$res=mysql_db_query($database,$sql,$cx);
-		$rw =mysql_fetch_array($res) ;
+		$res=$cx->query($sql);
+		$rw = $res->fetch_array();
 if ($rw['info']=='SI')
 {
 
@@ -128,13 +131,10 @@ table.bordepunteado1 { border-style: solid; border-collapse:collapse; border-wid
         <div align="center">
 	      <?php
 //-------
-include('../config.php');	
-
-$cxx = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
 $sxx = "select * from fecha";
-$rxx = mysql_db_query($database, $sxx, $cxx);
+$rxx = $cx->query($sxx);
 
-while($rowxxx = mysql_fetch_array($rxx)) 
+while($rowxxx = $rxx->fetch_array())
    {
    
    $idxxx=$rowxxx["id_emp"];
@@ -145,9 +145,10 @@ while($rowxxx = mysql_fetch_array($rxx))
    
 
 $sxxq = "select * from fecha_ini_op";
-$rxxq = mysql_db_query($database, $sxxq, $cxx);
+$rxxq = $cx->query($sxxq);
 
-while($rowxxxq = mysql_fetch_array($rxxq)) 
+while($rowxxxq = $rxxq->fetch_array())
+   
    {
    
    $fecha_ini_op=$rowxxxq["fecha_ini_op"];
@@ -156,11 +157,11 @@ while($rowxxxq = mysql_fetch_array($rxxq))
    }   
 
 			
-$cx2 = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
 $sq2 = "select * from empresa where cod_emp = '$idxxx'";
-$re2 = mysql_db_query($database, $sq2, $cx2);
+$re2 = $cx->query($sq2);
 
-while($row2 = mysql_fetch_array($re2)) 
+while($row2 = $re2->fetch_array())
+   
    {
 printf("<span class='Estilo4'><b>...::: %s :::...</b></span><br>", $row2["raz_soc"]);  
    }
@@ -268,29 +269,29 @@ printf("<span class='Estilo4'><b>...::: %s :::...</b></span><br>", $row2["raz_so
     <td colspan="3"><div style="padding-left:5px; padding-top:5px; padding-right:5px; padding-bottom:5px;">
       <div align="center"> <span class="Estilo4">Fecha de  esta Sesion:</span> <br />
             <span class="Estilo4"> <strong>
-            <? include('../config.php');				
-$connectionxx = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
+            <?php				
 $sqlxx = "select * from fecha";
-$resultadoxx = mysql_db_query($database, $sqlxx, $connectionxx);
+$resultadoxx = $cx->query($sqlxx);
 
-while($rowxx = mysql_fetch_array($resultadoxx)) 
+while($rowxx = $resultadoxx->fetch_assoc())
+
 {
   $ano=$rowxx["ano"];
 }
 echo $ano;
 ?>
             </strong> </span> <br />
-            <span class="Estilo4"><b>Usuario: </b><u><? echo $_SESSION["login"];?></u> </span> </div>
+            <span class="Estilo4"><b>Usuario: </b><u><?php echo $_SESSION["login"];?></u> </span> </div>
     </div></td>
   </tr>
   <tr>
     <td width="266"><div class="Estilo7" id="div3" style="padding-left:3px; padding-top:5px; padding-right:3px; padding-bottom:3px;">
       <div align="center">
-        <?PHP include('../config.php'); echo $nom_emp ?>
+        <?php  echo $nom_emp ?>
         <br />
-        <?PHP echo $dir_tel ?><br />
-        <?PHP echo $muni ?> <br />
-        <?PHP echo $email?> </div>
+        <?php echo $dir_tel ?><br />
+        <?php echo $muni ?> <br />
+        <?php echo $email?> </div>
     </div></td>
     <td width="266"><div class="Estilo7" id="div3" style="padding-left:3px; padding-top:5px; padding-right:3px; padding-bottom:3px;">
       <div align="center"><a href="../../politicas.php" target="_blank">POLITICAS DE PRIVACIDAD <br />
@@ -308,7 +309,7 @@ echo $ano;
 </body>
 </html>
 
-<?
+<?php
 }else{ // si no tiene persisos de usuario
 	echo "<br><br><center>Usuario no tiene permisos en este m&oacute;dulo</center><br>";
 	echo "<center>Click <a href=\"../user.php\">aqu&iacute; para volver</a></center>";

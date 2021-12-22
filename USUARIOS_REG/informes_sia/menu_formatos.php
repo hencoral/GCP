@@ -1,7 +1,8 @@
 <?php
 set_time_limit(600);
 session_start();
-if(!session_is_registered("login"))
+
+if (!isset($_SESSION["login"]))
 {
 header("Location: ../login.php");
 exit;
@@ -22,11 +23,13 @@ exit;
 <br />
 <center>
 <?php
-include('../config.php');               
-$cx = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
+include('../config.php');
+global $server, $database, $dbpass, $dbuser, $charset;
+// Conexion con la base de datos
+$cx = new mysqli($server, $dbuser, $dbpass, $database);
 $sql = "select * from fecha";
-$res = mysql_db_query($database, $sql, $cx);
-while($row = mysql_fetch_array($res))
+$res = $cx->query($sql);
+while($row = $res->fetch_array())
  {
    $idxx=$row["id_emp"];
    $id_emp=$row["id_emp"];

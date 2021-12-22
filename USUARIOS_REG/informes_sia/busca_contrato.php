@@ -1,4 +1,4 @@
-<?
+<?php
 set_time_limit(1800);
 session_start();
 ?>
@@ -7,7 +7,6 @@ session_start();
 <title>CONTAFACIL ...::: Informe por terceros  :::...</title>
 
 <script language="">
-<!--
 //function cursor(){document.login.login.focus();}
 // -->
 </script>
@@ -76,16 +75,18 @@ table.bordepunteado1 { border-style: solid; border-collapse:collapse; border-wid
 .Estilo9 {font-weight: bold}
 </style>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"></head>
-<?				// verifico permisos del usuario
+<?php				// verifico permisos del usuario
 		include('../config.php');
-		$cx = mysql_connect("$server","$dbuser","$dbpass")or die ("Conexion no Exitosa");
-		mysql_select_db("$database"); 
+		global $server, $database, $dbpass, $dbuser, $charset;
+// Conexion con la base de datos
+$cx = new mysqli($server, $dbuser, $dbpass, $database);
+
        	$sql="SELECT teso FROM usuarios2 where login = '$_SESSION[login]'";
-		$res=mysql_db_query($database,$sql,$cx);
-		$rw =mysql_fetch_array($res);
+		$res=$cx->query($sql);
+		$rw = $res->fetch_array();
 if ($rw['teso']=='SI')
 {
-$num = $_POST['cheque'];
+if(isset($_POST['cheque']))	$num = $_POST['cheque']; else $num='';
 ?>
 <body >
 
@@ -137,27 +138,27 @@ $num = $_POST['cheque'];
   
   
   $sq1 = "select * from crpp where n_contrato = '$num'";
-  $re1 = mysql_query($sq1,$cx);
-  $rw1 = mysql_fetch_array($re1);
-  
+  $re1 = $cx->query($sq1);
+  $rw1 = $re1->fetch_array();
+  $ccnit='';
   if($rw1['ter_nat'] !='')
   {
   $sqn ="select num_id from terceros_naturales where id ='$rw1[ter_nat]'";
-  $ren =mysql_query($sqn,$cx);
-  $rwn =mysql_fetch_array($ren);
+  $ren = $cx->query($sqn);
+  $rwn = $ren->fetch_array();
   $ccnit = $rwn['num_id'];
   }
   
   if($rw1['ter_jur'] !='')
   {
   $sqj ="select num_id2 from terceros_juridicos where id ='$rw1[ter_jur]'";
-  $rej =mysql_query($sqj,$cx);
-  $rwj =mysql_fetch_array($rej);
+  $rej = $cx->query($sqj);
+  $rwj = $rej->fetch_array();
   $ccnit = $rwj['num_id2'];
   }
   $sq8 = "select nom_rubro from car_ppto_gas  where cod_pptal ='$rw1[cuenta]'";
-  $re8 =mysql_query($sq8,$cx);
-  $rw8 =mysql_fetch_array($re8);
+  $re8 = $cx->query($sq8);
+  $rw8 = $re8->fetch_array();
   ?>
   <div id="ejecuta"></div>
   <div id="enca" class="oculto">
@@ -199,21 +200,20 @@ $num = $_POST['cheque'];
 <?php
 	$total =0;
 	$bases =0;
-	mysql_db_query($database,"TRUNCATE TABLE retefte_det",$cx);
 	if ($num != '')
 	{
 	$sq2= "select sum(vr_digitado) as valor,fecha_crpp,id_manu_crpp,id_auto_cdpp,id_auto_crpp,id from crpp where n_contrato ='$num' group by n_contrato";
-	$rs2 =mysql_query($sq2,$cx);
-	while ($rw2 = mysql_fetch_array($rs2))
+	$rs2 = $cx->query($sq2);
+	while ($rw2 = $rs2->fetch_array())
 		{
 			// Buscar el valor del pago sin iva
 			$sq3 = "select sum(valor) as valcdp,fecha_reg,cdpp,consecutivo from cdpp where consecutivo ='$rw2[id_auto_cdpp]' group by consecutivo";
-			$rs3 =mysql_query($sq3,$cx);
-			$rw3 = mysql_fetch_array($rs3);
+			$rs3 = $cx->query($sq3);
+			$rw3 = $rs3->fetch_array();
 			
 			$sq7 = "select estado from si_observa where doc ='$rw3[cdpp]' ";
-			$re7 = mysql_query($sq7,$cx);
-			$rw7 = mysql_fetch_array($re7);
+			$re7 = $cx->query($sq7);
+			$rw7 = $re7->fetch_array();
 			
 			$val_cdp =number_format($rw3['valcdp'],0,'.',',');
 			if (!$rw7['estado']) $estado1 =''; else $estado1='checked';
@@ -228,8 +228,8 @@ $num = $_POST['cheque'];
 					</tr>	
 			";	
 			$sq6 = "select estado from si_observa where doc ='$rw2[id_manu_crpp]' ";
-			$re6 = mysql_query($sq6,$cx);
-			$rw6 = mysql_fetch_array($re6);
+			$re6 = $cx->query($sq6);
+			$rw6 = $re6->fetch_array();
 			$val_crp =number_format($rw2['valor'],0,'.',',');
 			if (!$rw6['estado']) $estado2 =''; else $estado2='checked';
 			echo "  <tr class='Estilo8'>
@@ -244,12 +244,12 @@ $num = $_POST['cheque'];
 			";	
 			// Buscar el valor del pago sin iva
 			$sq4 = "select fecha_ceva,id_manu_ceva, (iva+salud + pension + libranza + f_solidaridad + f_empleados + sindicato + embargo + cruce + otros+ vr_retefuente+ vr_reteiva+ vr_retecree  +  vr_reteica + vr_estampilla1 + vr_estampilla2 + vr_estampilla3 + vr_estampilla4 + vr_estampilla5 + total_pagado) as valor,id_auto_ceva from ceva where id_auto_crpp = '$rw2[id_auto_crpp]'";
-			$rs4 =mysql_query($sq4,$cx);
-			while ($rw4 = mysql_fetch_array($rs4))
+			$rs4 = $cx->query($sq4);
+			while ($rw4 =$rs4->fetch_assoc())
 			{	
 				$sq5 = "select estado from si_observa where doc ='$rw4[id_manu_ceva]' ";
-				$re5 = mysql_query($sq5,$cx);
-				$rw5 = mysql_fetch_array($re5);
+				$re5 = $cx->query($sq5);
+				$rw5 = $re5->fetch_array();
 				if (!$rw5['estado']) $estado3 =''; else $estado3='checked';
 			$val_ce =number_format($rw4['valor'],0,'.',',');
 			echo "  <tr class='Estilo8'>
@@ -286,7 +286,7 @@ $num = $_POST['cheque'];
 
 </body>
 </html>
-<?
+<?php
 }else{ // si no tiene persisos de usuario
 	echo "<br><br><center>Usuario no tiene permisos en este m&oacute;dulo</center><br>";
 	echo "<center>Click <a href=\"../user.php\">aqu&iacute; para volver</a></center>";

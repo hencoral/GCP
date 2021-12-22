@@ -1,17 +1,19 @@
 <?php
 session_start();
+include('../config.php');
+global $server, $database, $dbpass, $dbuser, $charset;
+// Conexion con la base de datos
+$cx = new mysqli($server, $dbuser, $dbpass, $database);
 if(!isset($_SESSION["login"]))
 {
 header("Location: ../login.php");
 exit;
 } else {
 	// verifico permisos del usuario
-		include('../config.php');
-		$cx = new mysqli($server, $dbuser, $dbpass, $database)or die ("Conexion no Exitosa");
 		
-       	$sql="SELECT info FROM usuarios2 where login = '$_SESSION[login]'";
+   	$sql="SELECT info FROM usuarios2 where login = '$_SESSION[login]'";
 		$res=$cx->query($sql);
-		$rw =mysql_fetch_array($res);
+		$rw = $res->fetch_array();
 if ($rw['info']=='SI')
 {
 ?>
@@ -24,7 +26,6 @@ if ($rw['info']=='SI')
 
 
 <style type="text/css">
-<!--
 .Estilo2 {font-size: 9px}
 .Estilo4 {font-family: Verdana, Geneva, Arial, Helvetica, sans-serif; font-size: 10px; color: #333333; }
 a {
@@ -101,12 +102,10 @@ table.bordepunteado1 { border-style: solid; border-collapse:collapse; border-wid
   <tr>
     <td colspan="3">
 <?php
-include('../config.php');				
-$connectionxx = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
 $sqlxx = "select * from fecha";
-$resultadoxx = mysql_db_query($database, $sqlxx, $connectionxx);
+$resultadoxx = $cx->query($sqlxx);
 
-while($rowxx = mysql_fetch_array($resultadoxx)) 
+while($rowxx = $resultadoxx->fetch_array())
    {
    
    $idxx=$rowxx["id_emp"];
@@ -116,9 +115,10 @@ while($rowxx = mysql_fetch_array($resultadoxx))
    }
    
 $sqlxx3 = "select * from fecha_ini_op";
-$resultadoxx3 = mysql_db_query($database, $sqlxx3, $connectionxx);
+$resultadoxx3 = $cx->query($sqlxx3);
 
-while($rowxx3 = mysql_fetch_array($resultadoxx3)) 
+while($rowxx3 = $resultadoxx3->fetch_array())
+   
    {
    $desde=$rowxx3["fecha_ini_op"];
    }    
@@ -192,12 +192,12 @@ while($rowxx3 = mysql_fetch_array($resultadoxx3))
     <td colspan="3"><div style="padding-left:5px; padding-top:5px; padding-right:5px; padding-bottom:5px;">
       <div align="center"> <span class="Estilo4">Fecha de  esta Sesion:</span> <br />
           <span class="Estilo4"> <strong>
-          <?php include('../config.php');				
-$connectionxx = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
+          <?php 			
 $sqlxx = "select * from fecha";
-$resultadoxx = mysql_db_query($database, $sqlxx, $connectionxx);
+$resultadoxx = $cx->query($sqlxx);
 
-while($rowxx = mysql_fetch_array($resultadoxx)) 
+while($rowxx = $resultadoxx->fetch_array())
+  
 {
   $ano=$rowxx["ano"];
 }
@@ -210,7 +210,7 @@ echo $ano;
   <tr>
     <td width="266">
 	<div class="Estilo7" id="main_div" style="padding-left:3px; padding-top:5px; padding-right:3px; padding-bottom:3px;">
-	  <div align="center"><?php include('../config.php'); echo $nom_emp ?><br />
+	  <div align="center"><?php  echo $nom_emp ?><br />
 	    <?php echo $dir_tel ?><BR />
 	    <?php echo $muni ?> <br />
 	    <?php echo $email?>	</div>
@@ -231,12 +231,6 @@ echo $ano;
 </table>
 </body>
 </html>
-
-
-
-
-
-
 <?php
 }else{ // si no tiene persisos de usuario
 	echo "<br><br><center>Usuario no tiene permisos en este m&oacute;dulo</center><br>";

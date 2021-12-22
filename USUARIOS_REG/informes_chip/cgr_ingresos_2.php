@@ -1,7 +1,7 @@
-<?
+<?php
 set_time_limit(3600);
 session_start();
-if(!session_is_registered("login"))
+if (!isset($_SESSION["login"])) 
 {
 header("Location: ../login.php");
 exit;
@@ -48,20 +48,20 @@ table.bordepunteado1 { border-style: solid; border-collapse:collapse; border-wid
 <link type="text/css" rel="stylesheet" href="dhtmlgoodies_calendar/dhtmlgoodies_calendar.css?random=20051112" media="screen"></LINK>
 	
 <SCRIPT type="text/javascript" src="dhtmlgoodies_calendar/dhtmlgoodies_calendar.js?random=20060118"></script>
-<?
-$corte=$_POST['corte'];
+<?php
+if(isset($_POST['corte'])) $corte=$_POST['corte']; else $corte='';
 
 
 include('../config.php');
-$base=$database;
-$conexion=mysql_connect ($server, $dbuser, $dbpass);
-
+global $server, $database, $dbpass, $dbuser, $charset;
+// Conexion con la base de datos
+$cx = new mysqli($server, $dbuser, $dbpass, $database);
 //************* borro la tabla		
 $tabla6="cgr_aux_ing";
 $anadir6="truncate TABLE ";
 $anadir6.=$tabla6;
 $anadir6.=" ";
-
+/*
 mysql_select_db ($base, $conexion);
 
 		if(mysql_query ($anadir6 ,$conexion)) 
@@ -72,7 +72,7 @@ mysql_select_db ($base, $conexion);
 		{
 		echo "";
 		};
-
+*/
 //********************crea tabla fut_aux_ing
 
 $tabla7="cgr_aux_ing";
@@ -101,67 +101,56 @@ $tabla7="cgr_aux_ing";
    PRIMARY KEY  (`id`)
 )TYPE=MyISAM AUTO_INCREMENT=1 COLLATE=latin1_general_ci";
 		
-		mysql_select_db ($base, $conexion);
-
-		if(mysql_query ($anadir7 ,$conexion)) 
-		{
-		echo "";
-		}
-		else
-		{
-		echo "";
-		}
+		
 
 //*****************
 //*****************
 
-include('../config.php');				
-$cx = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
 $sq = "select * from car_ppto_ing where tip_dato = 'D' order by cod_pptal asc ";
-$re = mysql_db_query($database, $sq, $cx);
+$re = $cx->query($sq);
 
-while($rw = mysql_fetch_array($re)) 
+while($rw = $re->fetch_array())
+
 {
 
-$link=mysql_connect($server,$dbuser,$dbpass);
 //****
 $cod=$rw["cod_pptal"];
 $cod_cgr=$rw["cod_cgr"];
 if ($cod_cgr !='')
 {
 //****
-$resulta=mysql_query("select SUM(valor_adi) AS TOTAL from adi_ppto_ing WHERE (fecha_adi <= '$corte' ) and cod_pptal LIKE '$cod%'",$link) or die (mysql_error());
-$row=mysql_fetch_row($resulta);
+$resulta=$cx->query("select SUM(valor_adi) AS TOTAL from adi_ppto_ing WHERE (fecha_adi <= '$corte' ) and cod_pptal LIKE '$cod%'");
+$row=$reslta->num_rows;
 $total_adi=$row[0]; 
 //****
-$resulta2=mysql_query("select SUM(valor_adi) AS TOTAL from red_ppto_ing WHERE (fecha_adi <= '$corte' ) and cod_pptal LIKE '$cod%'",$link) or die (mysql_error());
-$row2=mysql_fetch_row($resulta2);
+$resulta2=$cx->query("select SUM(valor_adi) AS TOTAL from red_ppto_ing WHERE (fecha_adi <= '$corte' ) and cod_pptal LIKE '$cod%'");
+$row2=$reslta2->num_rows;
 $total_red=$row2[0];
 //****
-$resulta8=mysql_query("select SUM(valor_adi) AS TOTAL from creditos_ing WHERE (fecha_adi <= '$corte' ) and cod_pptal LIKE '$cod%'",$link) or die (mysql_error());
-$row8=mysql_fetch_row($resulta8);
+$resulta8=$cx->query("select SUM(valor_adi) AS TOTAL from creditos_ing WHERE (fecha_adi <= '$corte' ) and cod_pptal LIKE '$cod%'");
+$row8=	$reslta8->num_rows;
 $total_cred=$row8[0];
 //****
-$resulta9=mysql_query("select SUM(valor_adi) AS TOTAL from contracreditos_ing WHERE (fecha_adi <= '$corte' ) and cod_pptal LIKE '$cod%'",$link) or die (mysql_error());
-$row9=mysql_fetch_row($resulta9);
+$resulta9=$cx->query("select SUM(valor_adi) AS TOTAL from contracreditos_ing WHERE (fecha_adi <= '$corte' ) and cod_pptal LIKE '$cod%'");
+$row9=	$reslta9->num_rows;
 $total_ccred=$row9[0];
 
 //****
 
-$resulta4=mysql_query("select SUM(valor) AS TOTAL, count(num) as registros from z_aux_ing WHERE (fecha <= '$corte' ) and  rubro LIKE '$cod%'",$link) or die (mysql_error());
-$row4=mysql_fetch_row($resulta4);
+$resulta4=$cx->query("select SUM(valor) AS TOTAL, count(num) as registros from z_aux_ing WHERE (fecha <= '$corte' ) and  rubro LIKE '$cod%'");
+$row4=$reslta4->num_rows;
 $total_ncbt=$row4[0];
 $registros=$row4[1];
 /*
-$resulta5=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_rcgt WHERE (fecha_recaudo <= '$corte' ) and  cuenta LIKE '$cod%'",$link) or die (mysql_error());
+$resulta5=$cx->query"select SUM(vr_digitado) AS TOTAL from recaudo_rcgt WHERE (fecha_recaudo <= '$corte' ) and  cuenta LIKE '$cod%'");
 $row5=mysql_fetch_row($resulta5);
 $total_rcgt=$row5[0];
 
-$resulta6=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_tnat WHERE (fecha_recaudo <= '$corte' ) and  cuenta LIKE '$cod%'",$link) or die (mysql_error());
+$resulta6=$cx->query"select SUM(vr_digitado) AS TOTAL from recaudo_tnat WHERE (fecha_recaudo <= '$corte' ) and  cuenta LIKE '$cod%'");
 $row6=mysql_fetch_row($resulta6);
 $total_tnat=$row6[0];
 
-$resulta7=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_roit WHERE (fecha_recaudo <= '$corte' ) and  cuenta LIKE '$cod%' and vr_digitado <> '0'",$link) or die (mysql_error());
+$resulta7=$cx->query"select SUM(vr_digitado) AS TOTAL from recaudo_roit WHERE (fecha_recaudo <= '$corte' ) and  cuenta LIKE '$cod%' and vr_digitado <> '0'");
 $row7=mysql_fetch_row($resulta7);
 $total_roit=$row7[0];
 */
@@ -174,7 +163,7 @@ $sql = "
 INSERT INTO cgr_aux_ing (fecha,cuenta,cod_cgr,rec,oer,cda,recip,acto,sit_fondos,registros,inicial,adiciones,reducciones,creditos,contracreditos,recaudos) 
 VALUES
 ('$corte','$cod','$rw[cod_cgr]','$rw[cod_rec]','$rw[oer]','$rw[cda]','$rw[ent_recip]','$rw[acto_fut]','$rw[situacion]','$registros','$rw[ppto_aprob]','$total_adi','$total_red','$total_cred','$total_ccred','$recaudos')";
-mysql_db_query($database, $sql, $conexion) or die(mysql_error());
+$cx->query($sql);
 
 }
 }
@@ -187,16 +176,6 @@ $anadir6="truncate TABLE ";
 $anadir6.=$tabla6;
 $anadir6.=" ";
 
-mysql_select_db ($base, $conexion);
-
-if(mysql_query ($anadir6 ,$conexion)) 
-{
-echo "";
-}
-else
-{
-echo "";
-};
 
 //********************crea tabla fut_aux_ing
 
@@ -237,16 +216,7 @@ $anadir7.="
 PRIMARY KEY  (`id`)
 )TYPE=MyISAM AUTO_INCREMENT=1 COLLATE=latin1_general_ci";
 
-mysql_select_db ($base, $conexion);
 
-if(mysql_query ($anadir7 ,$conexion)) 
-{
-echo "";
-}
-else
-{
-echo "";
-}
 //**********************
 //**********************
 
@@ -304,42 +274,42 @@ while($rowxx2 = mysql_fetch_array($resultadoxx2))
 		$cod_cgr = $rowxx2["cod_cgr"];
 		
 		//***** conteo de registros
-		$resulta4=mysql_query("
+		$resulta4=$cx->query"
 		SELECT COUNT(DISTINCT(id_manu_ncbt)) 
 		FROM recaudo_ncbt JOIN car_ppto_ing ON car_ppto_ing.cod_pptal = recaudo_ncbt.cuenta
 		WHERE car_ppto_ing.cod_cgr = '$cod_cgr'
 		GROUP BY car_ppto_ing.cod_cgr
-		",$link) or die (mysql_error());
+		");
 		$row4=mysql_fetch_row($resulta4);
 		$total_reg_ncbt=$row4[0];
 		
 		
-		$resulta5=mysql_query("
+		$resulta5=$cx->query"
 		SELECT COUNT(DISTINCT(id_manu_rcgt)) 
 		FROM recaudo_rcgt JOIN car_ppto_ing ON car_ppto_ing.cod_pptal = recaudo_rcgt.cuenta
 		WHERE car_ppto_ing.cod_cgr = '$cod_cgr'
 		GROUP BY car_ppto_ing.cod_cgr
-		",$link) or die (mysql_error());
+		");
 		$row5=mysql_fetch_row($resulta5);
 		$total_reg_rcgt=$row5[0];
 		
 		
-		$resulta5=mysql_query("
+		$resulta5=$cx->query"
 		SELECT COUNT(DISTINCT(id_manu_tnat)) 
 		FROM recaudo_tnat JOIN car_ppto_ing ON car_ppto_ing.cod_pptal = recaudo_tnat.cuenta
 		WHERE car_ppto_ing.cod_cgr = '$cod_cgr'
 		GROUP BY car_ppto_ing.cod_cgr
-		",$link) or die (mysql_error());
+		");
 		$row5=mysql_fetch_row($resulta5);
 		$total_reg_tnat=$row5[0];
 		
 		
-		$resulta5=mysql_query("
+		$resulta5=$cx->query"
 		SELECT COUNT(DISTINCT(id_manu_roit)) 
 		FROM recaudo_roit JOIN car_ppto_ing ON car_ppto_ing.cod_pptal = recaudo_roit.cuenta
 		WHERE car_ppto_ing.cod_cgr = '$cod_cgr'
 		GROUP BY car_ppto_ing.cod_cgr
-		",$link) or die (mysql_error());
+		");
 		$row5=mysql_fetch_row($resulta5);
 		$total_reg_roit=$row5[0];
 		//**************************
@@ -397,7 +367,7 @@ while($rowxx2 = mysql_fetch_array($resultadoxx2))
 	<input name="Submit" type="submit" class="Estilo4" value="Generar Informe" onclick="this.form.action = 'cgr_ingresos_3.php'">
   </div>
 </form>
-<?
+<?php
 printf("
 <br><br>
 <div align='center'>

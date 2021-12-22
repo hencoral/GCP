@@ -1,7 +1,7 @@
-<?
+<?php
 set_time_limit(600);
 session_start();
-if(!session_is_registered("login"))
+if(isset($_SESSION['user']))
 {
 header("Location: ../login.php");
 exit;
@@ -68,46 +68,38 @@ header("Expires: 0");
 <div align="center">
 <?php 
 include('../config.php');		
-		
-$connectionxx = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
-
-$base=$database;
-$conexion=mysql_connect ($server, $dbuser, $dbpass);
-
+global $server, $database, $dbpass, $dbuser, $charset;
+// Conexion con la base de datos
+$cx = new mysqli($server, $dbuser, $dbpass, $database);
 // ide emp
 $sqlxx = "select * from fecha";
-$resultadoxx = mysql_db_query($database, $sqlxx, $connectionxx);
+$resultadoxx = $cx->query($sqlxx);
+while($rowxx = $resultadoxx->fetch_array())
 
-while($rowxx = mysql_fetch_array($resultadoxx)) 
 {
   $id_emp=$rowxx["id_emp"];
 }
 // corte
-$connectionxx = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
 $sqlxx = "select corte from aux_corte_cgn";
-$resultadoxx = mysql_db_query($database, $sqlxx, $connectionxx);
+$resultadoxx = $cx->query($sqlxx);
 
-while($rowxx = mysql_fetch_array($resultadoxx)) 
+while($rowxx = $resultadoxx->fetch_array())
+
 {
   $corte=$rowxx["corte"];
 }
 // fecha ini op
 $sqlxx1 = "select * from vf";
-$resultadoxx1 = mysql_db_query($database, $sqlxx1, $connectionxx);
+$resultadoxx1 = $cx->query($sqlxx1);
 
-while($rowxx1 = mysql_fetch_array($resultadoxx1)) 
+while($rowxx1 = $resultadoxx1->fetch_array())
+
 {
   $fecha_ini_op=$rowxx1["fecha_ini"];
 }
 
 
 
-include('../config.php');		
-		
-$connectionxx = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
-
-$base=$database;
-$conexion=mysql_connect ($server, $dbuser, $dbpass);
 
 //**** borro tabla por si las moscas
 
@@ -116,16 +108,7 @@ $anadir6="truncate TABLE ";
 $anadir6.=$tabla6;
 $anadir6.=" ";
 
-mysql_select_db ($base, $conexion);
 
-if(mysql_query ($anadir6 ,$conexion)) 
-{
-echo "";
-}
-else
-{
-echo "";
-};	
 
 ///**** creo la tabla
 
@@ -146,16 +129,8 @@ $anadir7.="
 `no_corriente` decimal(20,2) NOT NULL default '0.00'
 
 )TYPE=MyISAM COLLATE=latin1_general_ci";
-mysql_select_db ($base, $conexion);
+$cx->query($anadir7);
 
-if(mysql_query ($anadir7 ,$conexion)) 
-{
-//echo "listo";
-}
-else
-{
-//echo "no se pudo";
-}
 //encabezado tabla
 printf("
 <center>
@@ -182,9 +157,9 @@ printf("
 
 
 $sqlxx2 = "select aux_contaduria_gral.cuenta,aux_contaduria_gral.debito, aux_contaduria_gral.credito, inicial from aux_contaduria_gral where (aux_contaduria_gral.fecha <= '$corte') group by aux_contaduria_gral.cuenta order by aux_contaduria_gral.cuenta asc";
-$resultadoxx2 = mysql_db_query($database, $sqlxx2, $connectionxx);
+$resultadoxx2 = $cx->query($sqlxx2);
 
-while($rowxx2 = mysql_fetch_array($resultadoxx2)) 
+while($rowxx2 =  $resultadoxx2->fetch_array())
 {
 		  
 			   printf("<span class='Estilo4'><tr>");
@@ -200,8 +175,8 @@ while($rowxx2 = mysql_fetch_array($resultadoxx2))
 //********************************* NIVEL		  
 
 $sql = "select * from pgcp where cod_pptal = '$cuenta_aux'";
-$result = mysql_query($sql, $connectionxx) or die(mysql_error());
-if (mysql_num_rows($result) == 0)
+$result = $cx->query($sql);
+if ($result->num_rows == 0)
 {
 //NIVEL
  printf("<td align='center' bgcolor ='#990000'><span class='Estilo4' style='color:#FFFF00'> error </span></td>");
@@ -209,9 +184,10 @@ if (mysql_num_rows($result) == 0)
 else
 {
 $sqlxx2a = "select * from pgcp where cod_pptal = '$cuenta_aux'";
-$resultadoxx2a = mysql_db_query($database, $sqlxx2a, $connectionxx);
+$resultadoxx2a = $cx->query($sqlxx2a);
 
-while($rowxx2a = mysql_fetch_array($resultadoxx2a)) 
+while($rowxx2a = $resultadoxx2a->fetch_array())
+
 {
   $nivel=$rowxx2a["nivel"];
 }
@@ -227,8 +203,8 @@ while($rowxx2a = mysql_fetch_array($resultadoxx2a))
 
 //******************************** NOMBRE			  
 $sql = "select * from pgcp where cod_pptal = '$cuenta_aux'";
-$result = mysql_query($sql, $connectionxx) or die(mysql_error());
-if (mysql_num_rows($result) == 0)
+$result = $cx->query($sql);
+if ($result->num_rows == 0)
 {
 //NOMBRE
  printf("<td align='center' bgcolor ='#990000'><span class='Estilo4' style='color:#FFFF00'> error </span></td>");
@@ -236,9 +212,9 @@ if (mysql_num_rows($result) == 0)
 else
 {
 $sqlxx2a = "select * from pgcp where cod_pptal = '$cuenta_aux'";
-$resultadoxx2a = mysql_db_query($database, $sqlxx2a, $connectionxx);
+$resultadoxx2a = $cx->query($sqlxx2a);
 
-while($rowxx2a = mysql_fetch_array($resultadoxx2a)) 
+while($rowxx2a =$resultadoxx2a->fetch_array())
 {
   $nom_rubro_pgcp=$rowxx2a["nom_rubro"];
 }
@@ -339,7 +315,7 @@ $sql_ok = "INSERT INTO aux_contaduria_gral_may
 (d,nivel,cuenta,nombre,inicial,debito,credito,saldo,corriente,no_corriente) 
 VALUES 
 ('$d','$nivel','$cuenta_aux','$nom_rubro_pgcp','$saldo_sico','$sd','$sc','$saldo','$cte_aux','$n_cte_aux')";
-mysql_query($sql_ok, $connectionxx) or die(mysql_error());
+$cx->query($sql_ok);
 				
 				
 				
@@ -347,71 +323,13 @@ mysql_query($sql_ok, $connectionxx) or die(mysql_error());
 		  		  
 		  
 } 
-?>
 
- <?php
 //-------
  printf("</table></center>");
 //--------	
 ?>
-
-</div>
-<!--table width="800" border="0" align="center">
-  
-  <tr>
-    <td colspan="3"><div style="padding-left:5px; padding-top:10px; padding-right:5px; padding-bottom:5px;">
-      <div align="center">
-        <div style='padding-left:3px; padding-top:3px; padding-right:3px; padding-bottom:3px; background:#004080; width:150px'>
-          <div style='padding-left:5px; padding-top:5px; padding-right:5px; padding-bottom:5px; background:#FFFFFF'>
-            <div align="center"><a href='a.php' target='_parent'>VOLVER </a> </div>
-          </div>
-        </div>
-      </div>
-    </div></td>
-  </tr>
-  <tr>
-    <td colspan="3"><div style="padding-left:5px; padding-top:5px; padding-right:5px; padding-bottom:5px;">
-      <div align="center"> <span class="Estilo4">Fecha de  esta Sesion:</span> <br />
-            <span class="Estilo4"> <strong>
-            <?/* include('../config.php');				
-$connectionxx = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
-$sqlxx = "select * from fecha";
-$resultadoxx = mysql_db_query($database, $sqlxx, $connectionxx);
-
-while($rowxx = mysql_fetch_array($resultadoxx)) 
-{
-  $ano=$rowxx["ano"];
-}
-echo $ano;
-*/
-?>
-            </strong> </span> <br />
-            <span class="Estilo4"><b>Usuario: </b><u><? //echo $_SESSION["login"];?></u> </span> </div>
-    </div></td>
-  </tr>
-  <tr>
-    <td width="266"><div class="Estilo7" id="div" style="padding-left:3px; padding-top:5px; padding-right:3px; padding-bottom:3px;">
-      <div align="center">
-        <?PHP //include('../config.php'); echo $nom_emp ?>
-        <br />
-        <?PHP //echo $dir_tel ?><br />
-        <?PHP //echo $muni ?> <br />
-        <?PHP //echo $email?> </div>
-    </div></td>
-    <td width="266"><div class="Estilo7" id="div" style="padding-left:3px; padding-top:5px; padding-right:3px; padding-bottom:3px;">
-      <div align="center"><a href="../../politicas.php" target="_blank">POLITICAS DE PRIVACIDAD <br />
-        </a><br />
-        <a href="../../condiciones.php" target="_blank">CONDICIONES DE USO </a></div>
-    </div></td>
-    <td width="266"><div class="Estilo7" id="div" style="padding-left:3px; padding-top:5px; padding-right:3px; padding-bottom:15px;">
-      <div align="center">Desarrollado por <br />
-            <a href="http://www.qualisoftsalud.com" target="_blank"><img src="../images/logoqsft2.png" width="150" height="69" border="0" /></a><br />
-        Derechos Reservados - 2009 </div>
-    </div></td>
-  </tr>
-<--/table>
 </body>
 </html>
-<?
+<?php
 }
 ?>

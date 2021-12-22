@@ -1,6 +1,6 @@
-<?
+<?php
 session_start();
-if(!session_is_registered("login"))
+if (!isset($_SESSION["login"]))
 {
 header("Location: ../login.php");
 exit;
@@ -85,12 +85,12 @@ table.bordepunteado1 { border-style: solid; border-collapse:collapse; border-wid
 <div align="center">
 <br />
 
-<?
+<?php
 
 include('../config.php');
-$base=$database;
-$conexion=mysql_connect ($server, $dbuser, $dbpass);
-
+global $server, $database, $dbpass, $dbuser, $charset;
+// Conexion con la base de datos
+$cx = new mysqli($server, $dbuser, $dbpass, $database);
 
 $corte=$_POST['corte'];
 
@@ -99,7 +99,6 @@ if($corte == '')
 }
 else
 {
-include('../config.php');	
 
 //************* borro la tabla		
 $tabla6="aux_corte_2193";
@@ -107,9 +106,9 @@ $anadir6="drop TABLE ";
 $anadir6.=$tabla6;
 $anadir6.=" ";
 
-mysql_select_db ($base, $conexion);
 
-		if(mysql_query ($anadir6 ,$conexion)) 
+		if($cx->query($anadir6))
+    
 		{
 		echo "";
 		}
@@ -126,9 +125,8 @@ $tabla7="aux_corte_2193";
          `corte` varchar(100) NOT NULL default ''
 		)TYPE=MyISAM AUTO_INCREMENT=1 ";
 		
-		mysql_select_db ($base, $conexion);
 
-		if(mysql_query ($anadir7 ,$conexion)) 
+		if($cx->query($anadir7))
 		{
 		echo "";
 		}
@@ -137,9 +135,8 @@ $tabla7="aux_corte_2193";
 		echo "";
 		}	
 
-$connection = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
 $sql_ok = "INSERT INTO aux_corte_2193 (corte) VALUES ('$corte') ";
-mysql_query($sql_ok, $connection) or die(mysql_error());		
+$cx->query($sql_ok);
 }
 
 
@@ -160,11 +157,10 @@ mysql_query($sql_ok, $connection) or die(mysql_error());
 <br />
   <?php
   
-$connection = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
 $sql = "select * from aux_corte_2193";
-$resultado = mysql_db_query($database, $sql, $connection);
+$resultado = $cx->query($sql);
 
-while($row = mysql_fetch_array($resultado)) 
+while($row = $resultado->fetch_assoc())
    {
    $fecha_fin=$row["corte"];
    }
@@ -183,13 +179,11 @@ $aux='T';
 printf("<center><br><span class='Estilo4'>Filtro Seleccionado : %s</span></center><br><br>",$aux);  
   
 //-------
-include('../config.php');	
-
-$connection = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
 $sql = "select * from fecha";
-$resultado = mysql_db_query($database, $sql, $connection);
+$resultado = $cx->query($sql);
 
-while($row = mysql_fetch_array($resultado)) 
+while($row = $resultado->fetch_array())
+   
    {
    
    $id=$row["id_emp"];
@@ -207,9 +201,10 @@ $anadir6="drop TABLE ";
 $anadir6.=$tabla6;
 $anadir6.=" ";
 
-mysql_select_db ($base, $connection);
 
-		if(mysql_query ($anadir6 ,$connection)) 
+		if($cx->query($anadir6))
+    
+    
 		{
 		echo "";
 		}
@@ -244,9 +239,9 @@ mysql_select_db ($base, $connection);
   `diciembre` varchar(200) NOT NULL default ''
   )TYPE=MyISAM ";
 		
-		mysql_select_db ($base, $connection);
 
-		if(mysql_query ($anadir7 ,$connection)) 
+		if($cx->query($anadir7))
+    
 		{
 		//echo "listo";
 		}
@@ -257,9 +252,9 @@ mysql_select_db ($base, $connection);
 
 
 $sqla = "select * from 2193_ing_ok ";
-$resultadoa = mysql_db_query($database, $sqla, $connection);
-
-while($rowa = mysql_fetch_array($resultadoa)) 
+$resultadoa = $cx->query($sqla);
+while($rowa = $resultadoa->fetch_array())
+   
    {
 
    $cod_homo=$rowa["cod_pptal"];
@@ -267,21 +262,20 @@ while($rowa = mysql_fetch_array($resultadoa))
    $cod_2193=$rowa["cod"];
 
 //***************
-		$connectionxx = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
 		$sqlxx = "select * from fecha_ini_op";
-		$resultadoxx = mysql_db_query($database, $sqlxx, $connectionxx);
+		$resultadoxx = $cx->query($sqlxx);
 		
-		while($rowxx = mysql_fetch_array($resultadoxx)) 
+		while($rowxx = $resultadoxx->fetch_array())
+    
 		{
 		  $fecha_ini=$rowxx["fecha_ini_op"];
 		}
 		
 //***************		
-		$connectionxx = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
 		$sqlxx = "select * from fecha";
-		$resultadoxx = mysql_db_query($database, $sqlxx, $connectionxx);
+		$resultadoxx = $cx->query($sqlxx);
 		
-		while($rowxx = mysql_fetch_array($resultadoxx)) 
+		while($rowxx = $resultadoxx->fetch_array())
 		{
 		$ano=$rowxx["ano"];
 		}
@@ -291,48 +285,47 @@ while($rowa = mysql_fetch_array($resultadoa))
 		
 		
 
-$link=mysql_connect($server,$dbuser,$dbpass);
 
 // presupuesto defiitivo
 
-$rs23=mysql_query("select sum(ppto_aprob) as total from car_ppto_ing WHERE cod_pptal LIKE '$cod_homo%' and tip_dato='D'",$link) or die (mysql_error());
-$rw23=mysql_fetch_row($rs23);
+$rs23=$cx->query("select sum(ppto_aprob) as total from car_ppto_ing WHERE cod_pptal LIKE '$cod_homo%' and tip_dato='D'");
+$rw23=$rs23->fetch_assoc();
 $inicial=$rw23[0];
 
-$rs23=mysql_query("select sum(valor_adi) as total from adi_ppto_ing  WHERE  (fecha_adi between '$fecha_ini' and '$fecha_fin' ) and cod_pptal LIKE '$cod_homo%'",$link) or die (mysql_error());
-$rw23=mysql_fetch_row($rs23);
+$rs23=$cx->query("select sum(valor_adi) as total from adi_ppto_ing  WHERE  (fecha_adi between '$fecha_ini' and '$fecha_fin' ) and cod_pptal LIKE '$cod_homo%'");
+$rw23=$rs23->fetch_assoc();
 $adi=$rw23[0];
 
-$rs23=mysql_query("select sum(valor_adi) as total from red_ppto_ing   WHERE  (fecha_adi between '$fecha_ini' and '$fecha_fin' ) and cod_pptal LIKE '$cod_homo%'",$link) or die (mysql_error());
-$rw23=mysql_fetch_row($rs23);
+$rs23=$cx->query("select sum(valor_adi) as total from red_ppto_ing   WHERE  (fecha_adi between '$fecha_ini' and '$fecha_fin' ) and cod_pptal LIKE '$cod_homo%'");
+$rw23=$rs23->fetch_assoc();
 $red=$rw23[0];
 
-$rs23=mysql_query("select sum(valor_adi) as total from creditos_ing    WHERE  (fecha_adi between '$fecha_ini' and '$fecha_fin' ) and cod_pptal LIKE '$cod_homo%'",$link) or die (mysql_error());
-$rw23=mysql_fetch_row($rs23);
+$rs23=$cx->query("select sum(valor_adi) as total from creditos_ing    WHERE  (fecha_adi between '$fecha_ini' and '$fecha_fin' ) and cod_pptal LIKE '$cod_homo%'");
+$rw23=$rs23->fetch_assoc();
 $cre_ing=$rw23[0];
 
-$rs23=mysql_query("select sum(valor_adi) as total from contracreditos_ing     WHERE  (fecha_adi between '$fecha_ini' and '$fecha_fin' ) and cod_pptal LIKE '$cod_homo%'",$link) or die (mysql_error());
-$rw23=mysql_fetch_row($rs23);
+$rs23=$cx->query("select sum(valor_adi) as total from contracreditos_ing     WHERE  (fecha_adi between '$fecha_ini' and '$fecha_fin' ) and cod_pptal LIKE '$cod_homo%'");
+$rw23=$rs23->fetch_assoc();
 $crec_ing=$rw23[0];
 
 $def = $inicial + $adi - $red + $cre_ing - $crec_ing;
 // Reconociientos
 
 
-$resulta3=mysql_query("select SUM(valor) AS TOTAL from reip_ing WHERE (fecha_reg between '$fecha_ini' and '$fecha_fin' ) and cuenta LIKE '$cod_homo%'",$link) or die (mysql_error());
-$row3=mysql_fetch_row($resulta3);
+$resulta3=$cx->query("select SUM(valor) AS TOTAL from reip_ing WHERE (fecha_reg between '$fecha_ini' and '$fecha_fin' ) and cuenta LIKE '$cod_homo%'");
+$row3=$resulta3->fetch_assoc();
 $total_reip=$row3[0];
 
-$resulta4=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_ncbt WHERE (fecha_recaudo between '$fecha_ini' and '$fecha_fin' ) and cuenta LIKE '$cod_homo%'",$link) or die (mysql_error());
-$row4=mysql_fetch_row($resulta4);
+$resulta4=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_ncbt WHERE (fecha_recaudo between '$fecha_ini' and '$fecha_fin' ) and cuenta LIKE '$cod_homo%'");
+$row4=$resulta4->fetch_assoc();
 $total_ncbt=$row4[0];
 
-$resulta5=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_rcgt WHERE (fecha_recaudo between '$fecha_ini' and '$fecha_fin' ) and cuenta LIKE '$cod_homo%'",$link) or die (mysql_error());
-$row5=mysql_fetch_row($resulta5);
+$resulta5=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_rcgt WHERE (fecha_recaudo between '$fecha_ini' and '$fecha_fin' ) and cuenta LIKE '$cod_homo%'");
+$row5=$resulta5->fetch_assoc();
 $total_rcgt=$row5[0];
 
-$resulta6=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_tnat WHERE (fecha_recaudo between '$fecha_ini' and '$fecha_fin' ) and cuenta LIKE '$cod_homo%'",$link) or die (mysql_error());
-$row6=mysql_fetch_row($resulta6);
+$resulta6=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_tnat WHERE (fecha_recaudo between '$fecha_ini' and '$fecha_fin' ) and cuenta LIKE '$cod_homo%'");
+$row6=$resulta6->fetch_assoc();
 $total_tnat=$row6[0];
 
 $reconocimientos = $total_reip + $total_ncbt + $total_rcgt + $total_tnat;
@@ -346,24 +339,24 @@ $reconocimientos = $total_reip + $total_ncbt + $total_rcgt + $total_tnat;
 $fecha_ini_ene= $anio.'/01/01';
 $fecha_fin_ene= $anio.'/01/31';
 
-$resulta4=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_ncbt WHERE (fecha_recaudo between '$fecha_ini_ene' and '$fecha_fin_ene' ) and cuenta LIKE '$cod_homo%'",$link) or die (mysql_error());
-$row4=mysql_fetch_row($resulta4);
+$resulta4=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_ncbt WHERE (fecha_recaudo between '$fecha_ini_ene' and '$fecha_fin_ene' ) and cuenta LIKE '$cod_homo%'");
+$row4=$resulta4->fetch_assoc();
 $total_ncbt=$row4[0];
 
-$resulta5=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_rcgt WHERE (fecha_recaudo between '$fecha_ini_ene' and '$fecha_fin_ene' ) and cuenta LIKE '$cod_homo%'",$link) or die (mysql_error());
-$row5=mysql_fetch_row($resulta5);
+$resulta5=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_rcgt WHERE (fecha_recaudo between '$fecha_ini_ene' and '$fecha_fin_ene' ) and cuenta LIKE '$cod_homo%'");
+$row5=$resulta5->fetch_assoc();
 $total_rcgt=$row5[0];
 
-$resulta6=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_tnat WHERE (fecha_recaudo between '$fecha_ini_ene' and '$fecha_fin_ene' ) and cuenta LIKE '$cod_homo%'",$link) or die (mysql_error());
-$row6=mysql_fetch_row($resulta6);
+$resulta6=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_tnat WHERE (fecha_recaudo between '$fecha_ini_ene' and '$fecha_fin_ene' ) and cuenta LIKE '$cod_homo%'");
+$row6=$resulta6->fetch_assoc();
 $total_tnat=$row6[0];
 
-$resulta7=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_roit WHERE (fecha_recaudo between '$fecha_ini_ene' and '$fecha_fin_ene' ) and cuenta LIKE '$cod_homo%' and vr_digitado <> '0'",$link) or die (mysql_error());
-$row7=mysql_fetch_row($resulta7);
+$resulta7=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_roit WHERE (fecha_recaudo between '$fecha_ini_ene' and '$fecha_fin_ene' ) and cuenta LIKE '$cod_homo%' and vr_digitado <> '0'");
+$row7=$resulta7->fetch_assoc();
 $total_roit=$row7[0];
 
-$resulta8=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_riip WHERE (fecha_recaudo between '$fecha_ini_ene' and '$fecha_fin_ene' ) and cuenta LIKE '$cod_homo%' and vr_digitado <> '0'",$link) or die (mysql_error());
-$row8=mysql_fetch_row($resulta8);
+$resulta8=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_riip WHERE (fecha_recaudo between '$fecha_ini_ene' and '$fecha_fin_ene' ) and cuenta LIKE '$cod_homo%' and vr_digitado <> '0'");
+$row8=$resulta8->fetch_assoc();
 $total_riip=$row8[0];
 
 $recaudos_ene = $total_roit + $total_ncbt + $total_rcgt + $total_tnat+$total_riip;
@@ -374,24 +367,24 @@ $recaudos_ene = $total_roit + $total_ncbt + $total_rcgt + $total_tnat+$total_rii
 $fecha_ini_feb=$anio.'/02/01';
 $fecha_fin_feb=$anio.'/02/29';
 
-$resulta4=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_ncbt WHERE (fecha_recaudo between '$fecha_ini_feb' and '$fecha_fin_feb' ) and cuenta LIKE '$cod_homo%'",$link) or die (mysql_error());
-$row4=mysql_fetch_row($resulta4);
+$resulta4=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_ncbt WHERE (fecha_recaudo between '$fecha_ini_feb' and '$fecha_fin_feb' ) and cuenta LIKE '$cod_homo%'");
+$row4=$resulta4->fetch_assoc();
 $total_ncbt=$row4[0];
 
-$resulta5=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_rcgt WHERE (fecha_recaudo between '$fecha_ini_feb' and '$fecha_fin_feb' ) and cuenta LIKE '$cod_homo%'",$link) or die (mysql_error());
-$row5=mysql_fetch_row($resulta5);
+$resulta5=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_rcgt WHERE (fecha_recaudo between '$fecha_ini_feb' and '$fecha_fin_feb' ) and cuenta LIKE '$cod_homo%'");
+$row5=$resulta5->fetch_assoc();
 $total_rcgt=$row5[0];
 
-$resulta6=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_tnat WHERE (fecha_recaudo between '$fecha_ini_feb' and '$fecha_fin_feb' ) and cuenta LIKE '$cod_homo%'",$link) or die (mysql_error());
-$row6=mysql_fetch_row($resulta6);
+$resulta6=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_tnat WHERE (fecha_recaudo between '$fecha_ini_feb' and '$fecha_fin_feb' ) and cuenta LIKE '$cod_homo%'");
+$row6=$resulta6->fetch_assoc();
 $total_tnat=$row6[0];
 
-$resulta7=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_roit WHERE (fecha_recaudo between '$fecha_ini_feb' and '$fecha_fin_feb' ) and cuenta LIKE '$cod_homo%' and vr_digitado <> '0'",$link) or die (mysql_error());
-$row7=mysql_fetch_row($resulta7);
+$resulta7=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_roit WHERE (fecha_recaudo between '$fecha_ini_feb' and '$fecha_fin_feb' ) and cuenta LIKE '$cod_homo%' and vr_digitado <> '0'");
+$row7=$resulta7->fetch_assoc();
 $total_roit=$row7[0];
 
-$resulta8=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_riip WHERE (fecha_recaudo between '$fecha_ini_feb' and '$fecha_fin_feb' ) and cuenta LIKE '$cod_homo%' and vr_digitado <> '0'",$link) or die (mysql_error());
-$row8=mysql_fetch_row($resulta8);
+$resulta8=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_riip WHERE (fecha_recaudo between '$fecha_ini_feb' and '$fecha_fin_feb' ) and cuenta LIKE '$cod_homo%' and vr_digitado <> '0'");
+$row8=$resulta8->fetch_assoc();
 $total_riip=$row8[0];
 
 $recaudos_feb = $total_roit + $total_ncbt + $total_rcgt + $total_tnat + $total_riip;
@@ -401,24 +394,24 @@ $recaudos_feb = $total_roit + $total_ncbt + $total_rcgt + $total_tnat + $total_r
 $fecha_ini_mar=$anio.'/03/01';
 $fecha_fin_mar=$anio.'/03/31';
 
-$resulta4=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_ncbt WHERE (fecha_recaudo between '$fecha_ini_mar' and '$fecha_fin_mar' ) and cuenta LIKE '$cod_homo%'",$link) or die (mysql_error());
-$row4=mysql_fetch_row($resulta4);
+$resulta4=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_ncbt WHERE (fecha_recaudo between '$fecha_ini_mar' and '$fecha_fin_mar' ) and cuenta LIKE '$cod_homo%'");
+$row4=
 $total_ncbt=$row4[0];
 
-$resulta5=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_rcgt WHERE (fecha_recaudo between '$fecha_ini_mar' and '$fecha_fin_mar' ) and cuenta LIKE '$cod_homo%'",$link) or die (mysql_error());
-$row5=mysql_fetch_row($resulta5);
+$resulta5=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_rcgt WHERE (fecha_recaudo between '$fecha_ini_mar' and '$fecha_fin_mar' ) and cuenta LIKE '$cod_homo%'");
+$row5=$resulta5->fetch_assoc();
 $total_rcgt=$row5[0];
 
-$resulta6=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_tnat WHERE (fecha_recaudo between '$fecha_ini_mar' and '$fecha_fin_mar' ) and cuenta LIKE '$cod_homo%'",$link) or die (mysql_error());
-$row6=mysql_fetch_row($resulta6);
+$resulta6=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_tnat WHERE (fecha_recaudo between '$fecha_ini_mar' and '$fecha_fin_mar' ) and cuenta LIKE '$cod_homo%'");
+$row6=$resulta6->fetch_assoc();
 $total_tnat=$row6[0];
 
-$resulta7=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_roit WHERE (fecha_recaudo between '$fecha_ini_mar' and '$fecha_fin_mar' ) and cuenta LIKE '$cod_homo%' and vr_digitado <> '0'",$link) or die (mysql_error());
-$row7=mysql_fetch_row($resulta7);
+$resulta7=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_roit WHERE (fecha_recaudo between '$fecha_ini_mar' and '$fecha_fin_mar' ) and cuenta LIKE '$cod_homo%' and vr_digitado <> '0'");
+$row7=$resulta7->fetch_assoc();
 $total_roit=$row7[0];
 
-$resulta8=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_riip WHERE (fecha_recaudo between '$fecha_ini_mar' and '$fecha_fin_mar' ) and cuenta LIKE '$cod_homo%' and vr_digitado <> '0'",$link) or die (mysql_error());
-$row8=mysql_fetch_row($resulta8);
+$resulta8=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_riip WHERE (fecha_recaudo between '$fecha_ini_mar' and '$fecha_fin_mar' ) and cuenta LIKE '$cod_homo%' and vr_digitado <> '0'");
+$row8=$resulta8->fetch_assoc();
 $total_riip=$row8[0];
 
 $recaudos_mar = $total_roit + $total_ncbt + $total_rcgt + $total_tnat + $total_riip;
@@ -428,24 +421,24 @@ $recaudos_mar = $total_roit + $total_ncbt + $total_rcgt + $total_tnat + $total_r
 $fecha_ini_abr=$anio.'/04/01';
 $fecha_fin_abr=$anio.'/04/30';
 
-$resulta4=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_ncbt WHERE (fecha_recaudo between '$fecha_ini_abr' and '$fecha_fin_abr' ) and cuenta LIKE '$cod_homo%'",$link) or die (mysql_error());
-$row4=mysql_fetch_row($resulta4);
+$resulta4=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_ncbt WHERE (fecha_recaudo between '$fecha_ini_abr' and '$fecha_fin_abr' ) and cuenta LIKE '$cod_homo%'");
+$row4=$resulta4->fetch_assoc();
 $total_ncbt=$row4[0];
 
-$resulta5=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_rcgt WHERE (fecha_recaudo between '$fecha_ini_abr' and '$fecha_fin_abr' ) and cuenta LIKE '$cod_homo%'",$link) or die (mysql_error());
-$row5=mysql_fetch_row($resulta5);
+$resulta5=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_rcgt WHERE (fecha_recaudo between '$fecha_ini_abr' and '$fecha_fin_abr' ) and cuenta LIKE '$cod_homo%'");
+$row5=$resulta5->fetch_assoc();
 $total_rcgt=$row5[0];
 
-$resulta6=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_tnat WHERE (fecha_recaudo between '$fecha_ini_abr' and '$fecha_fin_abr' ) and cuenta LIKE '$cod_homo%'",$link) or die (mysql_error());
-$row6=mysql_fetch_row($resulta6);
+$resulta6=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_tnat WHERE (fecha_recaudo between '$fecha_ini_abr' and '$fecha_fin_abr' ) and cuenta LIKE '$cod_homo%'");
+$row6=$resulta6->fetch_assoc();
 $total_tnat=$row6[0];
 
-$resulta7=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_roit WHERE (fecha_recaudo between '$fecha_ini_abr' and '$fecha_fin_abr' ) and cuenta LIKE '$cod_homo%' and vr_digitado <> '0'",$link) or die (mysql_error());
-$row7=mysql_fetch_row($resulta7);
+$resulta7=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_roit WHERE (fecha_recaudo between '$fecha_ini_abr' and '$fecha_fin_abr' ) and cuenta LIKE '$cod_homo%' and vr_digitado <> '0'");
+$row7=$resulta7->fetch_assoc();
 $total_roit=$row7[0];
 
-$resulta8=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_riip WHERE (fecha_recaudo between '$fecha_ini_abr' and '$fecha_fin_abr' ) and cuenta LIKE '$cod_homo%' and vr_digitado <> '0'",$link) or die (mysql_error());
-$row8=mysql_fetch_row($resulta8);
+$resulta8=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_riip WHERE (fecha_recaudo between '$fecha_ini_abr' and '$fecha_fin_abr' ) and cuenta LIKE '$cod_homo%' and vr_digitado <> '0'");
+$row8=$resulta8->fetch_assoc();
 $total_riip=$row8[0];
 
 $recaudos_abr = $total_roit + $total_ncbt + $total_rcgt + $total_tnat + $total_riip;
@@ -455,24 +448,24 @@ $recaudos_abr = $total_roit + $total_ncbt + $total_rcgt + $total_tnat + $total_r
 $fecha_ini_may=$anio.'/05/01';
 $fecha_fin_may=$anio.'/05/31';
 
-$resulta4=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_ncbt WHERE (fecha_recaudo between '$fecha_ini_may' and '$fecha_fin_may' ) and cuenta LIKE '$cod_homo%'",$link) or die (mysql_error());
-$row4=mysql_fetch_row($resulta4);
+$resulta4=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_ncbt WHERE (fecha_recaudo between '$fecha_ini_may' and '$fecha_fin_may' ) and cuenta LIKE '$cod_homo%'");
+$row4=$resulta4->fetch_assoc();
 $total_ncbt=$row4[0];
 
-$resulta5=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_rcgt WHERE (fecha_recaudo between '$fecha_ini_may' and '$fecha_fin_may' ) and cuenta LIKE '$cod_homo%'",$link) or die (mysql_error());
-$row5=mysql_fetch_row($resulta5);
+$resulta5=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_rcgt WHERE (fecha_recaudo between '$fecha_ini_may' and '$fecha_fin_may' ) and cuenta LIKE '$cod_homo%'");
+$row5=$resulta5->fetch_assoc();
 $total_rcgt=$row5[0];
 
-$resulta6=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_tnat WHERE (fecha_recaudo between '$fecha_ini_may' and '$fecha_fin_may' ) and cuenta LIKE '$cod_homo%'",$link) or die (mysql_error());
-$row6=mysql_fetch_row($resulta6);
+$resulta6=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_tnat WHERE (fecha_recaudo between '$fecha_ini_may' and '$fecha_fin_may' ) and cuenta LIKE '$cod_homo%'");
+$row6=$resulta6->fetch_assoc();
 $total_tnat=$row6[0];
 
-$resulta7=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_roit WHERE (fecha_recaudo between '$fecha_ini_may' and '$fecha_fin_may' ) and cuenta LIKE '$cod_homo%' and vr_digitado <> '0'",$link) or die (mysql_error());
-$row7=mysql_fetch_row($resulta7);
+$resulta7=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_roit WHERE (fecha_recaudo between '$fecha_ini_may' and '$fecha_fin_may' ) and cuenta LIKE '$cod_homo%' and vr_digitado <> '0'");
+$row7=$resulta7->fetch_assoc();
 $total_roit=$row7[0];
 
-$resulta8=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_riip WHERE (fecha_recaudo between '$fecha_ini_may' and '$fecha_fin_may' ) and cuenta LIKE '$cod_homo%' and vr_digitado <> '0'",$link) or die (mysql_error());
-$row8=mysql_fetch_row($resulta8);
+$resulta8=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_riip WHERE (fecha_recaudo between '$fecha_ini_may' and '$fecha_fin_may' ) and cuenta LIKE '$cod_homo%' and vr_digitado <> '0'");
+$row8=$resulta8->fetch_assoc();
 $total_riip=$row8[0];
 
 $recaudos_may = $total_roit + $total_ncbt + $total_rcgt + $total_tnat + $total_riip;
@@ -482,24 +475,24 @@ $recaudos_may = $total_roit + $total_ncbt + $total_rcgt + $total_tnat + $total_r
 $fecha_ini_jun=$anio.'/06/01';
 $fecha_fin_jun=$anio.'/06/30';
 
-$resulta4=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_ncbt WHERE (fecha_recaudo between '$fecha_ini_jun' and '$fecha_fin_jun' ) and cuenta LIKE '$cod_homo%'",$link) or die (mysql_error());
-$row4=mysql_fetch_row($resulta4);
+$resulta4=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_ncbt WHERE (fecha_recaudo between '$fecha_ini_jun' and '$fecha_fin_jun' ) and cuenta LIKE '$cod_homo%'");
+$row4=$resulta4->fetch_assoc();
 $total_ncbt=$row4[0];
 
-$resulta5=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_rcgt WHERE (fecha_recaudo between '$fecha_ini_jun' and '$fecha_fin_jun' ) and cuenta LIKE '$cod_homo%'",$link) or die (mysql_error());
-$row5=mysql_fetch_row($resulta5);
+$resulta5=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_rcgt WHERE (fecha_recaudo between '$fecha_ini_jun' and '$fecha_fin_jun' ) and cuenta LIKE '$cod_homo%'");
+$row5=$resulta5->fetch_assoc();
 $total_rcgt=$row5[0];
 
-$resulta6=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_tnat WHERE (fecha_recaudo between '$fecha_ini_jun' and '$fecha_fin_jun' ) and cuenta LIKE '$cod_homo%'",$link) or die (mysql_error());
-$row6=mysql_fetch_row($resulta6);
+$resulta6=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_tnat WHERE (fecha_recaudo between '$fecha_ini_jun' and '$fecha_fin_jun' ) and cuenta LIKE '$cod_homo%'");
+$row6=$resulta6->fetch_assoc();
 $total_tnat=$row6[0];
 
-$resulta7=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_roit WHERE (fecha_recaudo between '$fecha_ini_jun' and '$fecha_fin_jun' ) and cuenta LIKE '$cod_homo%' and vr_digitado <> '0'",$link) or die (mysql_error());
-$row7=mysql_fetch_row($resulta7);
+$resulta7=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_roit WHERE (fecha_recaudo between '$fecha_ini_jun' and '$fecha_fin_jun' ) and cuenta LIKE '$cod_homo%' and vr_digitado <> '0'");
+$row7=$resulta7->fetch_assoc();
 $total_roit=$row7[0];
 
-$resulta8=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_riip WHERE (fecha_recaudo between '$fecha_ini_jun' and '$fecha_fin_jun' ) and cuenta LIKE '$cod_homo%' and vr_digitado <> '0'",$link) or die (mysql_error());
-$row8=mysql_fetch_row($resulta8);
+$resulta8=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_riip WHERE (fecha_recaudo between '$fecha_ini_jun' and '$fecha_fin_jun' ) and cuenta LIKE '$cod_homo%' and vr_digitado <> '0'");
+$row8=$resulta8->fetch_assoc();
 $total_riip=$row8[0];
 
 $recaudos_jun = $total_roit + $total_ncbt + $total_rcgt + $total_tnat + $total_riip;
@@ -509,24 +502,24 @@ $recaudos_jun = $total_roit + $total_ncbt + $total_rcgt + $total_tnat + $total_r
 $fecha_ini_jul=$anio.'/07/01';
 $fecha_fin_jul=$anio.'/07/31';
 
-$resulta4=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_ncbt WHERE (fecha_recaudo between '$fecha_ini_jul' and '$fecha_fin_jul' ) and cuenta LIKE '$cod_homo%'",$link) or die (mysql_error());
-$row4=mysql_fetch_row($resulta4);
+$resulta4=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_ncbt WHERE (fecha_recaudo between '$fecha_ini_jul' and '$fecha_fin_jul' ) and cuenta LIKE '$cod_homo%'");
+$row4=$resulta4->fetch_assoc();
 $total_ncbt=$row4[0];
 
-$resulta5=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_rcgt WHERE (fecha_recaudo between '$fecha_ini_jul' and '$fecha_fin_jul' ) and cuenta LIKE '$cod_homo%'",$link) or die (mysql_error());
-$row5=mysql_fetch_row($resulta5);
+$resulta5=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_rcgt WHERE (fecha_recaudo between '$fecha_ini_jul' and '$fecha_fin_jul' ) and cuenta LIKE '$cod_homo%'");
+$row5=$resulta5->fetch_assoc();
 $total_rcgt=$row5[0];
 
-$resulta6=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_tnat WHERE (fecha_recaudo between '$fecha_ini_jul' and '$fecha_fin_jul' ) and cuenta LIKE '$cod_homo%'",$link) or die (mysql_error());
-$row6=mysql_fetch_row($resulta6);
+$resulta6=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_tnat WHERE (fecha_recaudo between '$fecha_ini_jul' and '$fecha_fin_jul' ) and cuenta LIKE '$cod_homo%'");
+$row6=$resulta6->fetch_assoc();
 $total_tnat=$row6[0];
 
-$resulta7=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_roit WHERE (fecha_recaudo between '$fecha_ini_jul' and '$fecha_fin_jul' ) and cuenta LIKE '$cod_homo%' and vr_digitado <> '0'",$link) or die (mysql_error());
-$row7=mysql_fetch_row($resulta7);
+$resulta7=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_roit WHERE (fecha_recaudo between '$fecha_ini_jul' and '$fecha_fin_jul' ) and cuenta LIKE '$cod_homo%' and vr_digitado <> '0'");
+$row7=$resulta7->fetch_assoc();
 $total_roit=$row7[0];
 
-$resulta8=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_riip WHERE (fecha_recaudo between '$fecha_ini_jul' and '$fecha_fin_jul' ) and cuenta LIKE '$cod_homo%' and vr_digitado <> '0'",$link) or die (mysql_error());
-$row8=mysql_fetch_row($resulta8);
+$resulta8=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_riip WHERE (fecha_recaudo between '$fecha_ini_jul' and '$fecha_fin_jul' ) and cuenta LIKE '$cod_homo%' and vr_digitado <> '0'");
+$row8=$resulta8->fetch_assoc();
 $total_riip=$row8[0];
 
 $recaudos_jul = $total_roit + $total_ncbt + $total_rcgt + $total_tnat + $total_riip;
@@ -536,24 +529,24 @@ $recaudos_jul = $total_roit + $total_ncbt + $total_rcgt + $total_tnat + $total_r
 $fecha_ini_ago=$anio.'/08/01';
 $fecha_fin_ago=$anio.'/08/31';
 
-$resulta4=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_ncbt WHERE (fecha_recaudo between '$fecha_ini_ago' and '$fecha_fin_ago' ) and cuenta LIKE '$cod_homo%'",$link) or die (mysql_error());
-$row4=mysql_fetch_row($resulta4);
+$resulta4=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_ncbt WHERE (fecha_recaudo between '$fecha_ini_ago' and '$fecha_fin_ago' ) and cuenta LIKE '$cod_homo%'");
+$row4=$resulta4->fetch_assoc();
 $total_ncbt=$row4[0];
 
-$resulta5=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_rcgt WHERE (fecha_recaudo between '$fecha_ini_ago' and '$fecha_fin_ago' ) and cuenta LIKE '$cod_homo%'",$link) or die (mysql_error());
-$row5=mysql_fetch_row($resulta5);
+$resulta5=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_rcgt WHERE (fecha_recaudo between '$fecha_ini_ago' and '$fecha_fin_ago' ) and cuenta LIKE '$cod_homo%'");
+$row5=$resulta5->fetch_assoc();
 $total_rcgt=$row5[0];
 
-$resulta6=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_tnat WHERE (fecha_recaudo between '$fecha_ini_ago' and '$fecha_fin_ago' ) and cuenta LIKE '$cod_homo%'",$link) or die (mysql_error());
-$row6=mysql_fetch_row($resulta6);
+$resulta6=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_tnat WHERE (fecha_recaudo between '$fecha_ini_ago' and '$fecha_fin_ago' ) and cuenta LIKE '$cod_homo%'");
+$row6=$resulta6->fetch_assoc();
 $total_tnat=$row6[0];
 
-$resulta7=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_roit WHERE (fecha_recaudo between '$fecha_ini_ago' and '$fecha_fin_ago' ) and cuenta LIKE '$cod_homo%' and vr_digitado <> '0'",$link) or die (mysql_error());
-$row7=mysql_fetch_row($resulta7);
+$resulta7=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_roit WHERE (fecha_recaudo between '$fecha_ini_ago' and '$fecha_fin_ago' ) and cuenta LIKE '$cod_homo%' and vr_digitado <> '0'");
+$row7=$resulta7->fetch_assoc();
 $total_roit=$row7[0];
 
-$resulta8=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_riip WHERE (fecha_recaudo between '$fecha_ini_agt' and '$fecha_fin_agt' ) and cuenta LIKE '$cod_homo%' and vr_digitado <> '0'",$link) or die (mysql_error());
-$row8=mysql_fetch_row($resulta8);
+$resulta8=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_riip WHERE (fecha_recaudo between '$fecha_ini_agt' and '$fecha_fin_agt' ) and cuenta LIKE '$cod_homo%' and vr_digitado <> '0'");
+$row8=$resulta8->fetch_assoc();
 $total_riip=$row8[0];
 
 $recaudos_ago = $total_roit + $total_ncbt + $total_rcgt + $total_tnat + $total_riip;
@@ -563,24 +556,24 @@ $recaudos_ago = $total_roit + $total_ncbt + $total_rcgt + $total_tnat + $total_r
 $fecha_ini_sep=$anio.'/09/01';
 $fecha_fin_sep=$anio.'/09/30';
 
-$resulta4=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_ncbt WHERE (fecha_recaudo between '$fecha_ini_sep' and '$fecha_fin_sep' ) and cuenta LIKE '$cod_homo%'",$link) or die (mysql_error());
-$row4=mysql_fetch_row($resulta4);
+$resulta4=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_ncbt WHERE (fecha_recaudo between '$fecha_ini_sep' and '$fecha_fin_sep' ) and cuenta LIKE '$cod_homo%'");
+$row4=$resulta4->fetch_assoc();
 $total_ncbt=$row4[0];
 
-$resulta5=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_rcgt WHERE (fecha_recaudo between '$fecha_ini_sep' and '$fecha_fin_sep' ) and cuenta LIKE '$cod_homo%'",$link) or die (mysql_error());
-$row5=mysql_fetch_row($resulta5);
+$resulta5=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_rcgt WHERE (fecha_recaudo between '$fecha_ini_sep' and '$fecha_fin_sep' ) and cuenta LIKE '$cod_homo%'");
+$row5=$resulta5->fetch_assoc();
 $total_rcgt=$row5[0];
 
-$resulta6=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_tnat WHERE (fecha_recaudo between '$fecha_ini_sep' and '$fecha_fin_sep' ) and cuenta LIKE '$cod_homo%'",$link) or die (mysql_error());
-$row6=mysql_fetch_row($resulta6);
+$resulta6=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_tnat WHERE (fecha_recaudo between '$fecha_ini_sep' and '$fecha_fin_sep' ) and cuenta LIKE '$cod_homo%'");
+$row6=$resulta6->fetch_assoc();
 $total_tnat=$row6[0];
 
-$resulta7=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_roit WHERE (fecha_recaudo between '$fecha_ini_sep' and '$fecha_fin_sep' ) and cuenta LIKE '$cod_homo%' and vr_digitado <> '0'",$link) or die (mysql_error());
-$row7=mysql_fetch_row($resulta7);
+$resulta7=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_roit WHERE (fecha_recaudo between '$fecha_ini_sep' and '$fecha_fin_sep' ) and cuenta LIKE '$cod_homo%' and vr_digitado <> '0'");
+$row7=$resulta7->fetch_assoc();
 $total_roit=$row7[0];
 
-$resulta8=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_riip WHERE (fecha_recaudo between '$fecha_ini_sep' and '$fecha_fin_sep' ) and cuenta LIKE '$cod_homo%' and vr_digitado <> '0'",$link) or die (mysql_error());
-$row8=mysql_fetch_row($resulta8);
+$resulta8=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_riip WHERE (fecha_recaudo between '$fecha_ini_sep' and '$fecha_fin_sep' ) and cuenta LIKE '$cod_homo%' and vr_digitado <> '0'");
+$row8=$resulta8->fetch_assoc();
 $total_riip=$row8[0];
 
 $recaudos_sep = $total_roit + $total_ncbt + $total_rcgt + $total_tnat + $total_riip;
@@ -590,24 +583,24 @@ $recaudos_sep = $total_roit + $total_ncbt + $total_rcgt + $total_tnat + $total_r
 $fecha_ini_oct=$anio.'/10/01';
 $fecha_fin_oct=$anio.'/10/31';
 
-$resulta4=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_ncbt WHERE (fecha_recaudo between '$fecha_ini_oct' and '$fecha_fin_oct' ) and cuenta LIKE '$cod_homo%'",$link) or die (mysql_error());
-$row4=mysql_fetch_row($resulta4);
+$resulta4=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_ncbt WHERE (fecha_recaudo between '$fecha_ini_oct' and '$fecha_fin_oct' ) and cuenta LIKE '$cod_homo%'");
+$row4=$resulta4->fetch_assoc();
 $total_ncbt=$row4[0];
 
-$resulta5=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_rcgt WHERE (fecha_recaudo between '$fecha_ini_oct' and '$fecha_fin_oct' ) and cuenta LIKE '$cod_homo%'",$link) or die (mysql_error());
-$row5=mysql_fetch_row($resulta5);
+$resulta5=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_rcgt WHERE (fecha_recaudo between '$fecha_ini_oct' and '$fecha_fin_oct' ) and cuenta LIKE '$cod_homo%'");
+$row5=$resulta5->fetch_assoc();
 $total_rcgt=$row5[0];
 
-$resulta6=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_tnat WHERE (fecha_recaudo between '$fecha_ini_oct' and '$fecha_fin_oct' ) and cuenta LIKE '$cod_homo%'",$link) or die (mysql_error());
-$row6=mysql_fetch_row($resulta6);
+$resulta6=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_tnat WHERE (fecha_recaudo between '$fecha_ini_oct' and '$fecha_fin_oct' ) and cuenta LIKE '$cod_homo%'");
+$row6=$resulta6->fetch_assoc();
 $total_tnat=$row6[0];
 
-$resulta7=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_roit WHERE (fecha_recaudo between '$fecha_ini_oct' and '$fecha_fin_oct' ) and cuenta LIKE '$cod_homo%' and vr_digitado <> '0'",$link) or die (mysql_error());
-$row7=mysql_fetch_row($resulta7);
+$resulta7=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_roit WHERE (fecha_recaudo between '$fecha_ini_oct' and '$fecha_fin_oct' ) and cuenta LIKE '$cod_homo%' and vr_digitado <> '0'");
+$row7=$resulta7->fetch_assoc();
 $total_roit=$row7[0];
 
-$resulta8=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_riip WHERE (fecha_recaudo between '$fecha_ini_oct' and '$fecha_fin_oct' ) and cuenta LIKE '$cod_homo%' and vr_digitado <> '0'",$link) or die (mysql_error());
-$row8=mysql_fetch_row($resulta8);
+$resulta8=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_riip WHERE (fecha_recaudo between '$fecha_ini_oct' and '$fecha_fin_oct' ) and cuenta LIKE '$cod_homo%' and vr_digitado <> '0'");
+$row8=$resulta8->fetch_assoc();
 $total_riip=$row8[0];
 
 $recaudos_oct = $total_roit + $total_ncbt + $total_rcgt + $total_tnat + $total_riip;
@@ -617,24 +610,24 @@ $recaudos_oct = $total_roit + $total_ncbt + $total_rcgt + $total_tnat + $total_r
 $fecha_ini_nov=$anio.'/11/01';
 $fecha_fin_nov=$anio.'/11/30';
 
-$resulta4=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_ncbt WHERE (fecha_recaudo between '$fecha_ini_nov' and '$fecha_fin_nov' ) and cuenta LIKE '$cod_homo%'",$link) or die (mysql_error());
-$row4=mysql_fetch_row($resulta4);
+$resulta4=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_ncbt WHERE (fecha_recaudo between '$fecha_ini_nov' and '$fecha_fin_nov' ) and cuenta LIKE '$cod_homo%'");
+$row4=$resulta4->fetch_assoc();
 $total_ncbt=$row4[0];
 
-$resulta5=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_rcgt WHERE (fecha_recaudo between '$fecha_ini_nov' and '$fecha_fin_nov' ) and cuenta LIKE '$cod_homo%'",$link) or die (mysql_error());
-$row5=mysql_fetch_row($resulta5);
+$resulta5=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_rcgt WHERE (fecha_recaudo between '$fecha_ini_nov' and '$fecha_fin_nov' ) and cuenta LIKE '$cod_homo%'");
+$row5=$resulta5->fetch_assoc();
 $total_rcgt=$row5[0];
 
-$resulta6=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_tnat WHERE (fecha_recaudo between '$fecha_ini_nov' and '$fecha_fin_nov' ) and cuenta LIKE '$cod_homo%'",$link) or die (mysql_error());
-$row6=mysql_fetch_row($resulta6);
+$resulta6=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_tnat WHERE (fecha_recaudo between '$fecha_ini_nov' and '$fecha_fin_nov' ) and cuenta LIKE '$cod_homo%'");
+$row6=$resulta6->fetch_assoc();
 $total_tnat=$row6[0];
 
-$resulta7=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_roit WHERE (fecha_recaudo between '$fecha_ini_nov' and '$fecha_fin_nov' ) and cuenta LIKE '$cod_homo%' and vr_digitado <> '0'",$link) or die (mysql_error());
-$row7=mysql_fetch_row($resulta7);
+$resulta7=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_roit WHERE (fecha_recaudo between '$fecha_ini_nov' and '$fecha_fin_nov' ) and cuenta LIKE '$cod_homo%' and vr_digitado <> '0'");
+$row7=$resulta7->fetch_assoc();
 $total_roit=$row7[0];
 
-$resulta8=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_riip WHERE (fecha_recaudo between '$fecha_ini_nov' and '$fecha_fin_nov' ) and cuenta LIKE '$cod_homo%' and vr_digitado <> '0'",$link) or die (mysql_error());
-$row8=mysql_fetch_row($resulta8);
+$resulta8=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_riip WHERE (fecha_recaudo between '$fecha_ini_nov' and '$fecha_fin_nov' ) and cuenta LIKE '$cod_homo%' and vr_digitado <> '0'");
+$row8=$resulta8->fetch_assoc();
 $total_riip=$row8[0];
 
 $recaudos_nov = $total_roit + $total_ncbt + $total_rcgt + $total_tnat + $total_riip;
@@ -644,24 +637,24 @@ $recaudos_nov = $total_roit + $total_ncbt + $total_rcgt + $total_tnat + $total_r
 $fecha_ini_dic=$anio.'/12/01';
 $fecha_fin_dic=$anio.'/12/31';
 
-$resulta4=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_ncbt WHERE (fecha_recaudo between '$fecha_ini_dic' and '$fecha_fin_dic' ) and cuenta LIKE '$cod_homo%'",$link) or die (mysql_error());
-$row4=mysql_fetch_row($resulta4);
+$resulta4=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_ncbt WHERE (fecha_recaudo between '$fecha_ini_dic' and '$fecha_fin_dic' ) and cuenta LIKE '$cod_homo%'");
+$row4=$resulta4->fetch_assoc();
 $total_ncbt=$row4[0];
 
-$resulta5=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_rcgt WHERE (fecha_recaudo between '$fecha_ini_dic' and '$fecha_fin_dic' ) and cuenta LIKE '$cod_homo%'",$link) or die (mysql_error());
-$row5=mysql_fetch_row($resulta5);
+$resulta5=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_rcgt WHERE (fecha_recaudo between '$fecha_ini_dic' and '$fecha_fin_dic' ) and cuenta LIKE '$cod_homo%'");
+$row5=$resulta5->fetch_assoc();
 $total_rcgt=$row5[0];
 
-$resulta6=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_tnat WHERE (fecha_recaudo between '$fecha_ini_dic' and '$fecha_fin_dic' ) and cuenta LIKE '$cod_homo%'",$link) or die (mysql_error());
-$row6=mysql_fetch_row($resulta6);
+$resulta6=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_tnat WHERE (fecha_recaudo between '$fecha_ini_dic' and '$fecha_fin_dic' ) and cuenta LIKE '$cod_homo%'");
+$row6=$resulta6->fetch_assoc();
 $total_tnat=$row6[0];
 
-$resulta7=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_roit WHERE (fecha_recaudo between '$fecha_ini_dic' and '$fecha_fin_dic' ) and cuenta LIKE '$cod_homo%' and vr_digitado <> '0'",$link) or die (mysql_error());
-$row7=mysql_fetch_row($resulta7);
+$resulta7=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_roit WHERE (fecha_recaudo between '$fecha_ini_dic' and '$fecha_fin_dic' ) and cuenta LIKE '$cod_homo%' and vr_digitado <> '0'");
+$row7=$resulta7->fetch_assoc();
 $total_roit=$row7[0];
 
-$resulta8=mysql_query("select SUM(vr_digitado) AS TOTAL from recaudo_riip WHERE (fecha_recaudo between '$fecha_ini_dic' and '$fecha_fin_dic' ) and cuenta LIKE '$cod_homo%' and vr_digitado <> '0'",$link) or die (mysql_error());
-$row8=mysql_fetch_row($resulta8);
+$resulta8=$cx->query("select SUM(vr_digitado) AS TOTAL from recaudo_riip WHERE (fecha_recaudo between '$fecha_ini_dic' and '$fecha_fin_dic' ) and cuenta LIKE '$cod_homo%' and vr_digitado <> '0'");
+$row8=$resulta8->fetch_assoc();
 $total_riip=$row8[0];
 
 $recaudos_dic = $total_roit + $total_ncbt + $total_rcgt + $total_tnat + $total_riip;
@@ -672,7 +665,7 @@ $sql_ok = "INSERT INTO aux_2193_ing
 						(cod2193,concepto,cod_ppto_ing,def,reconocimientos,enero,febrero,marzo,abril,mayo,junio,julio,agosto,septiembre,octubre,noviembre,diciembre) 
 						VALUES 
 						('$cod_2193','$conceptoa','$cod_homo','$def','$reconocimientos','$recaudos_ene','$recaudos_feb','$recaudos_mar','$recaudos_abr','$recaudos_may','$recaudos_jun','$recaudos_jul','$recaudos_ago','$recaudos_sep','$recaudos_oct','$recaudos_nov','$recaudos_dic') ";
-						mysql_query($sql_ok, $connection) or die(mysql_error());
+						$cx->query($sql_ok);
 
    }
 
@@ -687,7 +680,7 @@ if($aux == 'A')
 {
 $cx = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
 $sq = "select * from 2193_ing order by cod asc ";
-$re = mysql_db_query($database, $sq, $cx);
+$re = $cx->query($sq);
 
 printf("
 <center>
@@ -724,7 +717,7 @@ printf("
 ");
 
 
-while($rw = mysql_fetch_array($re)) 
+while($rw = $re->fetch_assoc())
    {
    
 $cod=$rw["cod"];
@@ -732,62 +725,61 @@ $tipo=$rw["tipo"];
 $concepto=$rw["concepto"];
 $trim=$rw["trimestre"];
 
-$link=mysql_connect($server,$dbuser,$dbpass);
 
-$resulta3=mysql_query("select SUM(def) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'",$link) or die (mysql_error());
-$row3=mysql_fetch_row($resulta3);
+$resulta3=$cx->query("select SUM(def) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'");
+$row3=$resulta3->fetch_assoc();
 $deft=$row3[0];
 
-$resulta3=mysql_query("select SUM(reconocimientos) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'",$link) or die (mysql_error());
-$row3=mysql_fetch_row($resulta3);
+$resulta3=$cx->query("select SUM(reconocimientos) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'");
+$row3=$resulta3->fetch_assoc();
 $tota=$row3[0];
 
-$resulta3=mysql_query("select SUM(enero) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'",$link) or die (mysql_error());
-$row3=mysql_fetch_row($resulta3);
+$resulta3=$cx->query("select SUM(enero) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'");
+$row3=$resulta3->fetch_assoc();
 $totaene=$row3[0];
 
-$resulta3=mysql_query("select SUM(febrero) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'",$link) or die (mysql_error());
-$row3=mysql_fetch_row($resulta3);
+$resulta3=$cx->query("select SUM(febrero) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'");
+$row3=$resulta3->fetch_assoc();
 $totafeb=$row3[0];
 
-$resulta3=mysql_query("select SUM(marzo) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'",$link) or die (mysql_error());
-$row3=mysql_fetch_row($resulta3);
+$resulta3=$cx->query("select SUM(marzo) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'");
+$row3=$resulta3->fetch_assoc();
 $totamar=$row3[0];
 
-$resulta3=mysql_query("select SUM(abril) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'",$link) or die (mysql_error());
-$row3=mysql_fetch_row($resulta3);
+$resulta3=$cx->query("select SUM(abril) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'");
+$row3=  $resulta3->fetch_assoc();
 $totaabr=$row3[0];
 
-$resulta3=mysql_query("select SUM(mayo) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'",$link) or die (mysql_error());
-$row3=mysql_fetch_row($resulta3);
+$resulta3=$cx->query("select SUM(mayo) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'");
+$row3=$resulta3->fetch_assoc();
 $totamay=$row3[0];
 
-$resulta3=mysql_query("select SUM(junio) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'",$link) or die (mysql_error());
-$row3=mysql_fetch_row($resulta3);
+$resulta3=$cx->query("select SUM(junio) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'");
+$row3=  $resulta3->fetch_assoc();
 $totajun=$row3[0];
 
-$resulta3=mysql_query("select SUM(julio) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'",$link) or die (mysql_error());
-$row3=mysql_fetch_row($resulta3);
+$resulta3=$cx->query("select SUM(julio) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'");
+$row3=  $resulta3->fetch_assoc();
 $totajul=$row3[0];
 
-$resulta3=mysql_query("select SUM(agosto) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'",$link) or die (mysql_error());
-$row3=mysql_fetch_row($resulta3);
+$resulta3=$cx->query("select SUM(agosto) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'");
+$row3=  $resulta3->fetch_assoc();
 $totaago=$row3[0];
 
-$resulta3=mysql_query("select SUM(septiembre) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'",$link) or die (mysql_error());
-$row3=mysql_fetch_row($resulta3);
+$resulta3=$cx->query("select SUM(septiembre) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'");
+$row3=  $resulta3->fetch_assoc();
 $totasep=$row3[0];
 
-$resulta3=mysql_query("select SUM(octubre) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'",$link) or die (mysql_error());
-$row3=mysql_fetch_row($resulta3);
+$resulta3=$cx->query("select SUM(octubre) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'");
+$row3=  $resulta3->fetch_assoc();
 $totaoct=$row3[0];
 
-$resulta3=mysql_query("select SUM(noviembre) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'",$link) or die (mysql_error());
-$row3=mysql_fetch_row($resulta3);
+$resulta3=$cx->query("select SUM(noviembre) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'");
+$row3=  $resulta3->fetch_assoc();
 $totanov=$row3[0];
 
-$resulta3=mysql_query("select SUM(diciembre) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'",$link) or die (mysql_error());
-$row3=mysql_fetch_row($resulta3);
+$resulta3=$cx->query("select SUM(diciembre) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'");
+$row3=  $resulta3->fetch_assoc();
 $totadic=$row3[0];
 
 printf("
@@ -940,9 +932,8 @@ printf("</table></center>");
 }//******************************
 else
 {//******************************
-$cx = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
 $sq = "select * from 2193_ing where trimestre = 'T' order by cod asc ";
-$re = mysql_db_query($database, $sq, $cx);
+$re = $cx->query($sq);
 
 printf("
 <center>
@@ -978,7 +969,7 @@ printf("
 ");
 
 
-while($rw = mysql_fetch_array($re)) 
+while($rw =$re->fetch_assoc())
    {
    
 $cod=$rw["cod"];
@@ -986,58 +977,57 @@ $tipo=$rw["tipo"];
 $concepto=$rw["concepto"];
 $trim=$rw["trimestre"];
 
-$link=mysql_connect($server,$dbuser,$dbpass);
 
-$resulta3=mysql_query("select SUM(reconocimientos) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'",$link) or die (mysql_error());
-$row3=mysql_fetch_row($resulta3);
+$resulta3=$cx->query("select SUM(reconocimientos) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'");
+$row3=$resulta3->fetch_assoc();
 $tota=$row3[0];
 
-$resulta3=mysql_query("select SUM(enero) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'",$link) or die (mysql_error());
-$row3=mysql_fetch_row($resulta3);
+$resulta3=$cx->query("select SUM(enero) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'");
+$row3=$resulta3->fetch_assoc();
 $totaene=$row3[0];
 
-$resulta3=mysql_query("select SUM(febrero) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'",$link) or die (mysql_error());
-$row3=mysql_fetch_row($resulta3);
+$resulta3=$cx->query("select SUM(febrero) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'");
+$row3=$resulta3->fetch_assoc();
 $totafeb=$row3[0];
 
-$resulta3=mysql_query("select SUM(marzo) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'",$link) or die (mysql_error());
-$row3=mysql_fetch_row($resulta3);
+$resulta3=$cx->query("select SUM(marzo) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'");
+$row3=  $resulta3->fetch_assoc();
 $totamar=$row3[0];
 
-$resulta3=mysql_query("select SUM(abril) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'",$link) or die (mysql_error());
-$row3=mysql_fetch_row($resulta3);
+$resulta3=$cx->query("select SUM(abril) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'");
+$row3=$resulta3->fetch_assoc();
 $totaabr=$row3[0];
 
-$resulta3=mysql_query("select SUM(mayo) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'",$link) or die (mysql_error());
-$row3=mysql_fetch_row($resulta3);
+$resulta3=$cx->query("select SUM(mayo) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'");
+$row3=$resulta3->fetch_assoc();
 $totamay=$row3[0];
 
-$resulta3=mysql_query("select SUM(junio) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'",$link) or die (mysql_error());
-$row3=mysql_fetch_row($resulta3);
+$resulta3=$cx->query("select SUM(junio) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'");
+$row3=$resulta3->fetch_assoc();
 $totajun=$row3[0];
 
-$resulta3=mysql_query("select SUM(julio) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'",$link) or die (mysql_error());
-$row3=mysql_fetch_row($resulta3);
+$resulta3=$cx->query("select SUM(julio) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'");
+$row3=$resulta3->fetch_assoc();
 $totajul=$row3[0];
 
-$resulta3=mysql_query("select SUM(agosto) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'",$link) or die (mysql_error());
-$row3=mysql_fetch_row($resulta3);
+$resulta3=$cx->query("select SUM(agosto) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'");
+$row3=$resulta3->fetch_assoc();
 $totaago=$row3[0];
 
-$resulta3=mysql_query("select SUM(septiembre) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'",$link) or die (mysql_error());
-$row3=mysql_fetch_row($resulta3);
+$resulta3=$cx->query("select SUM(septiembre) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'");
+$row3=$resulta3->fetch_assoc();
 $totasep=$row3[0];
 
-$resulta3=mysql_query("select SUM(octubre) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'",$link) or die (mysql_error());
-$row3=mysql_fetch_row($resulta3);
+$resulta3=$cx->query("select SUM(octubre) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'");
+$row3=
 $totaoct=$row3[0];
 
-$resulta3=mysql_query("select SUM(noviembre) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'",$link) or die (mysql_error());
-$row3=mysql_fetch_row($resulta3);
+$resulta3=$cx->query("select SUM(noviembre) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'");
+$row3=$resulta3->fetch_assoc();
 $totanov=$row3[0];
 
-$resulta3=mysql_query("select SUM(diciembre) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'",$link) or die (mysql_error());
-$row3=mysql_fetch_row($resulta3);
+$resulta3=$cx->query("select SUM(diciembre) AS TOTAL from aux_2193_ing WHERE cod2193 like '$cod%'");
+$row3=$resulta3->fetch_assoc();
 $totadic=$row3[0];
 
 printf("
@@ -1200,29 +1190,28 @@ printf("</table></center>");
     <td colspan="3"><div style="padding-left:5px; padding-top:5px; padding-right:5px; padding-bottom:5px;">
       <div align="center"> <span class="Estilo4">Fecha de  esta Sesion:</span> <br />
             <span class="Estilo4"> <strong>
-            <? include('../config.php');				
-$connectionxx = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
+            <?php		
 $sqlxx = "select * from fecha";
-$resultadoxx = mysql_db_query($database, $sqlxx, $connectionxx);
+$resultadoxx = $cx->query($sqlxx);
+while($rowxx = $resultadoxx->fetch_assoc())
 
-while($rowxx = mysql_fetch_array($resultadoxx)) 
 {
   $ano=$rowxx["ano"];
 }
 echo $ano;
 ?>
             </strong> </span> <br />
-            <span class="Estilo4"><b>Usuario: </b><u><? echo $_SESSION["login"];?></u> </span> </div>
+            <span class="Estilo4"><b>Usuario: </b><u><?php echo $_SESSION["login"];?></u> </span> </div>
     </div></td>
   </tr>
   <tr>
     <td width="266"><div class="Estilo7" id="div" style="padding-left:3px; padding-top:5px; padding-right:3px; padding-bottom:3px;">
       <div align="center">
-        <?PHP include('../config.php'); echo $nom_emp ?>
+        <?php  echo $nom_emp ?>
         <br />
-        <?PHP echo $dir_tel ?><br />
-        <?PHP echo $muni ?> <br />
-        <?PHP echo $email?> </div>
+        <?php echo $dir_tel ?><br />
+        <?php echo $muni ?> <br />
+        <?php echo $email?> </div>
     </div></td>
     <td width="266"><div class="Estilo7" id="div" style="padding-left:3px; padding-top:5px; padding-right:3px; padding-bottom:3px;">
       <div align="center"><a href="../../politicas.php" target="_blank">POLITICAS DE PRIVACIDAD <br />
@@ -1245,6 +1234,6 @@ echo $ano;
 
 
 
-<?
+<?php
 }
 ?>

@@ -1,18 +1,20 @@
-<?
+<?php
 session_start();
-if(!session_is_registered("login"))
+include('../config.php');
+global $server, $database, $dbpass, $dbuser, $charset;
+// Conexion con la base de datos
+$cx = new mysqli($server, $dbuser, $dbpass, $database);
+
+if(isset($_SESSION['user']))
 {
 header("Location: ../login.php");
 exit;
 } else {
 			
 	// verifico permisos del usuario
-		include('../config.php');
-		$cx = mysql_connect("$server","$dbuser","$dbpass")or die ("Conexion no Exitosa");
-		mysql_select_db("$database"); 
        	$sql="SELECT info FROM usuarios2 where login = '$_SESSION[login]'";
-		$res=mysql_db_query($database,$sql,$cx);
-		$rw =mysql_fetch_array($res);
+		$res=$cx->query($sql);
+		$rw = $res->fetch_array();
 if ($rw['info']=='SI')
 {
 
@@ -34,14 +36,12 @@ table.bordepunteado1 { border-style: solid; border-collapse:collapse; border-wid
 	
 }
 </style>
-<?
-include('../config.php');				
-$cx = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
-$reb =mysql_db_query($database,"select * from empresa",$cx);
-$rwb =mysql_fetch_array($reb);
+<?php
+$reb =$cx->query("select * from empresa");
+$rwb = $reb->fetch_array();
 $cod_cgn = $rwb["cod_cgn"];
-$rea =mysql_db_query($database,"select * from aux_contaduria_gral",$cx);
-$rwa =mysql_fetch_array($rea);
+$rea =$cx->query("select * from aux_contaduria_gral");
+$rwa = $rea->fetch_array();
 $fecha = $rwa["fecha"];
 $fecha2 = explode("/", $fecha);
 $anno = $fecha2[0];
@@ -64,8 +64,9 @@ printf("
 </tr>
 ");
 $sq = "select cuenta,sum(inicial),sum(debito),sum(credito),sum(saldo),sum(corriente),sum(no_corriente) from aux_contaduria_gral_may group by left(cuenta,6)";
-$re = mysql_db_query($database, $sq, $cx)or die ($resultadoxx2 .mysql_error()."");
-while($rw = mysql_fetch_array($re)) 
+$re = $cx->query($sq);
+while($rw = $re->fetch_array())
+
 {
 		$cuenta=$rw["cuenta"];
 		$cod= substr($cuenta ,0,6);

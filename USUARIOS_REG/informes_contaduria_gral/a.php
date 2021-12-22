@@ -1,19 +1,21 @@
-<?
+<?php
 set_time_limit(600);
 session_start();
-if(!session_is_registered("login"))
+include('../config.php');
+global $server, $database, $dbpass, $dbuser, $charset;
+// Conexion con la base de datos
+$cx = new mysqli($server, $dbuser, $dbpass, $database);
+
+if(isset($_SESSION['user']))
 {
 header("Location: ../login.php");
 exit;
 } else {
 		
 	// verifico permisos del usuario
-		include('../config.php');
-		$cx = mysql_connect("$server","$dbuser","$dbpass")or die ("Conexion no Exitosa");
-		mysql_select_db("$database"); 
        	$sql="SELECT info FROM usuarios2 where login = '$_SESSION[login]'";
-		$res=mysql_db_query($database,$sql,$cx);
-		$rw =mysql_fetch_array($res);
+		$res=mysqli_query($cx,$sql);
+		$rw = mysqli_fetch_array($res);
 if ($rw['info']=='SI')
 {
 
@@ -68,7 +70,7 @@ a:active {
   <p><span class="Estilo1x">Antes de Proceder asegurese de : <br>
     <br>
     1. Haber actualizado todos los Mvtos Contables (Opciones 4.4 y/o 4.8 del Menu Principal). <br>
-    2. Haber cargado la interfaz Presupuesto - Contabilidad (Opcion 4.12 del menu Principal).<br>
+    2. Haber cargado la interfaz Presupuesto - Contabilidad (Opcion 4.12 del menu Principal). <br>
   <br>
     Caso Contrario, el Catalogo de Cuentas se generara de forma incorrecta.</span><br>
   </p>
@@ -79,13 +81,11 @@ a:active {
 
   <form id="form1" name="form1" method="post">
 <div align="center">
-<?
-include('../config.php');				
-$connectionxx = new mysqli($server, $dbuser, $dbpass, $database) or die ("Fallo en la Conexion a la Base de Datos");
+<?php
 $sqlxx = "select * from fecha";
-$resultadoxx = mysql_db_query($database, $sqlxx, $connectionxx);
+$resultadoxx = $cx->query($sqlxx);
 
-while($rowxx = mysql_fetch_array($resultadoxx)) 
+while($rowxx = $resultadoxx->fetch_assoc())
 {
 $ano=$rowxx["ano"];
 }
@@ -93,10 +93,10 @@ $anio = substr($ano,0,4);
 
 ?>	  
 <select name="corte" class="Estilo4" id="corte">
-<option value="<? printf("$anio/03/31");?>">A 31 DE MARZO DE <? printf("$anio");?></option>
-<option value="<? printf("$anio/06/30");?>">A 30 DE JUNIO DE <? printf("$anio");?></option>
-<option value="<? printf("$anio/09/30");?>">A 30 DE SEPTIEMBRE DE <? printf("$anio");?></option>
-<option value="<? printf("$anio/12/31");?>">A 31 DE DICIEMBRE DE <? printf("$anio");?></option>
+<option value="<?php printf("$anio/03/31");?>">A 31 DE MARZO DE <?php printf("$anio");?></option>
+<option value="<?php printf("$anio/06/30");?>">A 30 DE JUNIO DE <?php printf("$anio");?></option>
+<option value="<?php printf("$anio/09/30");?>">A 30 DE SEPTIEMBRE DE <?php printf("$anio");?></option>
+<option value="<?php printf("$anio/12/31");?>">A 31 DE DICIEMBRE DE <?php printf("$anio");?></option>
 </select>
 <br />
 <br />
@@ -104,20 +104,16 @@ $anio = substr($ano,0,4);
 </div>
 </form>
   <p>
-<?
-$corte = $_POST['corte'];
+<?php
+if (isset($_POST["corte"]))$corte = $_POST['corte']; else $corte = "";
 printf("<u><b><center class='EStilo4'>Fecha de Corte Seleccionada $corte </center></b></u>");
-include('../config.php');
-$base=$database;
-$conexion=mysql_connect ($server, $dbuser, $dbpass);
 //************* borro la tabla		
 $tabla6="aux_corte_cgn";
 $anadir6="truncate TABLE ";
 $anadir6.=$tabla6;
 $anadir6.=" ";
-mysql_select_db ($base, $conexion);
 
-		if(mysql_query ($anadir6 ,$conexion)) 
+		if($cx->query($anadir6)) 
 		{
 		echo "";
 		}
@@ -135,9 +131,10 @@ $tabla7="aux_corte_cgn";
 
 )TYPE=MyISAM AUTO_INCREMENT=1 COLLATE=latin1_general_ci ";
 		
-		mysql_select_db ($base, $conexion);
+		
 
-		if(mysql_query ($anadir7 ,$conexion)) 
+		if($cx->query($anadir7)) 
+		
 		{
 		echo "";
 		}
@@ -147,11 +144,11 @@ $tabla7="aux_corte_cgn";
 		}
 		
 $sql = "INSERT INTO aux_corte_cgn (corte) VALUES ('$corte')";
-mysql_query($sql, $conexion) or die(mysql_error());
+$cx->query($sql);
 
 //***
 $sql = "update aux_corte_cgn set corte='$corte'";
-$resultado = mysql_db_query($database, $sql, $conexion);
+$resultado = $cx->query($sql);
 		
 ?>    
     <a href="#" class="Estilo1x" id="enlaceajax"><b><br>
@@ -181,7 +178,7 @@ $resultado = mysql_db_query($database, $sql, $conexion);
 
 </body>
 </html> 
-<?
+<?php
 }else{ // si no tiene persisos de usuario
 	echo "<br><br><center>Usuario no tiene permisos en este m&oacute;dulo</center><br>";
 	echo "<center>Click <a href=\"../user.php\">aqu&iacute; para volver</a></center>";
